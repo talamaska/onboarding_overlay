@@ -114,15 +114,7 @@ void onboard(List<OnboardStep> steps, BuildContext context) {
             ? HitTestBehavior.opaque
             : HitTestBehavior.deferToChild,
           onTap: steps[i].tappable
-            ? () {
-                overlays.removeAt(0).remove();
-                if (overlays.isNotEmpty) overlay.insert(overlays[0]);
-                if (i + 1 >= steps.length) return;
-                steps[i + 1].proceed?.listen((_) {
-                  if (overlays.isNotEmpty) overlays.removeAt(0).remove();
-                  if (overlays.isNotEmpty) overlay.insert(overlays[0]);
-                });
-              }
+            ? () => _proceed(i, steps, overlays, overlay)
             : null,
           child: OnboardOverlay(
             step: steps[i],
@@ -132,11 +124,19 @@ void onboard(List<OnboardStep> steps, BuildContext context) {
       ),
     );
   });
-  overlay.insert(overlays[0]);
-  steps[0].proceed?.listen((_) {
-    if (overlays.isNotEmpty) overlays.removeAt(0).remove();
-    if (overlays.isNotEmpty) overlay.insert(overlays[0]);
-  });
+  _proceed(0, steps, overlays, overlay);
+}
+
+void _proceed(int i, List<OnboardStep> steps, List<OverlayEntry> overlays, OverlayState overlay) {
+  if (i != 0) overlays.removeAt(0).remove();
+  if (overlays.isNotEmpty) {
+    overlay.insert(overlays[0]);
+    StreamSubscription subscription;
+    subscription = steps[i].proceed?.listen((_) {
+      subscription.cancel();
+      _proceed(i + 1, steps, overlays, overlay);
+    });
+  }
 }
 
 class OnboardOverlay extends StatelessWidget {
