@@ -1,38 +1,39 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(App());
 
-class MyApp extends StatelessWidget {
+class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MaterialApp(
-    home: MyHomePage(),
+    home: Home(),
   );
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key}) : super(key: key);
-
+class Home extends StatefulWidget {
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _HomeState createState() => _HomeState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _HomeState extends State<Home> {
   List<OnboardStep> steps;
-  StreamController onboardStream;
+  StreamController proceed;
   int _counter = 0;
 
   void initState() {
     super.initState();
-    onboardStream = StreamController();
+    proceed = StreamController();
     steps = [
       OnboardStep(
-          key: GlobalKey(),
-          label: "Tap this to increment the counter",
-          tappable: false,
-          proceed: onboardStream.stream),
-      OnboardStep(key: GlobalKey(), label: "This is some instructional text"),
-      OnboardStep(key: GlobalKey(), label: "This displays the counter value"),
+        key: GlobalKey(),
+        label: "Tap to increment & continue",
+        shape: CircleBorder(),
+        tappable: false,
+        proceed: proceed.stream,
+      ),
+      OnboardStep(key: GlobalKey(), label: "Tap anywhere to continue."),
+      OnboardStep(key: GlobalKey(), label: "Easy to customise"),
+      OnboardStep(key: GlobalKey(), label: "Add steps for any widget"),
     ];
     WidgetsBinding.instance
       .addPostFrameCallback((_) => onboard(steps, context));
@@ -40,7 +41,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void dispose() {
-    onboardStream.close();
+    proceed.close();
     super.dispose();
   }
 
@@ -48,13 +49,13 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _counter++;
     });
-    onboardStream.add(null);
+    proceed.add(null);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(key: steps[3].key),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -92,8 +93,8 @@ class OnboardStep {
     @required this.key,
     @required this.label,
     this.shape: const RoundedRectangleBorder(
-        side: BorderSide(),
-        borderRadius: BorderRadius.all(Radius.circular(8.0))),
+      borderRadius: BorderRadius.all(Radius.circular(8.0)),
+    ),
     this.margin: const EdgeInsets.all(8.0),
     this.tappable: true,
     this.proceed,
@@ -113,16 +114,16 @@ void onboard(List<OnboardStep> steps, BuildContext context) {
             ? HitTestBehavior.opaque
             : HitTestBehavior.deferToChild,
           onTap: steps[i].tappable
-              ? () {
-                  overlays.removeAt(0).remove();
+            ? () {
+                overlays.removeAt(0).remove();
+                if (overlays.isNotEmpty) overlay.insert(overlays[0]);
+                if (i + 1 >= steps.length) return;
+                steps[i + 1].proceed?.listen((_) {
+                  if (overlays.isNotEmpty) overlays.removeAt(0).remove();
                   if (overlays.isNotEmpty) overlay.insert(overlays[0]);
-                  if (i + 1 >= steps.length) return;
-                  steps[i + 1].proceed?.listen((_) {
-                    if (overlays.isNotEmpty) overlays.removeAt(0).remove();
-                    if (overlays.isNotEmpty) overlay.insert(overlays[0]);
-                  });
-                }
-              : null,
+                });
+              }
+            : null,
           child: OnboardOverlay(
             step: steps[i],
             hole: offset & box.size,
