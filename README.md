@@ -11,12 +11,12 @@ An onboarding method that gets the user straight into the app and doesn't requir
       OnboardStep(
           key: GlobalKey(),
           label: "Tap to increment & continue",
-          //this sets the shape of the hole
+          //this sets the shape of the hole, defaults to a rounded rectangle
           shape: CircleBorder(),
-          //tappable defaults to true, which means any tap will proceed to the next step
+          //if tappable is false, tapping will not proceed to next step
           tappable: false,
-          //if set you false, you must provide a stream to listen to for when to proceed
-          proceed: onboardStream.stream,
+          //in this case, you must provide a stream to listen to for when to proceed
+          proceed: proceed1.stream,
           //you can also specify a margin
           margin: EdgeInsets.all(8.0),
       ),

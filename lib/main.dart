@@ -24,14 +24,14 @@ class _HomeState extends State<Home> {
     super.initState();
     proceed = StreamController();
     steps = [
+      OnboardStep(key: GlobalKey(), label: "Tap anywhere to continue"),
       OnboardStep(
         key: GlobalKey(),
-        label: "Tap to increment & continue",
+        label: "Tap only here to increment & continue",
         shape: CircleBorder(),
         tappable: false,
         proceed: proceed.stream,
       ),
-      OnboardStep(key: GlobalKey(), label: "Tap anywhere to continue."),
       OnboardStep(key: GlobalKey(), label: "Easy to customise"),
       OnboardStep(key: GlobalKey(), label: "Add steps for any widget"),
     ];
@@ -62,7 +62,7 @@ class _HomeState extends State<Home> {
           children: <Widget>[
             Text(
               'You have pushed the button this many times:',
-              key: steps[1].key,
+              key: steps[0].key,
             ),
             Text(
               '$_counter',
@@ -73,7 +73,7 @@ class _HomeState extends State<Home> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        key: steps[0].key,
+        key: steps[1].key,
         onPressed: _incrementCounter,
         child: Icon(Icons.add),
       ),
@@ -114,7 +114,7 @@ void onboard(List<OnboardStep> steps, BuildContext context) {
             ? HitTestBehavior.opaque
             : HitTestBehavior.deferToChild,
           onTap: steps[i].tappable
-            ? () => _proceed(i, steps, overlays, overlay)
+            ? () => _proceed(i+1, steps, overlays, overlay)
             : null,
           child: OnboardOverlay(
             step: steps[i],
@@ -146,19 +146,15 @@ class OnboardOverlay extends StatelessWidget {
       : this.hole = step.margin.inflateRect(hole);
 
   @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) => CustomPaint(
-        size: constraints.biggest,
-        painter: HolePainter(shape: step.shape, hole: hole),
-        foregroundPainter: LabelPainter(
-          label: step.label,
-          hole: hole,
-          viewport: MediaQuery.of(context).size,
-        ),
+  Widget build(BuildContext context) => CustomPaint(
+      child: Container(),
+      painter: HolePainter(shape: step.shape, hole: hole),
+      foregroundPainter: LabelPainter(
+        label: step.label,
+        hole: hole,
+        viewport: MediaQuery.of(context).size,
       ),
-    );
-  }
+  );
 }
 
 class HolePainter extends CustomPainter {
@@ -199,14 +195,14 @@ class LabelPainter extends CustomPainter {
   LabelPainter({this.label, this.hole, this.viewport});
 
   @override
-  void paint(Canvas canvas, Size canvasSize) {
+  void paint(Canvas canvas, Size size) {
     TextPainter p = TextPainter(
       text: TextSpan(text: label),
       textDirection: TextDirection.ltr,
     );
-    p.layout(maxWidth: canvasSize.width * 0.8);
+    p.layout(maxWidth: size.width * 0.8);
     Offset o = Offset(
-      canvasSize.width/2  - p.size.width/2,
+      size.width/2  - p.size.width/2,
       hole.center.dy <= viewport.height/2
         ? hole.bottom + p.size.height * 1.5
         : hole.top - p.size.height * 1.5,
