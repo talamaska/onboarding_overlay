@@ -1,0 +1,218 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => MaterialApp(
+    home: MyHomePage(),
+  );
+}
+
+class MyHomePage extends StatefulWidget {
+  MyHomePage({Key key}) : super(key: key);
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  List<OnboardStep> steps;
+  StreamController onboardStream;
+  int _counter = 0;
+
+  void initState() {
+    super.initState();
+    onboardStream = StreamController();
+    steps = [
+      OnboardStep(
+          key: GlobalKey(),
+          label: "Tap this to increment the counter",
+          tappable: false,
+          proceed: onboardStream.stream),
+      OnboardStep(key: GlobalKey(), label: "This is some instructional text"),
+      OnboardStep(key: GlobalKey(), label: "This displays the counter value"),
+    ];
+    WidgetsBinding.instance
+      .addPostFrameCallback((_) => onboard(steps, context));
+  }
+
+  @override
+  void dispose() {
+    onboardStream.close();
+    super.dispose();
+  }
+
+  void _incrementCounter() {
+    setState(() {
+      _counter++;
+    });
+    onboardStream.add(null);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              'You have pushed the button this many times:',
+              key: steps[1].key,
+            ),
+            Text(
+              '$_counter',
+              key: steps[2].key,
+              style: Theme.of(context).textTheme.display1,
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        key: steps[0].key,
+        onPressed: _incrementCounter,
+        child: Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+@immutable
+class OnboardStep {
+  final GlobalKey key;
+  final String label;
+  final ShapeBorder shape;
+  final EdgeInsets margin;
+  final bool tappable;
+  final Stream proceed;
+  OnboardStep({
+    @required this.key,
+    @required this.label,
+    this.shape: const RoundedRectangleBorder(
+        side: BorderSide(),
+        borderRadius: BorderRadius.all(Radius.circular(8.0))),
+    this.margin: const EdgeInsets.all(8.0),
+    this.tappable: true,
+    this.proceed,
+  });
+}
+
+void onboard(List<OnboardStep> steps, BuildContext context) {
+  OverlayState overlay = Overlay.of(context);
+  List<OverlayEntry> overlays = [];
+  List.generate(steps.length, (i) => i).forEach((i) {
+    RenderBox box = steps[i].key.currentContext.findRenderObject();
+    Offset offset = box.localToGlobal(Offset.zero);
+    overlays.add(
+      OverlayEntry(
+        builder: (context) => GestureDetector(
+          behavior: steps[i].tappable
+            ? HitTestBehavior.opaque
+            : HitTestBehavior.deferToChild,
+          onTap: steps[i].tappable
+              ? () {
+                  overlays.removeAt(0).remove();
+                  if (overlays.isNotEmpty) overlay.insert(overlays[0]);
+                  if (i + 1 >= steps.length) return;
+                  steps[i + 1].proceed?.listen((_) {
+                    if (overlays.isNotEmpty) overlays.removeAt(0).remove();
+                    if (overlays.isNotEmpty) overlay.insert(overlays[0]);
+                  });
+                }
+              : null,
+          child: OnboardOverlay(
+            step: steps[i],
+            hole: offset & box.size,
+          ),
+        ),
+      ),
+    );
+  });
+  overlay.insert(overlays[0]);
+  steps[0].proceed?.listen((_) {
+    if (overlays.isNotEmpty) overlays.removeAt(0).remove();
+    if (overlays.isNotEmpty) overlay.insert(overlays[0]);
+  });
+}
+
+class OnboardOverlay extends StatelessWidget {
+  final OnboardStep step;
+  final Rect hole;
+  OnboardOverlay({this.step, Rect hole})
+      : this.hole = step.margin.inflateRect(hole);
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) => CustomPaint(
+        size: constraints.biggest,
+        painter: HolePainter(shape: step.shape, hole: hole),
+        foregroundPainter: LabelPainter(
+          label: step.label,
+          hole: hole,
+          viewport: MediaQuery.of(context).size,
+        ),
+      ),
+    );
+  }
+}
+
+class HolePainter extends CustomPainter {
+  final ShapeBorder shape;
+  final Rect hole;
+  HolePainter({this.shape, this.hole});
+
+  @override
+  bool hitTest(Offset position) {
+    return !hole.contains(position);
+  }
+
+  @override
+  void paint(Canvas canvas, Size canvasSize) {
+    Path canvasPath = Path()
+      ..lineTo(canvasSize.width, 0)
+      ..lineTo(canvasSize.width, canvasSize.height)
+      ..lineTo(0, canvasSize.height)
+      ..close();
+    Path holePath = shape.getOuterPath(hole);
+    Path path = Path.combine(PathOperation.difference, canvasPath, holePath);
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = Color(0xaa000000)
+        ..style = PaintingStyle.fill,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_) => false;
+}
+
+class LabelPainter extends CustomPainter {
+  final String label;
+  final Rect hole;
+  final Size viewport;
+  LabelPainter({this.label, this.hole, this.viewport});
+
+  @override
+  void paint(Canvas canvas, Size canvasSize) {
+    TextPainter p = TextPainter(
+      text: TextSpan(text: label),
+      textDirection: TextDirection.ltr,
+    );
+    p.layout(maxWidth: canvasSize.width * 0.8);
+    Offset o = Offset(
+      canvasSize.width/2  - p.size.width/2,
+      hole.center.dy <= viewport.height/2
+        ? hole.bottom + p.size.height * 1.5
+        : hole.top - p.size.height * 1.5,
+    );
+    p.paint(canvas, o);
+  }
+
+  @override
+  bool shouldRepaint(_) => false;
+}
