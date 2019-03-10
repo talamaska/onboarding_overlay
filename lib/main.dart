@@ -45,7 +45,7 @@ class _HomeState extends State<Home> {
     super.dispose();
   }
 
-  void _incrementCounter() {
+  void _increment() {
     setState(() {
       _counter++;
     });
@@ -74,7 +74,7 @@ class _HomeState extends State<Home> {
       ),
       floatingActionButton: FloatingActionButton(
         key: steps[1].key,
-        onPressed: _incrementCounter,
+        onPressed: _increment,
         child: Icon(Icons.add),
       ),
     );
@@ -91,7 +91,7 @@ class OnboardStep {
   final Stream proceed;
   OnboardStep({
     @required this.key,
-    @required this.label,
+    this.label: "",
     this.shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.all(Radius.circular(8.0)),
     ),
