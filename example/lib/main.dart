@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'onboard_overlay.dart';
+import 'package:onboard_overlay/onboard_overlay.dart';
 
 void main() => runApp(App());
 
