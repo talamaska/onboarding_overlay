@@ -22,90 +22,123 @@ class OnboardStep {
 }
 
 void onboard(List<OnboardStep> steps, BuildContext context) {
-  OverlayState overlay = Overlay.of(context);
-  List<OverlayEntry> overlays = [];
-  List.generate(steps.length, (i) => i).forEach((i) {
-    RenderBox box = steps[i].key.currentContext.findRenderObject();
-    Offset offset = box.localToGlobal(Offset.zero);
-    overlays.add(
-      OverlayEntry(
-        builder: (context) => GestureDetector(
-              behavior: steps[i].tappable
-                  ? HitTestBehavior.opaque
-                  : HitTestBehavior.deferToChild,
-              onTap: steps[i].tappable
-                  ? () => _proceed(i + 1, steps, overlays, overlay)
-                  : null,
-              child: OnboardOverlay(
-                step: steps[i],
-                hole: offset & box.size,
-              ),
-            ),
+  Navigator.of(context).push(
+    OnboardRoute(
+      steps: steps,
+    )
+  );
+}
+
+class OnboardRoute extends TransitionRoute {
+  final List<OnboardStep> steps;
+  OnboardRoute({@required this.steps});
+
+  Widget buildTransitions(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
+    return FadeTransition(
+      opacity: animation,
+      child: child,
+    );
+  }
+
+  @override
+  Duration get transitionDuration => const Duration(milliseconds: 300);
+
+  @override
+  Iterable<OverlayEntry> createOverlayEntries() sync* {
+    yield OverlayEntry(
+      builder: (context) => buildTransitions(
+        context,
+        animation,
+        secondaryAnimation,
+        OnboardWidget(steps: steps),
       ),
     );
-  });
-  _proceed(0, steps, overlays, overlay);
-}
-
-void _proceed(int i, List<OnboardStep> steps, List<OverlayEntry> overlays,
-    OverlayState overlay) {
-  if (i != 0) overlays.removeAt(0).remove();
-  if (overlays.isNotEmpty) {
-    overlay.insert(overlays[0]);
-    StreamSubscription subscription;
-    subscription = steps[i].proceed?.listen((_) {
-      subscription.cancel();
-      _proceed(i + 1, steps, overlays, overlay);
-    });
   }
-}
-
-class OnboardOverlay extends StatefulWidget {
-  final OnboardStep step;
-  final Rect hole;
-  OnboardOverlay({this.step, Rect hole})
-      : this.hole = step.margin.inflateRect(hole);
 
   @override
-  _OnboardOverlayState createState() => _OnboardOverlayState();
+  bool get opaque => false;
+
 }
 
-class _OnboardOverlayState extends State<OnboardOverlay>
-    with SingleTickerProviderStateMixin {
+class OnboardWidget extends StatefulWidget {
+  final List<OnboardStep> steps;
+  OnboardWidget({this.steps});
+  
+  @override
+  _OnboardWidgetState createState() => _OnboardWidgetState();
+}
+
+class _OnboardWidgetState extends State<OnboardWidget> with SingleTickerProviderStateMixin {
+  int index = 0;
+  RectTween _hole;
   AnimationController _controller;
   Animation _animation;
-  RectTween _hole;
 
-  @override
-  void initState() {
+  void initState() { 
     super.initState();
-    _hole =
-        RectTween(begin: Rect.zero.shift(widget.hole.center), end: widget.hole);
-    _controller =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 400));
-    _animation = _controller.drive(CurveTween(curve: Curves.ease));
-    _controller.forward();
-    _animation.addListener(() => setState(() {}));
+    _controller = AnimationController(vsync: this, duration: Duration(milliseconds: 150));
+    _hole = RectTween(begin: Rect.zero, end: Rect.zero);
+    _animation = AlwaysStoppedAnimation(0);
+    _controller.addListener(() => setState((){}));
+    _proceed(init: true);
   }
 
   @override
-  void dispose() {
+  void dispose() { 
     _controller.dispose();
     super.dispose();
   }
 
+  void _proceed({bool init: false}) async {
+    if (init) {
+      index = 0;
+    } else {
+      await _controller.reverse();
+      index++;
+      if (index >= widget.steps.length) {
+        index--;
+        Navigator.of(context).pop();
+        return;
+      }
+    }
+    RenderBox box = widget.steps[index].key?.currentContext?.findRenderObject();
+    Offset offset = box?.localToGlobal(Offset.zero);
+    Rect widgetRect = (offset ?? MediaQuery.of(context).size.center(Offset.zero)) & (box?.size ?? Size.zero);
+    _hole = RectTween(
+        begin: Rect.zero.shift(widgetRect.center),
+        end: widget.steps[index].margin.inflateRect(widgetRect),
+    );
+    _animation = CurvedAnimation(curve: Curves.ease, parent: _controller);
+    StreamSubscription subscription;
+    subscription = widget.steps[index].proceed?.listen((_) {
+      subscription.cancel();
+      _proceed();
+    });
+    _controller.forward();
+  }
+
   @override
-  Widget build(BuildContext context) => CustomPaint(
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: widget.steps[index].tappable
+          ? HitTestBehavior.opaque
+          : HitTestBehavior.deferToChild,
+      onTap: widget.steps[index].tappable
+          ? _proceed
+          : null,
+      child: CustomPaint(
         child: Container(),
         painter: HolePainter(
-            shape: widget.step.shape, hole: _hole.evaluate(_animation)),
+            shape: widget.steps[index].shape, hole: _hole.evaluate(_animation)),
         foregroundPainter: LabelPainter(
-          label: widget.step.label,
+          label: widget.steps[index].label,
           opacity: _animation.value,
           hole: _hole.end,
           viewport: MediaQuery.of(context).size,
         ),
-      );
+      ),
+    );
+  }
 }
 
 class HolePainter extends CustomPainter {
