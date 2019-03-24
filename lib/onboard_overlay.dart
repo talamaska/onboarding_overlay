@@ -78,7 +78,7 @@ class _OnboardWidgetState extends State<OnboardWidget> with SingleTickerProvider
     super.initState();
     _controller = AnimationController(vsync: this, duration: Duration(milliseconds: 150));
     _hole = RectTween(begin: Rect.zero, end: Rect.zero);
-    _animation = AlwaysStoppedAnimation(0);
+    _animation = AlwaysStoppedAnimation<double>(0.0);
     _controller.addListener(() => setState((){}));
     _proceed(init: true);
   }
@@ -103,11 +103,14 @@ class _OnboardWidgetState extends State<OnboardWidget> with SingleTickerProvider
     }
     RenderBox box = widget.steps[index].key?.currentContext?.findRenderObject();
     Offset offset = box?.localToGlobal(Offset.zero);
-    Rect widgetRect = (offset ?? MediaQuery.of(context).size.center(Offset.zero)) & (box?.size ?? Size.zero);
-    _hole = RectTween(
-        begin: Rect.zero.shift(widgetRect.center),
-        end: widget.steps[index].margin.inflateRect(widgetRect),
-    );
+    Rect widgetRect = box != null
+      ? offset & box.size
+      : null;
+    _hole = widgetRect != null 
+      ? RectTween(
+          begin: Rect.zero.shift(widgetRect.center),
+          end: widget.steps[index].margin.inflateRect(widgetRect),
+      ) : null;
     _animation = CurvedAnimation(curve: Curves.ease, parent: _controller);
     StreamSubscription subscription;
     subscription = widget.steps[index].proceed?.listen((_) {
@@ -129,11 +132,11 @@ class _OnboardWidgetState extends State<OnboardWidget> with SingleTickerProvider
       child: CustomPaint(
         child: Container(),
         painter: HolePainter(
-            shape: widget.steps[index].shape, hole: _hole.evaluate(_animation)),
+            shape: widget.steps[index].shape, hole: _hole?.evaluate(_animation)),
         foregroundPainter: LabelPainter(
           label: widget.steps[index].label,
           opacity: _animation.value,
-          hole: _hole.end,
+          hole: _hole?.end,
           viewport: MediaQuery.of(context).size,
         ),
       ),
@@ -148,7 +151,7 @@ class HolePainter extends CustomPainter {
 
   @override
   bool hitTest(Offset position) {
-    return !hole.contains(position);
+    return !(hole?.contains(position) ?? false);
   }
 
   @override
@@ -158,7 +161,7 @@ class HolePainter extends CustomPainter {
       ..lineTo(canvasSize.width, canvasSize.height)
       ..lineTo(0, canvasSize.height)
       ..close();
-    Path holePath = shape.getOuterPath(hole);
+    Path holePath = shape.getOuterPath(hole ?? Rect.zero);
     Path path = Path.combine(PathOperation.difference, canvasPath, holePath);
     canvas.drawPath(
       path,
@@ -185,15 +188,18 @@ class LabelPainter extends CustomPainter {
       text: TextSpan(
           text: label,
           style: TextStyle(color: Color.fromRGBO(255, 255, 255, opacity))),
+      textAlign: TextAlign.center,
       textDirection: TextDirection.ltr,
     );
     p.layout(maxWidth: size.width * 0.8);
     Offset o = Offset(
-      size.width / 2 - p.size.width / 2,
-      hole.center.dy <= viewport.height / 2
-          ? hole.bottom + p.size.height * 1.5
-          : hole.top - p.size.height * 1.5,
-    );
+        size.width / 2 - p.size.width / 2,
+        hole == null
+          ? Rect.fromPoints(Offset.zero, size.bottomRight(Offset.zero)).center.dy
+          : hole.center.dy <= viewport.height / 2
+            ? hole.bottom + p.size.height * 1.5
+            : hole.top - p.size.height * 1.5,
+      );
     p.paint(canvas, o);
   }
 
