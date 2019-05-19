@@ -1,4 +1,4 @@
-# overlay_onboard
+# onboard_overlay
 
 An onboarding method that gets the user straight into the app and doesn't require any splash screens.
 
