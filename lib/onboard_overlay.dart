@@ -13,6 +13,7 @@ class OnboardStep {
     this.margin = const EdgeInsets.all(8.0),
     this.tappable = true,
     this.proceed,
+    this.callback,
   });
   final GlobalKey key;
   final String label;
@@ -20,6 +21,7 @@ class OnboardStep {
   final EdgeInsets margin;
   final bool tappable;
   final Stream<dynamic> proceed;
+  final Function callback;
 }
 
 void onboard(List<OnboardStep> steps, BuildContext context) {
@@ -105,11 +107,15 @@ class _OnboardWidgetState extends State<OnboardWidget>
       index = 0;
     } else {
       await _controller.reverse();
-      index++;
-      if (index >= widget.steps.length) {
-        index--;
+      if (index + 1 >= widget.steps.length && _lastScreen == false) {
+        _lastScreen = true;
         Navigator.of(context).pop();
         return;
+      } else if (_lastScreen == false) {
+        index++;
+        if (widget.steps[index].callback != null) {
+          widget.steps[index].callback();
+        }
       }
     }
 
@@ -156,7 +162,10 @@ class _OnboardWidgetState extends State<OnboardWidget>
 }
 
 class HolePainter extends CustomPainter {
-  HolePainter({this.shape, this.hole});
+  HolePainter({
+    this.shape,
+    this.hole,
+  });
 
   final ShapeBorder shape;
   final Rect hole;
@@ -174,8 +183,11 @@ class HolePainter extends CustomPainter {
       ..lineTo(0, size.height)
       ..close();
     final Path holePath = shape.getOuterPath(hole ?? Rect.zero);
-    final Path path =
-        Path.combine(PathOperation.difference, canvasPath, holePath);
+    final Path path = Path.combine(
+      PathOperation.difference,
+      canvasPath,
+      holePath,
+    );
     canvas.drawPath(
       path,
       Paint()
@@ -189,7 +201,12 @@ class HolePainter extends CustomPainter {
 }
 
 class LabelPainter extends CustomPainter {
-  LabelPainter({this.label, this.opacity, this.hole, this.viewport});
+  LabelPainter({
+    this.label,
+    this.opacity,
+    this.hole,
+    this.viewport,
+  });
 
   final String label;
   final double opacity;
@@ -198,7 +215,7 @@ class LabelPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    TextPainter p = TextPainter(
+    final TextPainter p = TextPainter(
       text: TextSpan(
         text: label,
         style: TextStyle(
