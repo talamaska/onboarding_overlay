@@ -47,6 +47,9 @@ class _HomeState extends State<Home> {
       OnboardStep(
         key: GlobalKey(),
         label: 'Add steps for any widget',
+        callback: () {
+          _increment();
+        },
       ),
       const OnboardStep(
         key: null,

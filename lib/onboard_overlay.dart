@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 @immutable
@@ -161,8 +162,9 @@ class _OnboardWidgetState extends State<OnboardWidget>
       child: CustomPaint(
         child: Container(),
         painter: HolePainter(
-            shape: widget.steps[index].shape,
-            hole: _hole?.evaluate(_animation)),
+          shape: widget.steps[index].shape,
+          hole: _hole?.evaluate(_animation),
+        ),
         foregroundPainter: LabelPainter(
           label: widget.steps[index].label,
           color: widget.steps[index].color,
