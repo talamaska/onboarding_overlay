@@ -18,27 +18,37 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   List<OnboardStep> steps;
-  StreamController proceed;
+  StreamController<dynamic> proceed;
   int _counter = 0;
 
   void initState() {
     super.initState();
-    proceed = StreamController();
-    steps = [
-      OnboardStep(key: GlobalKey(), label: "Tap anywhere to continue"),
+    proceed = StreamController<dynamic>();
+    steps = <OnboardStep>[
       OnboardStep(
         key: GlobalKey(),
-        label: "Tap only here to increment & continue",
-        shape: CircleBorder(),
+        label: 'Tap anywhere to continue',
+      ),
+      OnboardStep(
+        key: GlobalKey(),
+        label: 'Tap only here to increment & continue',
+        shape: const CircleBorder(),
         tappable: false,
         proceed: proceed.stream,
       ),
-      OnboardStep(key: GlobalKey(), label: "Easy to customise"),
-      OnboardStep(key: GlobalKey(), label: "Add steps for any widget"),
       OnboardStep(
-          key: null,
-          label: "Or no widget at all! You're all done!",
-          margin: EdgeInsets.zero),
+        key: GlobalKey(),
+        label: 'Easy to customise',
+      ),
+      OnboardStep(
+        key: GlobalKey(),
+        label: 'Add steps for any widget',
+      ),
+      const OnboardStep(
+        key: null,
+        label: "Or no widget at all! You're all done!",
+        margin: EdgeInsets.zero,
+      ),
     ];
     WidgetsBinding.instance
         .addPostFrameCallback((_) => onboard(steps, context));
@@ -72,7 +82,7 @@ class _HomeState extends State<Home> {
             Text(
               '$_counter',
               key: steps[2].key,
-              style: Theme.of(context).textTheme.display1,
+              style: Theme.of(context).textTheme.headline4,
             ),
           ],
         ),
@@ -80,7 +90,7 @@ class _HomeState extends State<Home> {
       floatingActionButton: FloatingActionButton(
         key: steps[1].key,
         onPressed: _increment,
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
