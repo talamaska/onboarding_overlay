@@ -35,7 +35,10 @@ class _HomeState extends State<Home> {
       ),
       OnboardStep(key: GlobalKey(), label: "Easy to customise"),
       OnboardStep(key: GlobalKey(), label: "Add steps for any widget"),
-      OnboardStep(key: null, label: "Or no widget at all! You're all done!", margin: EdgeInsets.zero),
+      OnboardStep(
+          key: null,
+          label: "Or no widget at all! You're all done!",
+          margin: EdgeInsets.zero),
     ];
     WidgetsBinding.instance
         .addPostFrameCallback((_) => onboard(steps, context));
