@@ -28,6 +28,10 @@ class _HomeState extends State<Home> {
       OnboardStep(
         key: GlobalKey(),
         label: 'Tap anywhere to continue',
+        color: Colors.red,
+        hasLabelBox: true,
+        labelBoxColor: Colors.yellow,
+        hasArrow: true,
       ),
       OnboardStep(
         key: GlobalKey(),

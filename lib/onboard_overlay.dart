@@ -14,7 +14,14 @@ class OnboardStep {
     this.tappable = true,
     this.proceed,
     this.callback,
+    this.color = const Color(0xFFFFFFFF),
+    this.style,
+    this.labelBoxRadius = 10.0,
+    this.labelBoxColor = const Color(0xFF0A76F1),
+    this.hasLabelBox = false,
+    this.hasArrow = false,
   });
+
   final GlobalKey key;
   final String label;
   final ShapeBorder shape;
@@ -22,6 +29,12 @@ class OnboardStep {
   final bool tappable;
   final Stream<dynamic> proceed;
   final Function callback;
+  final Color color;
+  final TextStyle style;
+  final double labelBoxRadius;
+  final Color labelBoxColor;
+  final bool hasLabelBox;
+  final bool hasArrow;
 }
 
 void onboard(List<OnboardStep> steps, BuildContext context) {
@@ -152,6 +165,12 @@ class _OnboardWidgetState extends State<OnboardWidget>
             hole: _hole?.evaluate(_animation)),
         foregroundPainter: LabelPainter(
           label: widget.steps[index].label,
+          color: widget.steps[index].color,
+          style: widget.steps[index].style,
+          labelBoxColor: widget.steps[index].labelBoxColor,
+          labelBoxRadius: widget.steps[index].labelBoxRadius,
+          hasArrow: widget.steps[index].hasArrow,
+          hasLabelBox: widget.steps[index].hasLabelBox,
           opacity: _animation.value,
           hole: _hole?.end,
           viewport: MediaQuery.of(context).size,
@@ -206,42 +225,110 @@ class LabelPainter extends CustomPainter {
     this.opacity,
     this.hole,
     this.viewport,
+    this.color = const Color(0xFFFFFFFF),
+    this.style,
+    this.labelBoxRadius = 10.0,
+    this.labelBoxColor = const Color(0xFF0A76F1),
+    this.hasLabelBox = false,
+    this.hasArrow = false,
   });
 
   final String label;
   final double opacity;
   final Rect hole;
   final Size viewport;
+  final Color color;
+  final TextStyle style;
+  final double labelBoxRadius;
+  final Color labelBoxColor;
+  final bool hasLabelBox;
+  final bool hasArrow;
 
   @override
   void paint(Canvas canvas, Size size) {
     final TextPainter p = TextPainter(
       text: TextSpan(
         text: label,
-        style: TextStyle(
-          color: Color.fromRGBO(
-            255,
-            255,
-            255,
-            opacity,
-          ),
-        ),
+        style: style ??
+            TextStyle(
+              color: color.withOpacity(opacity),
+            ),
       ),
       textAlign: TextAlign.center,
       textDirection: TextDirection.ltr,
     );
+
     p.layout(maxWidth: size.width * 0.8);
-    final Offset o = Offset(
+
+    final Offset offset = Offset(
       size.width / 2 - p.size.width / 2,
       hole == null
           ? Rect.fromPoints(Offset.zero, size.bottomRight(Offset.zero))
               .center
               .dy
           : hole.center.dy <= viewport.height / 2
-              ? hole.bottom + p.size.height * 1.5
-              : hole.top - p.size.height * 1.5,
+              ? hole.bottom + p.size.height * (hasLabelBox ? 2.5 : 1.5)
+              : hole.top - p.size.height * (hasLabelBox ? 2.5 : 1.5),
     );
-    p.paint(canvas, o);
+
+    final Paint labelBoxPaint = Paint()
+      ..color = labelBoxColor
+      ..style = PaintingStyle.fill;
+
+    final Path triangleTop = Path()
+      ..moveTo(
+        offset.dx + p.size.width / 2,
+        offset.dy - p.size.height * 1.2,
+      )
+      ..lineTo(
+        offset.dx + p.size.width / 2 - p.size.height / 2,
+        offset.dy - p.size.height / 2 + 1,
+      )
+      ..lineTo(
+        offset.dx + p.size.width / 2 + p.size.height / 2,
+        offset.dy - p.size.height / 2 + 1,
+      )
+      ..close();
+
+    final Path triangleBottom = Path()
+      ..moveTo(
+        offset.dx + p.size.width / 2,
+        offset.dy + p.size.height * 2.2,
+      )
+      ..lineTo(
+        offset.dx + p.size.width / 2 - p.size.height / 2,
+        offset.dy + p.size.height + p.size.height / 2 - 1,
+      )
+      ..lineTo(
+        offset.dx + p.size.width / 2 + p.size.height / 2,
+        offset.dy + p.size.height + p.size.height / 2 - 1,
+      )
+      ..close();
+
+    if (hasLabelBox) {
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(
+            offset.dx - p.size.height / 2,
+            offset.dy - p.size.height / 2,
+            p.size.width + p.size.height,
+            p.size.height + p.size.height,
+          ),
+          Radius.circular(labelBoxRadius),
+        ),
+        labelBoxPaint,
+      );
+      debugPrint('hasArrow $hasArrow');
+      if (hole != null && hasArrow) {
+        if (hole.center.dy <= viewport.height / 2) {
+          canvas.drawPath(triangleTop, labelBoxPaint);
+        } else {
+          canvas.drawPath(triangleBottom, labelBoxPaint);
+        }
+      }
+    }
+
+    p.paint(canvas, offset);
   }
 
   @override
