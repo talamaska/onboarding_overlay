@@ -147,9 +147,9 @@ class _OnboardWidgetState extends State<OnboardWidget>
           )
         : null;
     _colorTween = ColorTween(
-      begin: widget.steps[index - 1] != null
+      begin: index > 0
           ? widget.steps[index - 1].overlayColor
-          : const Color(0x00000000),
+          : widget.steps[index].overlayColor,
       end: widget.steps[index].overlayColor,
     );
     _animation = CurvedAnimation(curve: Curves.ease, parent: _controller);
