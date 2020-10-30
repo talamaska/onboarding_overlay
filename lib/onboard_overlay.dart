@@ -15,8 +15,9 @@ class OnboardStep {
     this.tappable = true,
     this.proceed,
     this.callback,
-    this.color = const Color(0xFFFFFFFF),
-    this.style,
+    this.overlayColor = const Color(0xaa000000),
+    this.textColor = const Color(0xFFFFFFFF),
+    this.textStyle,
     this.labelBoxRadius = 10.0,
     this.labelBoxColor = const Color(0xFF0A76F1),
     this.hasLabelBox = false,
@@ -30,8 +31,9 @@ class OnboardStep {
   final bool tappable;
   final Stream<dynamic> proceed;
   final Function callback;
-  final Color color;
-  final TextStyle style;
+  final Color textColor;
+  final Color overlayColor;
+  final TextStyle textStyle;
   final double labelBoxRadius;
   final Color labelBoxColor;
   final bool hasLabelBox;
@@ -93,6 +95,7 @@ class _OnboardWidgetState extends State<OnboardWidget>
     with SingleTickerProviderStateMixin {
   int index = 0;
   RectTween _hole;
+  ColorTween _colorTween;
   AnimationController _controller;
   Animation<double> _animation;
   bool _lastScreen = false;
@@ -143,6 +146,12 @@ class _OnboardWidgetState extends State<OnboardWidget>
             end: widget.steps[index].margin.inflateRect(widgetRect),
           )
         : null;
+    _colorTween = ColorTween(
+      begin: widget.steps[index - 1] != null
+          ? widget.steps[index - 1].overlayColor
+          : const Color(0x00000000),
+      end: widget.steps[index].overlayColor,
+    );
     _animation = CurvedAnimation(curve: Curves.ease, parent: _controller);
     StreamSubscription<dynamic> subscription;
     subscription = widget.steps[index].proceed?.listen((dynamic _) {
@@ -164,11 +173,12 @@ class _OnboardWidgetState extends State<OnboardWidget>
         painter: HolePainter(
           shape: widget.steps[index].shape,
           hole: _hole?.evaluate(_animation),
+          overlayColor: _colorTween?.evaluate(_animation),
         ),
         foregroundPainter: LabelPainter(
           label: widget.steps[index].label,
-          color: widget.steps[index].color,
-          style: widget.steps[index].style,
+          color: widget.steps[index].textColor,
+          style: widget.steps[index].textStyle,
           labelBoxColor: widget.steps[index].labelBoxColor,
           labelBoxRadius: widget.steps[index].labelBoxRadius,
           hasArrow: widget.steps[index].hasArrow,
@@ -186,10 +196,12 @@ class HolePainter extends CustomPainter {
   HolePainter({
     this.shape,
     this.hole,
+    this.overlayColor = const Color(0xaa000000),
   });
 
   final ShapeBorder shape;
   final Rect hole;
+  final Color overlayColor;
 
   @override
   bool hitTest(Offset position) {
@@ -212,7 +224,7 @@ class HolePainter extends CustomPainter {
     canvas.drawPath(
       path,
       Paint()
-        ..color = const Color(0xaa000000)
+        ..color = overlayColor
         ..style = PaintingStyle.fill,
     );
   }
