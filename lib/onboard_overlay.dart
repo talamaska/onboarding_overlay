@@ -124,15 +124,11 @@ class _OnboardWidgetState extends State<OnboardWidget>
       index = 0;
     } else {
       await _controller.reverse();
-      if (index + 1 >= widget.steps.length && _lastScreen == false) {
-        _lastScreen = true;
+      index++;
+      if (index >= widget.steps.length) {
+        index--;
         Navigator.of(context).pop();
         return;
-      } else if (_lastScreen == false) {
-        index++;
-        if (widget.steps[index].callback != null) {
-          widget.steps[index].callback();
-        }
       }
     }
 
