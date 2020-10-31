@@ -1,8 +1,14 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:onboard_overlay/onboard_overlay.dart';
 
-void main() => runApp(App());
+void main() {
+  // timeDilation = 2;
+
+  runApp(App());
+}
+
+final GlobalKey<OnboardingState> onboadingKey = GlobalKey<OnboardingState>();
 
 class App extends StatelessWidget {
   @override
@@ -18,12 +24,11 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   List<OnboardStep> steps;
-  StreamController<dynamic> proceed;
   int _counter = 0;
 
+  @override
   void initState() {
     super.initState();
-    proceed = StreamController<dynamic>();
     steps = <OnboardStep>[
       OnboardStep(
         key: GlobalKey(),
@@ -37,9 +42,11 @@ class _HomeState extends State<Home> {
         key: GlobalKey(),
         label: 'Tap only here to increment & continue',
         shape: const CircleBorder(),
-        tappable: false,
-        proceed: proceed.stream,
+        // tappable: false,
+        // proceed: proceed.stream,
         overlayColor: Colors.blue.withOpacity(0.8),
+        fullscreen: false,
+        overlayShape: const CircleBorder(),
       ),
       OnboardStep(
         key: GlobalKey(),
@@ -50,9 +57,6 @@ class _HomeState extends State<Home> {
         key: GlobalKey(),
         label: 'Add steps for any widget',
         overlayColor: Colors.green.withOpacity(0.8),
-        callback: () {
-          _increment();
-        },
       ),
       const OnboardStep(
         key: null,
@@ -60,13 +64,10 @@ class _HomeState extends State<Home> {
         margin: EdgeInsets.zero,
       ),
     ];
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => onboard(steps, context));
   }
 
   @override
   void dispose() {
-    proceed.close();
     super.dispose();
   }
 
@@ -74,33 +75,43 @@ class _HomeState extends State<Home> {
     setState(() {
       _counter++;
     });
-    proceed.add(null);
+    // proceed.add(null);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(key: steps[3].key),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-              key: steps[0].key,
-            ),
-            Text(
-              '$_counter',
-              key: steps[2].key,
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
+    return Onboarding(
+      key: onboadingKey,
+      steps: steps,
+      onChanged: (int index) {
+        debugPrint('----index $index');
+      },
+      child: Scaffold(
+        appBar: AppBar(key: steps[3].key),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                'You have pushed the button this many times:',
+                key: steps[0].key,
+              ),
+              Text(
+                '$_counter',
+                key: steps[2].key,
+                style: Theme.of(context).textTheme.headline4,
+              ),
+            ],
+          ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        key: steps[1].key,
-        onPressed: _increment,
-        child: const Icon(Icons.add),
+        floatingActionButton: FloatingActionButton(
+          key: steps[1].key,
+          onPressed: () {
+            onboadingKey.currentState.show();
+            _increment();
+          },
+          child: const Icon(Icons.add),
+        ),
       ),
     );
   }
