@@ -145,13 +145,13 @@ class _OnboardWidgetState extends State<OnboardWidget>
       index = 0;
     } else {
       await _controller.reverse();
-      index++;
-
-      if (index >= widget.steps.length) {
-        index--;
+      if (index < widget.steps.length - 1) {
+        index++;
+      } else {
         widget.onEnd();
         return;
       }
+
       if (widget.onChanged != null) {
         widget.onChanged(index);
       }

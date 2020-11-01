@@ -31,7 +31,9 @@ class OnboardingState extends State<Onboarding> {
   }
 
   void hide() {
-    widget.onEnd();
+    if (widget.onEnd != null) {
+      widget.onEnd();
+    }
     _overlayEntry.remove();
   }
 
@@ -44,24 +46,18 @@ class OnboardingState extends State<Onboarding> {
     return OverlayEntry(
         opaque: false,
         builder: (BuildContext context) {
-          return Navigator(
-            initialRoute: '/onboarding',
-            onGenerateRoute: (RouteSettings settings) {
-              return OnboardingRoute(
-                builder: (BuildContext context) {
-                  return OnboardWidget(
-                    initialIndex: index ?? widget.initialIndex,
-                    steps: widget.steps,
-                    onChanged: (int index) {
-                      debugPrint('+++++++++++++ index $index');
-                    },
-                    onEnd: () {
-                      debugPrint('end');
-                      // hide();
-                    },
-                  );
-                },
-              );
+          return OnboardWidget(
+            initialIndex: index ?? widget.initialIndex,
+            steps: widget.steps,
+            onChanged: (int index) {
+              debugPrint('+++++++++++++ index $index');
+              if (widget.onChanged != null) {
+                widget.onChanged(index);
+              }
+            },
+            onEnd: () {
+              debugPrint('end');
+              hide();
             },
           );
         });
