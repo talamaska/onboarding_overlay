@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 const double kOverlayRatio = 0.65;
@@ -6,7 +8,8 @@ const double kOverlayRatio = 0.65;
 class OnboardStep {
   const OnboardStep({
     @required this.key,
-    this.label = '',
+    this.title,
+    this.bodyText = '',
     this.shape = const RoundedRectangleBorder(
       borderRadius: BorderRadius.all(Radius.circular(8.0)),
     ),
@@ -17,7 +20,7 @@ class OnboardStep {
     // this.tappable = true,
     // this.proceed,
     // this.callback,
-    this.overlayColor = const Color(0xaa000000),
+    this.overlayColor = const Color(0xC4000000),
     this.textColor = const Color(0xFFFFFFFF),
     this.textStyle,
     this.labelBoxRadius = 10.0,
@@ -28,7 +31,8 @@ class OnboardStep {
   });
 
   final GlobalKey key;
-  final String label;
+  final String title;
+  final String bodyText;
   final ShapeBorder shape;
   final ShapeBorder overlayShape;
   final EdgeInsets margin;
@@ -43,6 +47,50 @@ class OnboardStep {
   final bool hasLabelBox;
   final bool hasArrow;
   final bool fullscreen;
+
+  @override
+  bool operator ==(Object o) {
+    if (identical(this, o)) return true;
+
+    return o is OnboardStep &&
+        o.key == key &&
+        o.bodyText == bodyText &&
+        o.title == title &&
+        o.shape == shape &&
+        o.overlayShape == overlayShape &&
+        o.margin == margin &&
+        o.textColor == textColor &&
+        o.overlayColor == overlayColor &&
+        o.textStyle == textStyle &&
+        o.labelBoxRadius == labelBoxRadius &&
+        o.labelBoxColor == labelBoxColor &&
+        o.hasLabelBox == hasLabelBox &&
+        o.hasArrow == hasArrow &&
+        o.fullscreen == fullscreen;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode ^
+        title.hashCode ^
+        bodyText.hashCode ^
+        shape.hashCode ^
+        overlayShape.hashCode ^
+        margin.hashCode ^
+        textColor.hashCode ^
+        overlayColor.hashCode ^
+        textStyle.hashCode ^
+        labelBoxRadius.hashCode ^
+        labelBoxColor.hashCode ^
+        hasLabelBox.hashCode ^
+        hasArrow.hashCode ^
+        fullscreen.hashCode;
+  }
+
+  @override
+  String toString() {
+    return 'OnboardStep(key: $key, bodyText: $bodyText, title: $title, shape: $shape, overlayShape: $overlayShape, margin: $margin, textColor: $textColor, overlayColor: $overlayColor, textStyle: $textStyle, labelBoxRadius: $labelBoxRadius, labelBoxColor: $labelBoxColor, hasLabelBox: $hasLabelBox, hasArrow: $hasArrow, fullscreen: $fullscreen)';
+  }
 }
 
 void onboard(List<OnboardStep> steps, BuildContext context) {
@@ -115,6 +163,7 @@ class _OnboardWidgetState extends State<OnboardWidget>
   ColorTween _colorTween;
   AnimationController _controller;
   Animation<double> _animation;
+  Rect _widgetRect;
 
   @override
   void initState() {
@@ -162,11 +211,11 @@ class _OnboardWidgetState extends State<OnboardWidget>
 
       _holeOffset = box?.localToGlobal(Offset.zero);
 
-      final Rect widgetRect = box != null ? _holeOffset & box.size : null;
-      _hole = widgetRect != null
+      _widgetRect = box != null ? _holeOffset & box.size : null;
+      _hole = _widgetRect != null
           ? RectTween(
-              begin: Rect.zero.shift(widgetRect.center),
-              end: widget.steps[index].margin.inflateRect(widgetRect),
+              begin: Rect.zero.shift(_widgetRect.center),
+              end: widget.steps[index].margin.inflateRect(_widgetRect),
             )
           : null;
 
@@ -182,36 +231,119 @@ class _OnboardWidgetState extends State<OnboardWidget>
     }
   }
 
+  double _getHorizontalPosition(OnboardStep step, Size size) {
+    if (step.fullscreen) {
+      return (size.width - size.width * 0.55) / 2;
+    } else {
+      if (step.margin.inflateRect(_widgetRect).center.dx > size.width / 2) {
+        return _widgetRect.center.dx - size.width * 0.55;
+      } else {
+        return (size.width - size.width * 0.55) / 2;
+      }
+    }
+  }
+
+  double _getVerticalPosition(OnboardStep step, Size size) {
+    if (_widgetRect != null) {
+      if (step.fullscreen) {
+        if (step.margin.inflateRect(_widgetRect).center.dy > size.height / 2) {
+          return step.margin.inflateRect(_widgetRect).top -
+              size.width * 0.45 -
+              step.margin.bottom * 2;
+        } else {
+          return step.margin.inflateRect(_widgetRect).bottom +
+              step.margin.bottom * 2;
+        }
+      } else {
+        if (_widgetRect.center.dy > size.height / 2) {
+          return _widgetRect.top - size.width * 0.45;
+        } else {
+          return _widgetRect.bottom + size.width * 0.45;
+        }
+      }
+    } else {
+      return size.height / 2 - size.width * 0.45 / 2;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
+    // RenderBox renderBox = context.findRenderObject() as RenderBox;
+    // var size = renderBox.size;
+    // var offset = renderBox.localToGlobal(Offset.zero);
+    // left: offset.dx,
+    //     top: offset.dy + size.height + 5.0,
+    //     width: size.width,
+    // debugPrint('step ${widget.steps[index]}');
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: _proceed,
-      child: CustomPaint(
-        child: Container(),
-        painter: HolePainter(
-          fullscreen: widget.steps[index].fullscreen,
-          shape: widget.steps[index].shape,
-          overlayShape: widget.steps[index].overlayShape,
-          center: _holeOffset,
-          hole: _hole?.evaluate(_animation),
-          animation: _animation.value,
-          overlayColor: _colorTween?.evaluate(_animation),
-        ),
-        foregroundPainter: LabelPainter(
-          label: widget.steps[index].label,
-          color: widget.steps[index].textColor,
-          style: widget.steps[index].textStyle,
-          margin: widget.steps[index].margin,
-          labelBoxColor: widget.steps[index].labelBoxColor,
-          labelBoxRadius: widget.steps[index].labelBoxRadius,
-          hasArrow: widget.steps[index].hasArrow,
-          hasLabelBox: widget.steps[index].hasLabelBox,
-          opacity: _animation.value,
-          hole: _hole?.end,
-          viewport: MediaQuery.of(context).size,
-          fullscreen: widget.steps[index].fullscreen,
-        ),
+      child: Stack(
+        children: [
+          CustomPaint(
+            child: Container(),
+            painter: HolePainter(
+              fullscreen: widget.steps[index].fullscreen,
+              shape: widget.steps[index].shape,
+              overlayShape: widget.steps[index].overlayShape,
+              center: _holeOffset,
+              hole: _hole?.evaluate(_animation),
+              animation: _animation.value,
+              overlayColor: _colorTween?.evaluate(_animation),
+            ),
+            // foregroundPainter: LabelPainter(
+            //   label: widget.steps[index].label,
+            //   color: widget.steps[index].textColor,
+            //   style: widget.steps[index].textStyle,
+            //   margin: widget.steps[index].margin,
+            //   labelBoxColor: widget.steps[index].labelBoxColor,
+            //   labelBoxRadius: widget.steps[index].labelBoxRadius,
+            //   hasArrow: widget.steps[index].hasArrow,
+            //   hasLabelBox: widget.steps[index].hasLabelBox,
+            //   opacity: _animation.value,
+            //   hole: _hole?.end,
+            //   viewport: MediaQuery.of(context).size,
+            //   fullscreen: widget.steps[index].fullscreen,
+            // ),
+          ),
+          Positioned(
+            left: _getHorizontalPosition(widget.steps[index], size),
+            top: _getVerticalPosition(widget.steps[index], size),
+            child: FadeTransition(
+              opacity: _animation,
+              child: Container(
+                width: size.width * 0.55,
+                height: size.width * 0.45,
+                padding: const EdgeInsets.all(8.0),
+                color: widget.steps[index].labelBoxColor,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (widget.steps[index].title != null)
+                      Text(
+                        widget.steps[index].title,
+                        style: Theme.of(context)
+                            .textTheme
+                            .headline5
+                            .copyWith(color: widget.steps[index].textColor),
+                        textAlign: TextAlign.left,
+                      ),
+                    if (widget.steps[index].bodyText != null)
+                      Text(
+                        widget.steps[index].bodyText,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText2
+                            .copyWith(color: widget.steps[index].textColor),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          )
+        ],
       ),
     );
   }
