@@ -244,7 +244,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
         }
       }
 
-      debugPrint('stepIndexes $_stepIndexes $_index');
+      debugPrint('stepIndexes ${widget.stepIndexes} $_stepIndexes $_index');
 
       final OnboardStep step = widget.steps[_index];
       if (!init) {
@@ -266,8 +266,10 @@ class _OnboardingStepperState extends State<OnboardingStepper>
       if (step.fullscreen) {
         return (size.width - boxWidth) / 2;
       } else {
-        if (holeRect.center.dx > size.width / 2) {
+        if (_widgetRect.center.dx > size.width / 2) {
           return _widgetRect.center.dx - boxWidth;
+        } else if (_widgetRect.center.dx == size.width / 2) {
+          return _widgetRect.center.dx - boxWidth / 2;
         } else {
           return holeRect.right - holeRect.width / 2;
         }
