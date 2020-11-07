@@ -1,6 +1,7 @@
-# onboard_overlay
+# onboarding_overlay
 
-An onboarding method that gets the user straight into the app and doesn't require any splash screens.
+An flexible onboarding widget that can start and stop with an arbitrary number of steps 
+and arbitrary starting point
 
 ## Usage
 
