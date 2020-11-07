@@ -267,11 +267,11 @@ class _OnboardingStepperState extends State<OnboardingStepper>
         return (size.width - boxWidth) / 2;
       } else {
         if (_widgetRect.center.dx > size.width / 2) {
-          return _widgetRect.center.dx - boxWidth;
+          return _widgetRect.right - boxWidth - 6;
         } else if (_widgetRect.center.dx == size.width / 2) {
           return _widgetRect.center.dx - boxWidth / 2;
         } else {
-          return holeRect.right - holeRect.width / 2;
+          return _widgetRect.left + 10;
         }
       }
     } else {
