@@ -313,7 +313,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
         .copyWith(color: step.titleTextColor);
     final TextStyle localBodyTextStyle = Theme.of(context)
         .textTheme
-        .headline5
+        .bodyText1
         .copyWith(color: step.bodyTextColor);
 
     return GestureDetector(
