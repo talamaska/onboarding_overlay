@@ -92,7 +92,6 @@ class _AppState extends State<App> {
             ),
           ],
           onChanged: (int index) {
-            debugPrint('----index $index');
             if (index == 5) {
               // widget.scaffoldKey.currentState.openDrawer();
 
@@ -155,19 +154,6 @@ class _HomeState extends State<Home> {
           child: const Text('Title'),
         ),
       ),
-      // drawer: Drawer(
-      //   child: Column(
-      //     children: <Widget>[
-      //       const DrawerHeader(
-      //         child: Text('Settings'),
-      //       ),
-      //       const Text('menu item'),
-      //       const Text('menu item'),
-      //       const Text('menu item'),
-      //       const Text('menu item'),
-      //     ],
-      //   ),
-      // ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
