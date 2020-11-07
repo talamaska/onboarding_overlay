@@ -1,174 +1,159 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 const double kOverlayRatio = 0.65;
+const double kLabelBoxWidthRatio = 0.55;
+const double kLabelBoxHeightRatio = 0.45;
 
 @immutable
 class OnboardStep {
   const OnboardStep({
-    @required this.key,
     this.title,
-    this.bodyText = '',
+    this.titleTextStyle,
+    @required this.focusNode,
+    this.bodyText,
+    this.bodyTextStyle,
     this.shape = const RoundedRectangleBorder(
       borderRadius: BorderRadius.all(Radius.circular(8.0)),
     ),
+    this.margin = const EdgeInsets.all(8.0),
+    this.overlayColor = const Color(0xC4000000),
     this.overlayShape = const RoundedRectangleBorder(
       borderRadius: BorderRadius.all(Radius.circular(8.0)),
     ),
-    this.margin = const EdgeInsets.all(8.0),
-    // this.tappable = true,
-    // this.proceed,
-    // this.callback,
-    this.overlayColor = const Color(0xC4000000),
-    this.textColor = const Color(0xFFFFFFFF),
-    this.textStyle,
-    this.labelBoxRadius = 10.0,
-    this.labelBoxColor = const Color(0xFF0A76F1),
+    this.titleTextColor = const Color(0xFFFFFFFF),
+    this.bodyTextColor = const Color(0xFFFFFFFF),
+    this.labelBoxDecoration = const BoxDecoration(
+      shape: BoxShape.rectangle,
+      borderRadius: BorderRadius.all(Radius.circular(5.0)),
+      color: Color(0x00000000),
+    ),
+    this.labelBoxPadding = EdgeInsets.zero,
     this.hasLabelBox = false,
     this.hasArrow = false,
     this.fullscreen = true,
-  });
+    this.delay = Duration.zero,
+  })  : assert(titleTextColor != null || titleTextStyle != null),
+        assert(bodyTextColor != null || bodyTextStyle != null),
+        assert(focusNode != null);
 
-  final GlobalKey key;
+  final FocusNode focusNode;
+  final Color titleTextColor;
+  final Color bodyTextColor;
   final String title;
+  final TextStyle titleTextStyle;
   final String bodyText;
+  final TextStyle bodyTextStyle;
   final ShapeBorder shape;
+  final Color overlayColor;
   final ShapeBorder overlayShape;
   final EdgeInsets margin;
-  // final bool tappable;
-  // final Stream<dynamic> proceed;
-  // final Function callback;
-  final Color textColor;
-  final Color overlayColor;
-  final TextStyle textStyle;
-  final double labelBoxRadius;
-  final Color labelBoxColor;
+  final EdgeInsets labelBoxPadding;
+  final BoxDecoration labelBoxDecoration;
   final bool hasLabelBox;
   final bool hasArrow;
   final bool fullscreen;
+  final Duration delay;
 
-  @override
-  bool operator ==(Object o) {
-    if (identical(this, o)) return true;
-
-    return o is OnboardStep &&
-        o.key == key &&
-        o.bodyText == bodyText &&
-        o.title == title &&
-        o.shape == shape &&
-        o.overlayShape == overlayShape &&
-        o.margin == margin &&
-        o.textColor == textColor &&
-        o.overlayColor == overlayColor &&
-        o.textStyle == textStyle &&
-        o.labelBoxRadius == labelBoxRadius &&
-        o.labelBoxColor == labelBoxColor &&
-        o.hasLabelBox == hasLabelBox &&
-        o.hasArrow == hasArrow &&
-        o.fullscreen == fullscreen;
-  }
-
-  @override
-  int get hashCode {
-    return key.hashCode ^
-        title.hashCode ^
-        bodyText.hashCode ^
-        shape.hashCode ^
-        overlayShape.hashCode ^
-        margin.hashCode ^
-        textColor.hashCode ^
-        overlayColor.hashCode ^
-        textStyle.hashCode ^
-        labelBoxRadius.hashCode ^
-        labelBoxColor.hashCode ^
-        hasLabelBox.hashCode ^
-        hasArrow.hashCode ^
-        fullscreen.hashCode;
+  OnboardStep copyWith({
+    FocusNode focusNode,
+    Color titleTextColor,
+    Color bodyTextColor,
+    String title,
+    TextStyle titleTextStyle,
+    String bodyText,
+    TextStyle bodyTextStyle,
+    ShapeBorder shape,
+    Color overlayColor,
+    ShapeBorder overlayShape,
+    EdgeInsets margin,
+    EdgeInsets labelBoxPadding,
+    BoxDecoration labelBoxDecoration,
+    bool hasLabelBox,
+    bool hasArrow,
+    bool fullscreen,
+    Duration delay,
+  }) {
+    return OnboardStep(
+      focusNode: focusNode ?? this.focusNode,
+      titleTextColor: titleTextColor ?? this.titleTextColor,
+      bodyTextColor: bodyTextColor ?? this.bodyTextColor,
+      title: title ?? this.title,
+      titleTextStyle: titleTextStyle ?? this.titleTextStyle,
+      bodyText: bodyText ?? this.bodyText,
+      bodyTextStyle: bodyTextStyle ?? this.bodyTextStyle,
+      shape: shape ?? this.shape,
+      overlayColor: overlayColor ?? this.overlayColor,
+      overlayShape: overlayShape ?? this.overlayShape,
+      margin: margin ?? this.margin,
+      labelBoxPadding: labelBoxPadding ?? this.labelBoxPadding,
+      labelBoxDecoration: labelBoxDecoration ?? this.labelBoxDecoration,
+      hasLabelBox: hasLabelBox ?? this.hasLabelBox,
+      hasArrow: hasArrow ?? this.hasArrow,
+      fullscreen: fullscreen ?? this.fullscreen,
+      delay: delay ?? this.delay,
+    );
   }
 
   @override
   String toString() {
-    return 'OnboardStep(key: $key, bodyText: $bodyText, title: $title, shape: $shape, overlayShape: $overlayShape, margin: $margin, textColor: $textColor, overlayColor: $overlayColor, textStyle: $textStyle, labelBoxRadius: $labelBoxRadius, labelBoxColor: $labelBoxColor, hasLabelBox: $hasLabelBox, hasArrow: $hasArrow, fullscreen: $fullscreen)';
+    return '''OnboardStep(
+      focusNode: $focusNode,
+      titleTextColor: $titleTextColor, 
+      bodyTextColor: $bodyTextColor, 
+      title: $title, 
+      titleTextStyle: $titleTextStyle, 
+      bodyText: $bodyText, 
+      bodyTextStyle: $bodyTextStyle, 
+      shape: $shape, 
+      overlayColor: $overlayColor, 
+      overlayShape: $overlayShape, 
+      margin: $margin, 
+      labelBoxPadding: $labelBoxPadding, 
+      labelBoxDecoration: $labelBoxDecoration, 
+      hasLabelBox: $hasLabelBox, 
+      hasArrow: $hasArrow, 
+      fullscreen: $fullscreen, 
+      delay: $delay
+    )''';
   }
 }
 
-void onboard(List<OnboardStep> steps, BuildContext context) {
-  Navigator.of(context).push<dynamic>(
-    OnboardRoute(
-      steps: steps,
-    ),
-  );
-}
-
-class OnboardRoute extends TransitionRoute<dynamic> {
-  OnboardRoute({@required this.steps});
-  final List<OnboardStep> steps;
-
-  Widget buildTransitions(
-    BuildContext context,
-    Animation<double> animation,
-    Animation<double> secondaryAnimation,
-    Widget child,
-  ) {
-    return FadeTransition(
-      opacity: animation,
-      child: child,
-    );
-  }
-
-  @override
-  Duration get transitionDuration => const Duration(milliseconds: 300);
-
-  @override
-  Iterable<OverlayEntry> createOverlayEntries() sync* {
-    yield OverlayEntry(
-      builder: (BuildContext context) => buildTransitions(
-        context,
-        animation,
-        secondaryAnimation,
-        OnboardWidget(
-          steps: steps,
-          onEnd: () {},
-        ),
-      ),
-    );
-  }
-
-  @override
-  bool get opaque => false;
-}
-
-class OnboardWidget extends StatefulWidget {
-  const OnboardWidget({
+class OnboardingStepper extends StatefulWidget {
+  const OnboardingStepper({
     this.initialIndex,
     this.steps,
     this.onChanged,
-    @required this.onEnd,
+    this.onEnd,
+    this.stepIndexes = const <int>[],
   });
+
   final List<OnboardStep> steps;
+  final List<int> stepIndexes;
   final ValueChanged<int> onChanged;
-  final VoidCallback onEnd;
+  final ValueChanged<int> onEnd;
   final int initialIndex;
 
   @override
-  _OnboardWidgetState createState() => _OnboardWidgetState();
+  _OnboardingStepperState createState() => _OnboardingStepperState();
 }
 
-class _OnboardWidgetState extends State<OnboardWidget>
+class _OnboardingStepperState extends State<OnboardingStepper>
     with SingleTickerProviderStateMixin {
-  int index;
+  int _index;
   RectTween _hole;
   Offset _holeOffset;
   ColorTween _colorTween;
   AnimationController _controller;
   Animation<double> _animation;
   Rect _widgetRect;
+  List<int> _stepIndexes;
 
   @override
   void initState() {
     super.initState();
-    index = widget.initialIndex ?? 0;
+    _index = widget.initialIndex ?? 0;
+    _stepIndexes = List<int>.from(widget.stepIndexes) ?? <int>[];
 
     _controller = AnimationController(
       vsync: this,
@@ -180,7 +165,8 @@ class _OnboardWidgetState extends State<OnboardWidget>
     _animation = const AlwaysStoppedAnimation<double>(0.0);
     _controller.addListener(() => setState(() {}));
 
-    _proceed(init: true);
+    debugPrint('stepIndexes ${widget.stepIndexes} $_index');
+    _proceed(init: true, fromIndex: _index);
   }
 
   @override
@@ -189,93 +175,147 @@ class _OnboardWidgetState extends State<OnboardWidget>
     super.dispose();
   }
 
-  Future<void> _proceed({bool init = false}) async {
-    if (init) {
-      index = 0;
-    } else {
-      await _controller.reverse();
-      if (index < widget.steps.length - 1) {
-        index++;
+  void _prepare(OnboardStep step) {
+    final RenderBox box =
+        step.focusNode?.context?.findRenderObject() as RenderBox;
+
+    _holeOffset = box?.localToGlobal(Offset.zero);
+    _widgetRect = box != null ? _holeOffset & box.size : null;
+    _hole = _widgetRect != null
+        ? RectTween(
+            begin: Rect.zero.shift(_widgetRect.center),
+            end: step.margin.inflateRect(_widgetRect),
+          )
+        : null;
+
+    final Color color = step.overlayColor;
+
+    _colorTween = ColorTween(
+      begin: color.withOpacity(_animation.value),
+      end: color,
+    );
+    _animation = CurvedAnimation(curve: Curves.ease, parent: _controller);
+
+    _controller.forward(from: 0.0);
+  }
+
+  Future<void> _proceed({bool init = false, int fromIndex = 0}) async {
+    if (widget.stepIndexes.isEmpty) {
+      if (init) {
+        _index = fromIndex != 0 ? fromIndex : 0;
       } else {
-        widget.onEnd();
-        return;
+        await _controller.reverse();
+        if (widget.onChanged != null) {
+          widget.onChanged(_index);
+        }
+        if (_index < widget.steps.length - 1) {
+          _index++;
+        } else {
+          widget.onEnd(_index);
+          return;
+        }
       }
 
-      if (widget.onChanged != null) {
-        widget.onChanged(index);
+      final OnboardStep step = widget.steps[_index];
+      if (_index > 0) {
+        await Future<void>.delayed(step.delay);
       }
-    }
-    if (index < widget.steps.length && index >= 0) {
-      final RenderBox box = widget.steps[index].key?.currentContext
-          ?.findRenderObject() as RenderBox;
+      if (_index < widget.steps.length && _index >= 0) {
+        _prepare(step);
+      }
 
-      _holeOffset = box?.localToGlobal(Offset.zero);
+      step.focusNode.requestFocus();
+    } else {
+      if (init) {
+        _index = widget.initialIndex ?? widget.stepIndexes.first;
+        _stepIndexes.removeAt(0);
+      } else {
+        await _controller.reverse();
+        if (widget.onChanged != null) {
+          widget.onChanged(_index);
+        }
+        if (_stepIndexes.isEmpty) {
+          widget.onEnd(_index);
+          return;
+        }
+        if (_stepIndexes.isNotEmpty) {
+          _index = _stepIndexes.first;
+          _stepIndexes.removeAt(0);
+        }
+      }
 
-      _widgetRect = box != null ? _holeOffset & box.size : null;
-      _hole = _widgetRect != null
-          ? RectTween(
-              begin: Rect.zero.shift(_widgetRect.center),
-              end: widget.steps[index].margin.inflateRect(_widgetRect),
-            )
-          : null;
+      debugPrint('stepIndexes $_stepIndexes $_index');
 
-      final Color color = widget.steps[index].overlayColor;
+      final OnboardStep step = widget.steps[_index];
+      if (!init) {
+        await Future<void>.delayed(step.delay);
+      }
 
-      _colorTween = ColorTween(
-        begin: color.withOpacity(_animation.value),
-        end: color,
-      );
-      _animation = CurvedAnimation(curve: Curves.ease, parent: _controller);
-
-      _controller.forward(from: 0.0);
+      if (widget.stepIndexes.indexWhere((int el) => el == _index) != -1) {
+        _prepare(step);
+      }
+      step.focusNode.requestFocus();
     }
   }
 
   double _getHorizontalPosition(OnboardStep step, Size size) {
-    if (step.fullscreen) {
-      return (size.width - size.width * 0.55) / 2;
-    } else {
-      if (step.margin.inflateRect(_widgetRect).center.dx > size.width / 2) {
-        return _widgetRect.center.dx - size.width * 0.55;
+    final double boxWidth =
+        step.fullscreen ? size.width * 0.8 : size.width * 0.55;
+    if (_widgetRect != null) {
+      final Rect holeRect = step.margin.inflateRect(_widgetRect);
+      if (step.fullscreen) {
+        return (size.width - boxWidth) / 2;
       } else {
-        return (size.width - size.width * 0.55) / 2;
+        if (holeRect.center.dx > size.width / 2) {
+          return _widgetRect.center.dx - boxWidth;
+        } else {
+          return holeRect.right - holeRect.width / 2;
+        }
       }
+    } else {
+      return size.width / 2 - boxWidth / 2;
     }
   }
 
   double _getVerticalPosition(OnboardStep step, Size size) {
+    final double boxHeight = size.width * 0.45;
     if (_widgetRect != null) {
+      final Rect holeRect = step.margin.inflateRect(_widgetRect);
       if (step.fullscreen) {
-        if (step.margin.inflateRect(_widgetRect).center.dy > size.height / 2) {
-          return step.margin.inflateRect(_widgetRect).top -
-              size.width * 0.45 -
-              step.margin.bottom * 2;
+        if (holeRect.center.dy > size.height / 2) {
+          return holeRect.top - boxHeight - step.margin.bottom * 2;
         } else {
-          return step.margin.inflateRect(_widgetRect).bottom +
-              step.margin.bottom * 2;
+          return holeRect.bottom + step.margin.bottom * 2;
         }
       } else {
         if (_widgetRect.center.dy > size.height / 2) {
-          return _widgetRect.top - size.width * 0.45;
+          return _widgetRect.top - boxHeight;
         } else {
-          return _widgetRect.bottom + size.width * 0.45;
+          return _widgetRect.bottom + step.margin.bottom;
         }
       }
     } else {
-      return size.height / 2 - size.width * 0.45 / 2;
+      return size.height / 2 - boxHeight / 2;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    // RenderBox renderBox = context.findRenderObject() as RenderBox;
-    // var size = renderBox.size;
-    // var offset = renderBox.localToGlobal(Offset.zero);
-    // left: offset.dx,
-    //     top: offset.dy + size.height + 5.0,
-    //     width: size.width,
-    // debugPrint('step ${widget.steps[index]}');
+    final OnboardStep step = widget.steps[_index];
+    final double boxWidth =
+        step.fullscreen ? size.width * 0.8 : size.width * 0.55;
+    final double boxHeight = size.width * 0.45;
+
+    final TextStyle localTitleTextStyle = Theme.of(context)
+        .textTheme
+        .headline5
+        .copyWith(color: step.titleTextColor);
+    final TextStyle localBodyTextStyle = Theme.of(context)
+        .textTheme
+        .headline5
+        .copyWith(color: step.bodyTextColor);
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: _proceed,
@@ -284,59 +324,43 @@ class _OnboardWidgetState extends State<OnboardWidget>
           CustomPaint(
             child: Container(),
             painter: HolePainter(
-              fullscreen: widget.steps[index].fullscreen,
-              shape: widget.steps[index].shape,
-              overlayShape: widget.steps[index].overlayShape,
+              fullscreen: step.fullscreen,
+              shape: step.shape,
+              overlayShape: step.overlayShape,
               center: _holeOffset,
               hole: _hole?.evaluate(_animation),
               animation: _animation.value,
               overlayColor: _colorTween?.evaluate(_animation),
             ),
-            // foregroundPainter: LabelPainter(
-            //   label: widget.steps[index].label,
-            //   color: widget.steps[index].textColor,
-            //   style: widget.steps[index].textStyle,
-            //   margin: widget.steps[index].margin,
-            //   labelBoxColor: widget.steps[index].labelBoxColor,
-            //   labelBoxRadius: widget.steps[index].labelBoxRadius,
-            //   hasArrow: widget.steps[index].hasArrow,
-            //   hasLabelBox: widget.steps[index].hasLabelBox,
-            //   opacity: _animation.value,
-            //   hole: _hole?.end,
-            //   viewport: MediaQuery.of(context).size,
-            //   fullscreen: widget.steps[index].fullscreen,
-            // ),
           ),
           Positioned(
-            left: _getHorizontalPosition(widget.steps[index], size),
-            top: _getVerticalPosition(widget.steps[index], size),
+            left: _getHorizontalPosition(step, size),
+            top: _getVerticalPosition(step, size),
             child: FadeTransition(
               opacity: _animation,
               child: Container(
-                width: size.width * 0.55,
-                height: size.width * 0.45,
-                padding: const EdgeInsets.all(8.0),
-                color: widget.steps[index].labelBoxColor,
+                width: boxWidth,
+                height: boxHeight,
+                padding: step.hasLabelBox ? step.labelBoxPadding : null,
+                decoration: step.hasLabelBox ? step.labelBoxDecoration : null,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (widget.steps[index].title != null)
+                  children: <Widget>[
+                    if (step.title != null)
                       Text(
-                        widget.steps[index].title,
-                        style: Theme.of(context)
-                            .textTheme
-                            .headline5
-                            .copyWith(color: widget.steps[index].textColor),
+                        step.title,
+                        style: step.titleTextStyle ?? localTitleTextStyle,
                         textAlign: TextAlign.left,
                       ),
-                    if (widget.steps[index].bodyText != null)
+                    const SizedBox(
+                      height: 8.0,
+                      width: double.infinity,
+                    ),
+                    if (step.bodyText != null)
                       Text(
-                        widget.steps[index].bodyText,
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyText2
-                            .copyWith(color: widget.steps[index].textColor),
+                        step.bodyText,
+                        style: step.bodyTextStyle ?? localBodyTextStyle,
                       ),
                   ],
                 ),

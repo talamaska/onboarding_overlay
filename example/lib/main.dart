@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:onboard_overlay/onboard_overlay.dart';
 
 void main() {
@@ -8,116 +7,194 @@ void main() {
   runApp(App());
 }
 
-final GlobalKey<OnboardingState> onboadingKey = GlobalKey<OnboardingState>();
+class App extends StatefulWidget {
+  final GlobalKey<OnboardingState> onboardingKey = GlobalKey<OnboardingState>();
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
-class App extends StatelessWidget {
+  @override
+  _AppState createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  List<FocusNode> focusNodes = <FocusNode>[];
+
+  @override
+  void initState() {
+    super.initState();
+
+    focusNodes = List<FocusNode>.generate(
+      7,
+      (int i) => FocusNode(debugLabel: i.toString()),
+      growable: false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) => MaterialApp(
-        home: Home(),
+        home: Onboarding(
+          key: widget.onboardingKey,
+          steps: <OnboardStep>[
+            OnboardStep(
+              focusNode: focusNodes[0],
+              title: 'Tap anywhere to continue',
+              bodyText: 'Tap anywhere to continue',
+              titleTextColor: Colors.black,
+              hasLabelBox: true,
+              labelBoxPadding: const EdgeInsets.all(8.0),
+              labelBoxDecoration: const BoxDecoration(
+                color: Colors.blue,
+                borderRadius: BorderRadius.all(Radius.circular(5.0)),
+              ),
+              hasArrow: true,
+            ),
+            OnboardStep(
+              focusNode: focusNodes[1],
+              title: 'Tap only here to increment & continue',
+              bodyText: 'Tap only here to increment & continue',
+              shape: const CircleBorder(),
+              fullscreen: false,
+              overlayColor: Colors.blue.withOpacity(0.9),
+              overlayShape: const CircleBorder(),
+            ),
+            OnboardStep(
+              focusNode: focusNodes[2],
+              title: 'Easy to customise',
+              bodyText: 'Easy to customise',
+              overlayColor: Colors.red.withOpacity(0.9),
+            ),
+            OnboardStep(
+              focusNode: focusNodes[3],
+              title: 'Add steps for any widget',
+              bodyText: 'Add steps for any widget',
+              overlayColor: Colors.green.withOpacity(0.9),
+            ),
+            OnboardStep(
+              focusNode: focusNodes[4],
+              title: 'Settings',
+              shape: const CircleBorder(),
+              bodyText:
+                  'Click here to access settings such as dark mode, daily limit, etc',
+              fullscreen: false,
+              overlayColor: Colors.black.withOpacity(0.8),
+              overlayShape: const CircleBorder(),
+            ),
+            OnboardStep(
+              focusNode: focusNodes[5],
+              title: 'test!',
+              bodyText: 'test test test!',
+              delay: const Duration(milliseconds: 300),
+            ),
+            OnboardStep(
+              focusNode: focusNodes[6],
+              title: "Or no widget at all! You're all done!",
+              bodyText: "Or no widget at all! You're all done!",
+              margin: EdgeInsets.zero,
+            ),
+          ],
+          onChanged: (int index) {
+            debugPrint('----index $index');
+            if (index == 5) {
+              // widget.scaffoldKey.currentState.openDrawer();
+
+              // interrupt onboarding on specific step
+              // widget.onboardingKey.currentState.hide();
+            }
+          },
+          child: Home(
+            scaffoldKey: widget.scaffoldKey,
+            focusNodes: focusNodes,
+          ),
+        ),
       );
 }
 
 class Home extends StatefulWidget {
+  const Home({Key key, this.scaffoldKey, this.focusNodes}) : super(key: key);
+
+  final List<FocusNode> focusNodes;
+  final GlobalKey<ScaffoldState> scaffoldKey;
+
   @override
   _HomeState createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
   List<OnboardStep> steps;
-  int _counter = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    steps = <OnboardStep>[
-      OnboardStep(
-        key: GlobalKey(),
-        title: 'Tap anywhere to continue',
-        bodyText: 'Tap anywhere to continue',
-        textColor: Colors.black,
-        hasLabelBox: true,
-        labelBoxColor: Colors.yellow,
-        hasArrow: true,
-      ),
-      OnboardStep(
-        key: GlobalKey(),
-        title: 'Tap only here to increment & continue',
-        bodyText: 'Tap only here to increment & continue',
-        shape: const CircleBorder(),
-        // tappable: false,
-        // proceed: proceed.stream,
-        overlayColor: Colors.blue.withOpacity(0.9),
-        fullscreen: false,
-        labelBoxColor: Colors.transparent,
-        overlayShape: const CircleBorder(),
-      ),
-      OnboardStep(
-        key: GlobalKey(),
-        title: 'Easy to customise',
-        bodyText: 'Easy to customise',
-        overlayColor: Colors.red.withOpacity(0.9),
-        labelBoxColor: Colors.transparent,
-      ),
-      OnboardStep(
-        key: GlobalKey(),
-        title: 'Add steps for any widget',
-        bodyText: 'Add steps for any widget',
-        overlayColor: Colors.green.withOpacity(0.9),
-        labelBoxColor: Colors.transparent,
-      ),
-      const OnboardStep(
-        key: null,
-        title: "Or no widget at all! You're all done!",
-        bodyText: "Or no widget at all! You're all done!",
-        labelBoxColor: Colors.transparent,
-        margin: EdgeInsets.zero,
-      ),
-    ];
-  }
+  int _counter = 0;
 
   @override
   void dispose() {
     super.dispose();
   }
 
-  void _increment() {
+  void _increment(BuildContext context) {
     setState(() {
       _counter++;
     });
-    // proceed.add(null);
+
+    final OnboardingState onboading = Onboarding.of(context);
+
+    /// or
+    /// context.findAncestorStateOfType<OnboardingState>();
+    /// onboading.showWithSteps(4, [4, 3, 1, 2]);
+    /// onboading.showFromIndex(3);
+    onboading.show();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Onboarding(
-      key: onboadingKey,
-      steps: steps,
-      onChanged: (int index) {
-        debugPrint('----index $index');
-      },
-      child: Scaffold(
-        appBar: AppBar(key: steps[3].key),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                'You have pushed the button this many times:',
-                key: steps[0].key,
-              ),
-              Text(
+    return Scaffold(
+      key: widget.scaffoldKey,
+      appBar: AppBar(
+        leading: IconButton(
+          focusNode: widget.focusNodes[4],
+          icon: Icon(Icons.menu),
+          onPressed: () {
+            widget.scaffoldKey.currentState.openDrawer();
+          },
+        ),
+        title: Focus(
+          focusNode: widget.focusNodes[3],
+          child: const Text('Title'),
+        ),
+      ),
+      // drawer: Drawer(
+      //   child: Column(
+      //     children: <Widget>[
+      //       const DrawerHeader(
+      //         child: Text('Settings'),
+      //       ),
+      //       const Text('menu item'),
+      //       const Text('menu item'),
+      //       const Text('menu item'),
+      //       const Text('menu item'),
+      //     ],
+      //   ),
+      // ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Focus(
+              focusNode: widget.focusNodes[0],
+              child: const Text('You have pushed the button this many times:'),
+            ),
+            Focus(
+              focusNode: widget.focusNodes[2],
+              child: Text(
                 '$_counter',
-                key: steps[2].key,
                 style: Theme.of(context).textTheme.headline4,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-        floatingActionButton: FloatingActionButton(
-          key: steps[1].key,
+      ),
+      floatingActionButton: Focus(
+        focusNode: widget.focusNodes[1],
+        child: FloatingActionButton(
           onPressed: () {
-            onboadingKey.currentState.show();
-            _increment();
+            _increment(context);
           },
           child: const Icon(Icons.add),
         ),
