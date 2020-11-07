@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:onboard_overlay/onboard_overlay.dart';
+import 'package:onboarding_overlay/onboarding_overlay.dart';
 
 void main() {
   // timeDilation = 2;
@@ -33,8 +33,8 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) => MaterialApp(
         home: Onboarding(
           key: widget.onboardingKey,
-          steps: <OnboardStep>[
-            OnboardStep(
+          steps: <OnboardingStep>[
+            OnboardingStep(
               focusNode: focusNodes[0],
               title: 'Tap anywhere to continue',
               bodyText: 'Tap anywhere to continue',
@@ -47,7 +47,7 @@ class _AppState extends State<App> {
               ),
               hasArrow: true,
             ),
-            OnboardStep(
+            OnboardingStep(
               focusNode: focusNodes[1],
               title: 'Tap only here to increment & continue',
               bodyText: 'Tap only here to increment & continue',
@@ -56,19 +56,19 @@ class _AppState extends State<App> {
               overlayColor: Colors.blue.withOpacity(0.9),
               overlayShape: const CircleBorder(),
             ),
-            OnboardStep(
+            OnboardingStep(
               focusNode: focusNodes[2],
               title: 'Easy to customise',
               bodyText: 'Easy to customise',
               overlayColor: Colors.red.withOpacity(0.9),
             ),
-            OnboardStep(
+            OnboardingStep(
               focusNode: focusNodes[3],
               title: 'Add steps for any widget',
               bodyText: 'Add steps for any widget',
               overlayColor: Colors.green.withOpacity(0.9),
             ),
-            OnboardStep(
+            OnboardingStep(
               focusNode: focusNodes[4],
               title: 'Settings',
               shape: const CircleBorder(),
@@ -78,13 +78,13 @@ class _AppState extends State<App> {
               overlayColor: Colors.black.withOpacity(0.8),
               overlayShape: const CircleBorder(),
             ),
-            OnboardStep(
+            OnboardingStep(
               focusNode: focusNodes[5],
               title: 'test!',
               bodyText: 'test test test!',
               delay: const Duration(milliseconds: 300),
             ),
-            OnboardStep(
+            OnboardingStep(
               focusNode: focusNodes[6],
               title: "Or no widget at all! You're all done!",
               bodyText: "Or no widget at all! You're all done!",
@@ -119,7 +119,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List<OnboardStep> steps;
+  List<OnboardingStep> steps;
 
   int _counter = 0;
 
@@ -135,10 +135,6 @@ class _HomeState extends State<Home> {
 
     final OnboardingState onboading = Onboarding.of(context);
 
-    /// or
-    /// context.findAncestorStateOfType<OnboardingState>();
-    /// onboading.showWithSteps(4, [4, 3, 1, 2]);
-    /// onboading.showFromIndex(3);
     onboading.show();
   }
 
@@ -149,7 +145,7 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         leading: IconButton(
           focusNode: widget.focusNodes[4],
-          icon: Icon(Icons.menu),
+          icon: const Icon(Icons.menu),
           onPressed: () {
             widget.scaffoldKey.currentState.openDrawer();
           },

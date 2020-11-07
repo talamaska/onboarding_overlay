@@ -6,13 +6,20 @@ const double kLabelBoxWidthRatio = 0.55;
 const double kLabelBoxHeightRatio = 0.45;
 
 @immutable
-class OnboardStep {
-  const OnboardStep({
+class OnboardingStep {
+  /// At least a [title] or a [bodyText] should be provided.
+  ///
+  /// At least a [titleTextColor] or a [titleTextStyle] should be provided.
+  ///
+  /// At least a [bodyTextColor] or a [bodyTextStyle] should be provided.
+  const OnboardingStep({
     this.title,
     this.titleTextStyle,
+    this.titleTextColor = const Color(0xFFFFFFFF),
     @required this.focusNode,
     this.bodyText,
     this.bodyTextStyle,
+    this.bodyTextColor = const Color(0xFFFFFFFF),
     this.shape = const RoundedRectangleBorder(
       borderRadius: BorderRadius.all(Radius.circular(8.0)),
     ),
@@ -21,8 +28,6 @@ class OnboardStep {
     this.overlayShape = const RoundedRectangleBorder(
       borderRadius: BorderRadius.all(Radius.circular(8.0)),
     ),
-    this.titleTextColor = const Color(0xFFFFFFFF),
-    this.bodyTextColor = const Color(0xFFFFFFFF),
     this.labelBoxDecoration = const BoxDecoration(
       shape: BoxShape.rectangle,
       borderRadius: BorderRadius.all(Radius.circular(5.0)),
@@ -35,27 +40,83 @@ class OnboardStep {
     this.delay = Duration.zero,
   })  : assert(titleTextColor != null || titleTextStyle != null),
         assert(bodyTextColor != null || bodyTextStyle != null),
+        assert(title != null || bodyText != null),
         assert(focusNode != null);
 
+  /// is required
   final FocusNode focusNode;
+
+  /// By default, the value used is `Color(0xFFFFFFFF)`
   final Color titleTextColor;
+
+  /// By default, the value used is `Color(0xFFFFFFFF)`
   final Color bodyTextColor;
+
   final String title;
+
+  /// TextStyle localBodyTextStyle = Theme.of(context)
+  ///   .textTheme
+  ///   .heading5
+  ///   .copyWith(color: step.titleTextColor)
   final TextStyle titleTextStyle;
+
   final String bodyText;
+
+  /// TextStyle localBodyTextStyle = Theme.of(context)
+  ///   .textTheme
+  ///   .bodyText1
+  ///   .copyWith(color: step.bodyTextColor)
   final TextStyle bodyTextStyle;
+
+  /// By default, the value is
+  /// ```
+  /// RoundedRectangleBorder(
+  ///   borderRadius: BorderRadius.all(Radius.circular(8.0)),
+  /// )
+  /// ````
   final ShapeBorder shape;
+
+  /// By default, the value used is `Color(0xC4000000)`
   final Color overlayColor;
+
+  /// By default, the value is
+  /// ```
+  /// RoundedRectangleBorder(
+  ///   borderRadius: BorderRadius.all(Radius.circular(8.0)),
+  /// )
+  /// ```
   final ShapeBorder overlayShape;
+
+  /// This is the space around the `Widget` we want which we would clip a whole
+  /// By default, the value is `EdgeInsets.all(8.0)`
   final EdgeInsets margin;
+
+  /// By default, the value is
+  /// ```
+  /// BoxDecoration(
+  ///   shape: BoxShape.rectangle,
+  ///   borderRadius: BorderRadius.all(Radius.circular(5.0)),
+  ///   color: Color(0x00000000),
+  /// )
+  /// ```
   final EdgeInsets labelBoxPadding;
+
+  /// By default, the value used is false
   final BoxDecoration labelBoxDecoration;
+
+  /// By default, the value used is false
   final bool hasLabelBox;
+
+  /// By default, the value used is false
   final bool hasArrow;
+
+  /// By default, the value used is true
   final bool fullscreen;
+
+  /// By default, the value used is `Duration.zero`
   final Duration delay;
 
-  OnboardStep copyWith({
+  OnboardingStep copyWith({
     FocusNode focusNode,
     Color titleTextColor,
     Color bodyTextColor,
@@ -74,7 +135,7 @@ class OnboardStep {
     bool fullscreen,
     Duration delay,
   }) {
-    return OnboardStep(
+    return OnboardingStep(
       focusNode: focusNode ?? this.focusNode,
       titleTextColor: titleTextColor ?? this.titleTextColor,
       bodyTextColor: bodyTextColor ?? this.bodyTextColor,
@@ -121,18 +182,34 @@ class OnboardStep {
 
 class OnboardingStepper extends StatefulWidget {
   const OnboardingStepper({
-    this.initialIndex,
-    this.steps,
+    Key key,
+    this.initialIndex = 0,
+    @required this.steps,
+    this.duration = const Duration(milliseconds: 350),
     this.onChanged,
     this.onEnd,
     this.stepIndexes = const <int>[],
-  });
+  }) : super(key: key);
 
-  final List<OnboardStep> steps;
-  final List<int> stepIndexes;
-  final ValueChanged<int> onChanged;
-  final ValueChanged<int> onEnd;
+  /// is reqired
+  final List<OnboardingStep> steps;
+
+  /// By default, vali is 0
   final int initialIndex;
+
+  /// By default stepIndexes os an empty array
+  final List<int> stepIndexes;
+
+  ///  `onChanged` is called everytime when the previous step has faded out,
+  ///
+  /// before the next step is shown with a value of the step index on which the user was
+  final ValueChanged<int> onChanged;
+
+  /// `onEnd` is called when there are no more steps to transition to
+  final ValueChanged<int> onEnd;
+
+  /// By default, the value is `Duration(milliseconds: 350)`
+  final Duration duration;
 
   @override
   _OnboardingStepperState createState() => _OnboardingStepperState();
@@ -143,7 +220,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
   int _index;
   RectTween _hole;
   Offset _holeOffset;
-  ColorTween _colorTween;
+  ColorTween _overlayColorTween;
   AnimationController _controller;
   Animation<double> _animation;
   Rect _widgetRect;
@@ -154,18 +231,22 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     super.initState();
     _index = widget.initialIndex ?? 0;
     _stepIndexes = List<int>.from(widget.stepIndexes) ?? <int>[];
-
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 350),
+      duration: widget.duration,
     );
-
-    _hole = RectTween(begin: Rect.zero, end: Rect.zero);
-
     _animation = const AlwaysStoppedAnimation<double>(0.0);
     _controller.addListener(() => setState(() {}));
 
-    debugPrint('stepIndexes ${widget.stepIndexes} $_index');
+    _hole = RectTween(
+      begin: Rect.zero,
+      end: Rect.zero,
+    );
+    _overlayColorTween = ColorTween(
+      begin: const Color(0x00000000),
+      end: const Color(0x00000000),
+    );
+
     _proceed(init: true, fromIndex: _index);
   }
 
@@ -175,7 +256,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     super.dispose();
   }
 
-  void _prepare(OnboardStep step) {
+  void _prepare(OnboardingStep step) {
     final RenderBox box =
         step.focusNode?.context?.findRenderObject() as RenderBox;
 
@@ -187,13 +268,11 @@ class _OnboardingStepperState extends State<OnboardingStepper>
             end: step.margin.inflateRect(_widgetRect),
           )
         : null;
-
-    final Color color = step.overlayColor;
-
-    _colorTween = ColorTween(
-      begin: color.withOpacity(_animation.value),
-      end: color,
+    _overlayColorTween = ColorTween(
+      begin: step.overlayColor.withOpacity(_animation.value),
+      end: step.overlayColor,
     );
+
     _animation = CurvedAnimation(curve: Curves.ease, parent: _controller);
 
     _controller.forward(from: 0.0);
@@ -216,7 +295,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
         }
       }
 
-      final OnboardStep step = widget.steps[_index];
+      final OnboardingStep step = widget.steps[_index];
       if (_index > 0) {
         await Future<void>.delayed(step.delay);
       }
@@ -226,6 +305,16 @@ class _OnboardingStepperState extends State<OnboardingStepper>
 
       step.focusNode.requestFocus();
     } else {
+      assert(() {
+        if (widget.stepIndexes.contains(widget.initialIndex)) {
+          final List<DiagnosticsNode> information = <DiagnosticsNode>[
+            ErrorSummary('stepIndexes should contain initialIndex'),
+          ];
+
+          throw FlutterError.fromParts(information);
+        }
+        return true;
+      }());
       if (init) {
         _index = widget.initialIndex ?? widget.stepIndexes.first;
         _stepIndexes.removeAt(0);
@@ -244,9 +333,9 @@ class _OnboardingStepperState extends State<OnboardingStepper>
         }
       }
 
-      debugPrint('stepIndexes ${widget.stepIndexes} $_stepIndexes $_index');
+      // debugPrint('stepIndexes ${widget.stepIndexes} $_stepIndexes $_index');
 
-      final OnboardStep step = widget.steps[_index];
+      final OnboardingStep step = widget.steps[_index];
       if (!init) {
         await Future<void>.delayed(step.delay);
       }
@@ -258,11 +347,11 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     }
   }
 
-  double _getHorizontalPosition(OnboardStep step, Size size) {
+  double _getHorizontalPosition(OnboardingStep step, Size size) {
     final double boxWidth =
         step.fullscreen ? size.width * 0.8 : size.width * 0.55;
     if (_widgetRect != null) {
-      final Rect holeRect = step.margin.inflateRect(_widgetRect);
+      // final Rect holeRect = step.margin.inflateRect(_widgetRect);
       if (step.fullscreen) {
         return (size.width - boxWidth) / 2;
       } else {
@@ -279,7 +368,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     }
   }
 
-  double _getVerticalPosition(OnboardStep step, Size size) {
+  double _getVerticalPosition(OnboardingStep step, Size size) {
     final double boxHeight = size.width * 0.45;
     if (_widgetRect != null) {
       final Rect holeRect = step.margin.inflateRect(_widgetRect);
@@ -304,7 +393,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    final OnboardStep step = widget.steps[_index];
+    final OnboardingStep step = widget.steps[_index];
     final double boxWidth =
         step.fullscreen ? size.width * 0.8 : size.width * 0.55;
     final double boxHeight = size.width * 0.45;
@@ -332,7 +421,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
               center: _holeOffset,
               hole: _hole?.evaluate(_animation),
               animation: _animation.value,
-              overlayColor: _colorTween?.evaluate(_animation),
+              overlayColor: _overlayColorTween?.evaluate(_animation),
             ),
           ),
           Positioned(
@@ -377,21 +466,42 @@ class _OnboardingStepperState extends State<OnboardingStepper>
 
 class HolePainter extends CustomPainter {
   HolePainter({
-    this.shape,
-    this.overlayShape,
+    this.shape = const RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(Radius.circular(8.0)),
+    ),
+    this.overlayShape = const RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(Radius.circular(8.0)),
+    ),
     this.hole,
     this.center,
     this.animation,
-    this.fullscreen,
+    this.fullscreen = true,
     this.overlayColor = const Color(0xaa000000),
   });
 
+  /// By default, the value is
+  /// ```
+  /// RoundedRectangleBorder(
+  ///   borderRadius: BorderRadius.all(Radius.circular(8.0)),
+  /// )
+  /// ````
   final ShapeBorder shape;
+
+  /// By default, the value is
+  /// ```
+  /// RoundedRectangleBorder(
+  ///   borderRadius: BorderRadius.all(Radius.circular(8.0)),
+  /// )
+  /// ````
   final ShapeBorder overlayShape;
   final Rect hole;
   final double animation;
+
+  /// By default, value is `Color(0xaa000000)`
   final Color overlayColor;
   final Offset center;
+
+  /// By default value is `true`
   final bool fullscreen;
 
   @override
