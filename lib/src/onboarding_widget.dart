@@ -109,15 +109,11 @@ class OnboardingState extends State<Onboarding> {
           duration: widget.duration,
           onChanged: (int index) {
             // debugPrint('change from $index');
-            if (widget.onChanged != null) {
-              widget.onChanged(index);
-            }
+            widget.onChanged?.call(index);
           },
           onEnd: (int index) {
             // debugPrint('end --- $index');
-            if (widget.onEnd != null) {
-              widget.onEnd(index);
-            }
+            widget.onEnd?.call(index);
             hide();
           },
         );

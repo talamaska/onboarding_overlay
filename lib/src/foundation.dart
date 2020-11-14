@@ -54,18 +54,24 @@ class OnboardingStep {
 
   final String title;
 
-  /// TextStyle localBodyTextStyle = Theme.of(context)
+  /// By default, the value is
+  /// ```
+  /// TextStyle titleTextStyle = Theme.of(context)
   ///   .textTheme
   ///   .heading5
   ///   .copyWith(color: step.titleTextColor)
+  /// ```
   final TextStyle titleTextStyle;
 
   final String bodyText;
 
-  /// TextStyle localBodyTextStyle = Theme.of(context)
+  /// By default, the value is
+  /// ```
+  /// TextStyle bodyTextStyle = Theme.of(context)
   ///   .textTheme
   ///   .bodyText1
   ///   .copyWith(color: step.bodyTextColor)
+  /// ```
   final TextStyle bodyTextStyle;
 
   /// By default, the value is
@@ -181,7 +187,7 @@ class OnboardingStep {
 }
 
 class OnboardingStepper extends StatefulWidget {
-  const OnboardingStepper({
+  OnboardingStepper({
     Key key,
     this.initialIndex = 0,
     @required this.steps,
@@ -189,7 +195,17 @@ class OnboardingStepper extends StatefulWidget {
     this.onChanged,
     this.onEnd,
     this.stepIndexes = const <int>[],
-  }) : super(key: key);
+  })  : assert(() {
+          if (stepIndexes.isNotEmpty && !stepIndexes.contains(initialIndex)) {
+            final List<DiagnosticsNode> information = <DiagnosticsNode>[
+              ErrorSummary('stepIndexes should contain initialIndex'),
+            ];
+
+            throw FlutterError.fromParts(information);
+          }
+          return true;
+        }()),
+        super(key: key);
 
   /// is reqired
   final List<OnboardingStep> steps;
@@ -279,18 +295,29 @@ class _OnboardingStepperState extends State<OnboardingStepper>
   }
 
   Future<void> _proceed({bool init = false, int fromIndex = 0}) async {
+    assert(() {
+      if (widget.stepIndexes.isNotEmpty &&
+          !widget.stepIndexes.contains(widget.initialIndex)) {
+        final List<DiagnosticsNode> information = <DiagnosticsNode>[
+          ErrorSummary('stepIndexes should contain initialIndex'),
+        ];
+
+        throw FlutterError.fromParts(information);
+      }
+      return true;
+    }());
     if (widget.stepIndexes.isEmpty) {
       if (init) {
         _index = fromIndex != 0 ? fromIndex : 0;
       } else {
         await _controller.reverse();
-        if (widget.onChanged != null) {
-          widget.onChanged(_index);
-        }
+
+        widget.onChanged?.call(_index);
+
         if (_index < widget.steps.length - 1) {
           _index++;
         } else {
-          widget.onEnd(_index);
+          widget.onEnd?.call(_index);
           return;
         }
       }
@@ -305,26 +332,16 @@ class _OnboardingStepperState extends State<OnboardingStepper>
 
       step.focusNode.requestFocus();
     } else {
-      assert(() {
-        if (widget.stepIndexes.contains(widget.initialIndex)) {
-          final List<DiagnosticsNode> information = <DiagnosticsNode>[
-            ErrorSummary('stepIndexes should contain initialIndex'),
-          ];
-
-          throw FlutterError.fromParts(information);
-        }
-        return true;
-      }());
       if (init) {
         _index = widget.initialIndex ?? widget.stepIndexes.first;
         _stepIndexes.removeAt(0);
       } else {
         await _controller.reverse();
-        if (widget.onChanged != null) {
-          widget.onChanged(_index);
-        }
+
+        widget.onChanged?.call(_index);
+
         if (_stepIndexes.isEmpty) {
-          widget.onEnd(_index);
+          widget.onEnd?.call(_index);
           return;
         }
         if (_stepIndexes.isNotEmpty) {
