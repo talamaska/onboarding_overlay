@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:onboarding_overlay/src/foundation.dart';
+import 'package:onboarding_overlay/src/stepper.dart';
+
+import 'step.dart';
 
 class Onboarding extends StatefulWidget {
   /// Onboarding is a widget that hold all the logic about reading the provided steps,
@@ -11,20 +13,18 @@ class Onboarding extends StatefulWidget {
   ///
   /// This class creates an instance of [StatefulWidget].
   const Onboarding({
-    Key key,
-    this.initialIndex,
+    Key? key,
+    this.initialIndex = 0,
     this.onChanged,
     this.onEnd,
+    required this.steps,
+    required this.child,
     this.duration = const Duration(milliseconds: 350),
-    @required this.steps,
-    @required this.child,
-  })  : assert(steps != null),
-        assert(child != null),
-        super(key: key);
+  }) : super(key: key);
 
   final int initialIndex;
-  final ValueChanged<int> onChanged;
-  final ValueChanged<int> onEnd;
+  final ValueChanged<int>? onChanged;
+  final ValueChanged<int>? onEnd;
 
   /// is required
   final List<OnboardingStep> steps;
@@ -37,12 +37,12 @@ class Onboarding extends StatefulWidget {
 
   /// or
   /// context.findAncestorStateOfType\<OnboardingState\>();
-  static OnboardingState of(
+  static OnboardingState? of(
     BuildContext context, {
     bool rootOnboarding = false,
-    Widget debugRequiredFor,
+    Widget? debugRequiredFor,
   }) {
-    final OnboardingState result = rootOnboarding
+    final OnboardingState? result = rootOnboarding
         ? context.findRootAncestorStateOfType<OnboardingState>()
         : context.findAncestorStateOfType<OnboardingState>();
     assert(() {
@@ -69,25 +69,25 @@ class Onboarding extends StatefulWidget {
 }
 
 class OnboardingState extends State<Onboarding> {
-  OverlayEntry _overlayEntry;
+  late OverlayEntry _overlayEntry;
 
-  /// Shows an onboarding session with all steps provided
+  /// Shows an onboarding session with all steps provided and initial index passed via the widget
   void show() {
     _overlayEntry = _createOverlayEntry(initialIndex: widget.initialIndex);
-    Overlay.of(context).insert(_overlayEntry);
+    Overlay.of(context)!.insert(_overlayEntry);
   }
 
   /// Shows an onboarding session from a specific step index
   void showFromIndex(int index) {
     _overlayEntry = _createOverlayEntry(initialIndex: index);
-    Overlay.of(context).insert(_overlayEntry);
+    Overlay.of(context)!.insert(_overlayEntry);
   }
 
   /// Shows an onboarding session from a specific step index and a specific order and set of step indexes
   void showWithSteps(int index, List<int> stepIndexes) {
     _overlayEntry =
         _createOverlayEntry(initialIndex: index, stepIndexes: stepIndexes);
-    Overlay.of(context).insert(_overlayEntry);
+    Overlay.of(context)!.insert(_overlayEntry);
   }
 
   /// Hides the onboarding session overlay
@@ -96,23 +96,21 @@ class OnboardingState extends State<Onboarding> {
   }
 
   OverlayEntry _createOverlayEntry({
-    int initialIndex,
+    required int initialIndex,
     List<int> stepIndexes = const <int>[],
   }) {
     return OverlayEntry(
       opaque: false,
       builder: (BuildContext context) {
         return OnboardingStepper(
-          initialIndex: initialIndex ?? widget.initialIndex,
+          initialIndex: initialIndex,
           steps: widget.steps,
           stepIndexes: stepIndexes,
           duration: widget.duration,
           onChanged: (int index) {
-            // debugPrint('change from $index');
             widget.onChanged?.call(index);
           },
           onEnd: (int index) {
-            // debugPrint('end --- $index');
             widget.onEnd?.call(index);
             hide();
           },

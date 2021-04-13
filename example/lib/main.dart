@@ -16,15 +16,15 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  List<FocusNode> focusNodes = <FocusNode>[];
+  late List<FocusNode> focusNodes;
 
   @override
   void initState() {
     super.initState();
 
     focusNodes = List<FocusNode>.generate(
-      7,
-      (int i) => FocusNode(debugLabel: i.toString()),
+      6,
+      (int i) => FocusNode(debugLabel: 'Onboarding Focus Node $i'),
       growable: false,
     );
   }
@@ -58,8 +58,8 @@ class _AppState extends State<App> {
             ),
             OnboardingStep(
               focusNode: focusNodes[2],
-              title: 'Easy to customise',
-              bodyText: 'Easy to customise',
+              title: 'Easy to customize',
+              bodyText: 'Easy to customize',
               overlayColor: Colors.red.withOpacity(0.9),
             ),
             OnboardingStep(
@@ -80,19 +80,13 @@ class _AppState extends State<App> {
             ),
             OnboardingStep(
               focusNode: focusNodes[5],
-              title: 'test!',
-              bodyText: 'test test test!',
-              delay: const Duration(milliseconds: 300),
-            ),
-            OnboardingStep(
-              focusNode: focusNodes[6],
               title: "Or no widget at all! You're all done!",
               bodyText: "Or no widget at all! You're all done!",
               margin: EdgeInsets.zero,
             ),
           ],
           onChanged: (int index) {
-            if (index == 5) {
+            if (index == 2) {
               // widget.scaffoldKey.currentState.openDrawer();
 
               // interrupt onboarding on specific step
@@ -100,7 +94,6 @@ class _AppState extends State<App> {
             }
           },
           child: Home(
-            scaffoldKey: widget.scaffoldKey,
             focusNodes: focusNodes,
           ),
         ),
@@ -108,19 +101,25 @@ class _AppState extends State<App> {
 }
 
 class Home extends StatefulWidget {
-  const Home({Key key, this.scaffoldKey, this.focusNodes}) : super(key: key);
+  const Home({
+    Key? key,
+    required this.focusNodes,
+  }) : super(key: key);
 
   final List<FocusNode> focusNodes;
-  final GlobalKey<ScaffoldState> scaffoldKey;
 
   @override
   _HomeState createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
-  List<OnboardingStep> steps;
+  late int _counter;
 
-  int _counter = 0;
+  @override
+  void initState() {
+    super.initState();
+    _counter = 0;
+  }
 
   @override
   void dispose() {
@@ -130,24 +129,18 @@ class _HomeState extends State<Home> {
   void _increment(BuildContext context) {
     setState(() {
       _counter++;
+      Onboarding.of(context)!.show();
     });
-
-    final OnboardingState onboading = Onboarding.of(context);
-
-    onboading.show();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: widget.scaffoldKey,
       appBar: AppBar(
         leading: IconButton(
           focusNode: widget.focusNodes[4],
           icon: const Icon(Icons.menu),
-          onPressed: () {
-            widget.scaffoldKey.currentState.openDrawer();
-          },
+          onPressed: () {},
         ),
         title: Focus(
           focusNode: widget.focusNodes[3],
@@ -172,14 +165,12 @@ class _HomeState extends State<Home> {
           ],
         ),
       ),
-      floatingActionButton: Focus(
+      floatingActionButton: FloatingActionButton(
         focusNode: widget.focusNodes[1],
-        child: FloatingActionButton(
-          onPressed: () {
-            _increment(context);
-          },
-          child: const Icon(Icons.add),
-        ),
+        onPressed: () {
+          _increment(context);
+        },
+        child: const Icon(Icons.add),
       ),
     );
   }

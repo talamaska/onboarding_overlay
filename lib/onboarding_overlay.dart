@@ -1,5 +1,8 @@
 library onboarding_overlay;
 
-export 'src/foundation.dart'
-    show OnboardingStep, OnboardingStepper, HolePainter;
+export 'src/constants.dart'
+    show kOverlayRatio, kLabelBoxWidthRatio, kLabelBoxHeightRatio;
+export 'src/hole_painter.dart' show HolePainter;
 export 'src/onboarding_widget.dart' show Onboarding, OnboardingState;
+export 'src/step.dart' show OnboardingStep;
+export 'src/stepper.dart' show OnboardingStepper;
