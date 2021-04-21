@@ -1,22 +1,22 @@
-# .DS_Store
-# .dart_tool/
+.DS_Store
+.dart_tool/
 
-# .packages
-# .pub/
+.packages
+.pub/
 
 # IntelliJ related
-# *.iml
-# *.ipr
-# *.iws
-# .idea/
+*.iml
+*.ipr
+*.iws
+.idea/
 
 # Visual Studio Code related
-# .classpath
-# .project
-# .settings/
-# .vscode/
+.classpath
+.project
+.settings/
+.vscode/
 
-# build/
-# ios/.generated/
-# ios/Flutter/Generated.xcconfig
-# ios/Runner/GeneratedPluginRegistrant.*
+build/
+ios/.generated/
+ios/Flutter/Generated.xcconfig
+ios/Runner/GeneratedPluginRegistrant.*
