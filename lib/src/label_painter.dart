@@ -79,7 +79,11 @@ class LabelPainter extends CustomPainter {
     textPainter.paint(canvas, offset);
   }
 
-  TextPainter _createTextPainter(Color color, double? opacity, TextStyle? style) {
+  TextPainter _createTextPainter(
+    Color color,
+    double? opacity,
+    TextStyle? style,
+  ) {
     return TextPainter(
       text: TextSpan(
         text: label,
