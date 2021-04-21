@@ -4,6 +4,18 @@
 .packages
 .pub/
 
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Visual Studio Code related
+.classpath
+.project
+.settings/
+.vscode/
+
 build/
 ios/.generated/
 ios/Flutter/Generated.xcconfig
