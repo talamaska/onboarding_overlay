@@ -1,7 +1,11 @@
 # onboarding_overlay
 
-An flexible onboarding widget that can start and stop with an arbitrary number of steps 
+A flexible onboarding widget that can start and stop with an arbitrary number of steps
 and arbitrary starting point
+
+## Demo
+
+<img src="https://github.com/talamaska/onboarding_overlay/blob/master/screenshots/demo.gif?raw=true"/>
 
 ## Usage
 
@@ -9,9 +13,9 @@ and arbitrary starting point
 
 ```dart
 final List<FocusNode> overlayKeys = <FocusNode>[
-    FocusNode(), 
-    FocusNode(), 
-    FocusNode(), 
+    FocusNode(),
+    FocusNode(),
+    FocusNode(),
   ];
 ```
 
@@ -48,6 +52,7 @@ Focus(
 ```
 
 4. Add Onboarding widget to your widget tree below MaterialWidget
+
 ```dart
 void main() {
   runApp(App());
@@ -95,14 +100,14 @@ class _AppState extends State<App> {
 }
 ```
 
-5. Show onboarding widget on some activity 
+5. Show onboarding widget on some activity
 
 ```dart
 final OnboardingState onboading = Onboarding.of(context);
 onboading.show();
 ```
 
-or immediately in initState 
+or immediately in initState
 
 ```dart
   @override
@@ -115,4 +120,3 @@ or immediately in initState
   }
 
 ```
-
