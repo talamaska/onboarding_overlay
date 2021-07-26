@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
 
+import 'label_painter.dart';
+
 @immutable
 class OnboardingStep {
   /// At least a [title] or a [bodyText] should be provided.
@@ -9,12 +11,13 @@ class OnboardingStep {
   /// At least a [bodyTextColor] or a [bodyTextStyle] should be provided.
   const OnboardingStep({
     required this.focusNode,
-    this.title,
+    required this.title,
     this.titleTextStyle,
     this.titleTextColor = const Color(0xFFFFFFFF),
     this.bodyText,
     this.bodyTextStyle,
     this.bodyTextColor = const Color(0xFFFFFFFF),
+    this.textAlign = TextAlign.start,
     this.shape = const RoundedRectangleBorder(
       borderRadius: BorderRadius.all(Radius.circular(8.0)),
     ),
@@ -23,16 +26,14 @@ class OnboardingStep {
     this.overlayShape = const RoundedRectangleBorder(
       borderRadius: BorderRadius.all(Radius.circular(8.0)),
     ),
-    this.labelBoxDecoration = const BoxDecoration(
-      shape: BoxShape.rectangle,
-      borderRadius: BorderRadius.all(Radius.circular(5.0)),
-      color: Color(0x00000000),
-    ),
-    this.labelBoxPadding = EdgeInsets.zero,
     this.hasLabelBox = false,
+    this.labelBoxColor = const Color(0x00000000),
+    this.labelBoxRadius = const Radius.circular(5.0),
+    this.labelBoxPadding = const EdgeInsets.all(8.0),
     this.hasArrow = false,
     this.fullscreen = true,
     this.delay = Duration.zero,
+    this.arrowPosition = ArrowPosition.bottomCenter,
   })  : assert(titleTextColor != null || titleTextStyle != null),
         assert(bodyTextColor != null || bodyTextStyle != null),
         assert(title != null || bodyText != null);
@@ -40,13 +41,19 @@ class OnboardingStep {
   /// is required
   final FocusNode focusNode;
 
+  /// By default, the value used is `TextAlign.start`
+  final TextAlign textAlign;
+
   /// By default, the value used is `Color(0xFFFFFFFF)`
   final Color? titleTextColor;
 
   /// By default, the value used is `Color(0xFFFFFFFF)`
   final Color? bodyTextColor;
 
-  final String? title;
+  final String title;
+
+  /// By default, the value used is `ArrowPosition.centerLeft`
+  final ArrowPosition arrowPosition;
 
   /// By default, the value is
   /// ```
@@ -96,13 +103,17 @@ class OnboardingStep {
 
   /// By default, the value is
   /// ```
-  /// BoxDecoration(
-  ///   shape: BoxShape.rectangle,
-  ///   borderRadius: BorderRadius.all(Radius.circular(5.0)),
-  ///   color: Color(0x00000000),
-  /// )
+  /// Color(0x00000000),
+  ///
   /// ```
-  final BoxDecoration labelBoxDecoration;
+  final Color labelBoxColor;
+
+  /// By default, the value is
+  /// ```
+  /// Radius.circular(5.0)
+  ///
+  /// ```
+  final Radius labelBoxRadius;
 
   /// By default, the value used is false
   final bool hasLabelBox;
@@ -129,9 +140,12 @@ class OnboardingStep {
     ShapeBorder? overlayShape,
     EdgeInsets? margin,
     EdgeInsets? labelBoxPadding,
-    BoxDecoration? labelBoxDecoration,
+    Color? labelBoxColor,
+    Radius? labelBoxRadius,
     bool? hasLabelBox,
     bool? hasArrow,
+    TextAlign? textAlign,
+    ArrowPosition? arrowPosition,
     bool? fullscreen,
     Duration? delay,
   }) {
@@ -143,14 +157,17 @@ class OnboardingStep {
       titleTextStyle: titleTextStyle ?? this.titleTextStyle,
       bodyText: bodyText ?? this.bodyText,
       bodyTextStyle: bodyTextStyle ?? this.bodyTextStyle,
+      textAlign: textAlign ?? this.textAlign,
       shape: shape ?? this.shape,
       overlayColor: overlayColor ?? this.overlayColor,
       overlayShape: overlayShape ?? this.overlayShape,
       margin: margin ?? this.margin,
       labelBoxPadding: labelBoxPadding ?? this.labelBoxPadding,
-      labelBoxDecoration: labelBoxDecoration ?? this.labelBoxDecoration,
+      labelBoxColor: labelBoxColor ?? this.labelBoxColor,
+      labelBoxRadius: labelBoxRadius ?? this.labelBoxRadius,
       hasLabelBox: hasLabelBox ?? this.hasLabelBox,
       hasArrow: hasArrow ?? this.hasArrow,
+      arrowPosition: arrowPosition ?? this.arrowPosition,
       fullscreen: fullscreen ?? this.fullscreen,
       delay: delay ?? this.delay,
     );
@@ -171,7 +188,7 @@ class OnboardingStep {
       overlayShape: $overlayShape, 
       margin: $margin, 
       labelBoxPadding: $labelBoxPadding, 
-      labelBoxDecoration: $labelBoxDecoration, 
+      labelBoxColor: $labelBoxColor, 
       hasLabelBox: $hasLabelBox, 
       hasArrow: $hasArrow, 
       fullscreen: $fullscreen, 

@@ -1,169 +1,237 @@
+import 'dart:developer';
+import 'dart:math' as math;
+import 'dart:ui';
 import 'package:flutter/widgets.dart';
+import 'package:vector_math/vector_math.dart';
 import 'constants.dart';
+
+enum ArrowPosition { centerLeft, centerRight, topCenter, bottomCenter }
 
 class LabelPainter extends CustomPainter {
   LabelPainter({
-    this.label,
+    required this.title,
+    this.body = '',
+    required this.titleTextStyle,
+    required this.bodyTextStyle,
+    this.textAlign = TextAlign.start,
+    required this.width,
+    required this.height,
     this.opacity,
-    this.hole,
-    this.viewport,
-    this.color = const Color(0xFFFFFFFF),
-    this.style,
-    this.labelBoxRadius = 10.0,
-    this.labelBoxColor = const Color(0xFF0A76F1),
     this.hasLabelBox = false,
+    this.labelBoxColor = const Color(0x00000000),
+    this.labelBoxRadius = const Radius.circular(3.0),
+    this.labelBoxPadding = const EdgeInsets.all(8.0),
     this.hasArrow = false,
-    this.fullscreen = true,
-    this.margin = const EdgeInsets.all(8.0),
+    this.arrowPosition = ArrowPosition.bottomCenter,
   });
 
-  final String? label;
-  final double? opacity;
-  final Rect? hole;
-  final Size? viewport;
-  final Color color;
-  final TextStyle? style;
-  final double labelBoxRadius;
   final Color labelBoxColor;
+  final Radius labelBoxRadius;
+  final EdgeInsets labelBoxPadding;
+  final String title;
+  final String? body;
+  final TextStyle titleTextStyle;
+  final TextStyle bodyTextStyle;
+  final double? opacity;
+  final double width;
+  final double height;
+  final TextAlign textAlign;
   final bool hasLabelBox;
   final bool hasArrow;
-  final bool fullscreen;
-  final EdgeInsets margin;
+  final ArrowPosition arrowPosition;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final TextPainter textPainter = _createTextPainter(color, opacity, style);
+    final ParagraphBuilder builder = ParagraphBuilder(ParagraphStyle(
+      textAlign: textAlign,
+    ))
+      ..pushStyle(titleTextStyle.getTextStyle())
+      ..addText(title)
+      ..addText("\n");
 
-    textPainter.layout(maxWidth: size.width * (fullscreen ? 0.8 : 0.55));
-    // debugPrint('$hole');
-    final Offset offset = Offset(
-      hole == null || fullscreen
-          ? size.width / 2 - textPainter.size.width / 2
-          : size.width -
-              (size.width * kOverlayRatio +
-                      hole!.width +
-                      (size.width - hole!.right)) /
-                  2 -
-              textPainter.size.width / 2,
-      hole == null
-          ? Rect.fromPoints(Offset.zero, size.bottomRight(Offset.zero))
-              .center
-              .dy
-          : hole!.center.dy <= viewport!.height / 2
-              ? hole!.bottom +
-                  textPainter.size.height +
-                  (hasLabelBox ? margin.bottom * 3 : margin.bottom * 2)
-              : hole!.top -
-                  textPainter.size.height -
-                  (hasLabelBox ? margin.top * 3 : margin.top * 2),
-    );
+    if (body != null && body!.isNotEmpty) {
+      builder
+        ..pushStyle(bodyTextStyle.getTextStyle())
+        ..addText(body!);
+    }
 
-    final Paint labelBoxPaint = Paint()
-      ..color = labelBoxColor
-      ..style = PaintingStyle.fill;
+    final Paragraph paragraph = builder.build()
+      ..layout(ParagraphConstraints(
+          width: width - labelBoxPadding.left - labelBoxPadding.right));
 
-    final Path triangleTop = _createTriangleTopPath(offset, textPainter);
-    final Path triangleBottom = _createTriangleBottomPath(offset, textPainter);
+    final double paragraphHeight = paragraph.height;
+    final double paragraphWidth = paragraph.width;
+
+    final Rect paraRect = Offset(
+          (size.width - paragraphWidth) / 2,
+          (size.height - paragraphHeight) / 2,
+        ) &
+        Size(paragraphWidth, paragraphHeight);
+
+    final Rect paddingBox = rectWithPadding(paraRect, labelBoxPadding);
 
     if (hasLabelBox) {
-      _drawLabelBox(
-        canvas: canvas,
-        offset: offset,
-        textPainter: textPainter,
-        labelBoxPaint: labelBoxPaint,
-        triangleTop: triangleTop,
-        triangleBottom: triangleBottom,
+      final Rect rect = Rect.fromLTWH(
+        paraRect.left - labelBoxPadding.left,
+        paraRect.top - labelBoxPadding.top,
+        paddingBox.width,
+        paddingBox.height,
       );
+      final RRect rrect = RRect.fromRectAndRadius(rect, labelBoxRadius);
+      final Paint labelBoxPaint = Paint()..color = labelBoxColor;
+      canvas.drawRRect(rrect, labelBoxPaint);
+    }
+    if (hasArrow) {
+      final Paint paintBody = Paint()..color = labelBoxColor;
+      const double a = 16;
+      final double c = a / math.sin(radians(60));
+      final double b = math.cos(radians(60)) * c;
+
+      Path arrowPath = Path();
+
+      switch (arrowPosition) {
+        case ArrowPosition.bottomCenter:
+          arrowPath = drawBottomCenterArrow(paddingBox, a, b);
+          break;
+        case ArrowPosition.topCenter:
+          arrowPath = drawTopCenterArrow(paddingBox, a, b);
+          break;
+        case ArrowPosition.centerLeft:
+          arrowPath = drawCenterLeftArrow(paddingBox, a, b);
+          break;
+        case ArrowPosition.centerRight:
+          arrowPath = drawCenterRightArrow(paddingBox, a, b);
+          break;
+        default:
+      }
+
+      canvas.drawPath(arrowPath, paintBody);
     }
 
-    textPainter.paint(canvas, offset);
+    canvas.drawParagraph(
+        paragraph,
+        Offset(
+          (size.width - paragraphWidth) / 2,
+          (size.height - paragraphHeight) / 2,
+        ));
   }
 
-  TextPainter _createTextPainter(
-    Color color,
-    double? opacity,
-    TextStyle? style,
-  ) {
-    return TextPainter(
-      text: TextSpan(
-        text: label,
-        style: style ??
-            TextStyle(
-              color: color.withOpacity(opacity!),
-            ),
-      ),
-      textAlign: TextAlign.center,
-      textDirection: TextDirection.ltr,
-    );
-  }
-
-  void _drawLabelBox({
-    required Canvas canvas,
-    required Offset offset,
-    required TextPainter textPainter,
-    required Paint labelBoxPaint,
-    Path? triangleTop,
-    Path? triangleBottom,
-  }) {
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(
-          offset.dx - margin.top,
-          offset.dy - margin.left,
-          textPainter.size.width + margin.left + margin.right,
-          textPainter.size.height + margin.top + margin.bottom,
-        ),
-        Radius.circular(labelBoxRadius),
-      ),
-      labelBoxPaint,
-    );
-
-    // debugPrint('hasArrow $hasArrow');
-    if (hole != null && hasArrow) {
-      if (hole!.center.dy <= viewport!.height / 2 && triangleTop != null) {
-        canvas.drawPath(triangleTop, labelBoxPaint);
-      }
-      if (hole!.center.dy > viewport!.height / 2 && triangleBottom != null) {
-        canvas.drawPath(triangleBottom, labelBoxPaint);
-      }
-    }
-  }
-
-  Path _createTriangleTopPath(Offset offset, TextPainter p) {
+  Path drawCenterRightArrow(Rect paddingBox, double a, double b) {
     return Path()
       ..moveTo(
-        offset.dx + p.size.width / 2,
-        offset.dy - p.size.height * 1.2,
+        paddingBox.centerRight.dx,
+        paddingBox.centerRight.dy,
       )
       ..lineTo(
-        offset.dx + p.size.width / 2 - p.size.height / 2,
-        offset.dy - p.size.height / 2 + 1,
+        paddingBox.centerRight.dx,
+        paddingBox.centerRight.dy - b,
       )
       ..lineTo(
-        offset.dx + p.size.width / 2 + p.size.height / 2,
-        offset.dy - p.size.height / 2 + 1,
+        paddingBox.centerRight.dx + a,
+        paddingBox.centerRight.dy,
       )
-      ..close();
+      ..lineTo(
+        paddingBox.centerRight.dx,
+        paddingBox.centerRight.dy + b,
+      )
+      ..lineTo(
+        paddingBox.centerRight.dx,
+        paddingBox.centerRight.dy,
+      );
   }
 
-  Path _createTriangleBottomPath(Offset offset, TextPainter p) {
+  Path drawCenterLeftArrow(Rect paddingBox, double a, double b) {
     return Path()
       ..moveTo(
-        offset.dx + p.size.width / 2,
-        offset.dy + p.size.height * 2.2,
+        paddingBox.centerLeft.dx,
+        paddingBox.centerLeft.dy,
       )
       ..lineTo(
-        offset.dx + p.size.width / 2 - p.size.height / 2,
-        offset.dy + p.size.height + p.size.height / 2 - 1,
+        paddingBox.centerLeft.dx,
+        paddingBox.centerLeft.dy - b,
       )
       ..lineTo(
-        offset.dx + p.size.width / 2 + p.size.height / 2,
-        offset.dy + p.size.height + p.size.height / 2 - 1,
+        paddingBox.centerLeft.dx - a,
+        paddingBox.centerLeft.dy,
       )
-      ..close();
+      ..lineTo(
+        paddingBox.centerLeft.dx,
+        paddingBox.centerLeft.dy + b,
+      )
+      ..lineTo(
+        paddingBox.centerLeft.dx,
+        paddingBox.centerLeft.dy,
+      );
+  }
+
+  Path drawBottomCenterArrow(Rect paddingBox, double a, double b) {
+    return Path()
+      ..moveTo(
+        paddingBox.bottomCenter.dx,
+        paddingBox.bottomCenter.dy,
+      )
+      ..lineTo(
+        paddingBox.bottomCenter.dx - b,
+        paddingBox.bottomCenter.dy,
+      )
+      ..lineTo(
+        paddingBox.bottomCenter.dx,
+        paddingBox.bottomCenter.dy + a,
+      )
+      ..lineTo(
+        paddingBox.bottomCenter.dx + b,
+        paddingBox.bottomCenter.dy,
+      )
+      ..lineTo(
+        paddingBox.bottomCenter.dx,
+        paddingBox.bottomCenter.dy,
+      );
+  }
+
+  Path drawTopCenterArrow(Rect paddingBox, double a, double b) {
+    return Path()
+      ..moveTo(
+        paddingBox.topCenter.dx,
+        paddingBox.topCenter.dy,
+      )
+      ..lineTo(
+        paddingBox.topCenter.dx - b,
+        paddingBox.topCenter.dy,
+      )
+      ..lineTo(
+        paddingBox.topCenter.dx,
+        paddingBox.topCenter.dy - a,
+      )
+      ..lineTo(
+        paddingBox.topCenter.dx + b,
+        paddingBox.topCenter.dy,
+      )
+      ..lineTo(
+        paddingBox.topCenter.dx,
+        paddingBox.topCenter.dy,
+      );
+  }
+
+  Rect rectWithPadding(Rect rect, EdgeInsets padding) {
+    return Rect.fromLTRB(
+      rect.left - padding.left,
+      rect.top - padding.top,
+      rect.right + padding.right,
+      rect.bottom + padding.bottom,
+    );
   }
 
   @override
   bool shouldRepaint(LabelPainter oldDelegate) =>
-      opacity != oldDelegate.opacity;
+      opacity != oldDelegate.opacity ||
+      width != oldDelegate.width ||
+      height != oldDelegate.height ||
+      title != oldDelegate.title ||
+      body != oldDelegate.body ||
+      titleTextStyle != oldDelegate.titleTextStyle ||
+      bodyTextStyle != oldDelegate.bodyTextStyle ||
+      labelBoxColor != oldDelegate.labelBoxColor ||
+      labelBoxPadding != oldDelegate.labelBoxPadding ||
+      labelBoxRadius != oldDelegate.labelBoxRadius ||
+      hasArrow != oldDelegate.hasArrow;
 }
