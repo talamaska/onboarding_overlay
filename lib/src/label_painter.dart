@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/widgets.dart';
@@ -7,122 +6,188 @@ import 'constants.dart';
 
 enum ArrowPosition { centerLeft, centerRight, topCenter, bottomCenter }
 
+const Color transparentColor = Color(0x00000000);
+
 class LabelPainter extends CustomPainter {
   LabelPainter({
     required this.title,
-    this.body = '',
     required this.titleTextStyle,
+    this.body = '',
     required this.bodyTextStyle,
     this.textAlign = TextAlign.start,
-    required this.width,
-    required this.height,
-    this.opacity,
-    this.hasLabelBox = false,
-    this.labelBoxColor = const Color(0x00000000),
-    this.labelBoxRadius = const Radius.circular(3.0),
-    this.labelBoxPadding = const EdgeInsets.all(8.0),
+    this.opacity = 1,
     this.hasArrow = false,
-    this.arrowPosition = ArrowPosition.bottomCenter,
-  });
+    this.hasLabelBox = false,
+    this.arrowPosition = ArrowPosition.topCenter,
+    this.arrowHeight = kArrowHeight,
+    this.labelBoxPadding = const EdgeInsets.all(8.0),
+    this.labelBoxDecoration = const BoxDecoration(
+      shape: BoxShape.rectangle,
+      borderRadius: BorderRadius.all(Radius.circular(8.0)),
+      color: Color(0x00000000),
+    ),
+  })  : assert(
+            (hasArrow && hasLabelBox) ||
+                (!hasArrow && !hasLabelBox) ||
+                !hasArrow && hasLabelBox,
+            'hasArrow $hasArrow cannot be true if hasLabelBox $hasLabelBox is false'),
+        _decoration = labelBoxDecoration.copyWith(
+          shape: BoxShape.rectangle,
+        );
 
-  final Color labelBoxColor;
-  final Radius labelBoxRadius;
+  /// By default, the value is
+  /// ```
+  /// BoxDecoration(
+  ///     shape: BoxShape.rectangle,
+  ///     borderRadius: BorderRadius.all(Radius.circular(8.0)),
+  ///     color: Color(0x00000000),
+  ///   )
+  /// ```
+  /// Any shape different from ```BoxShape.rectangle``` will be ignored
+  final BoxDecoration labelBoxDecoration;
+
+  /// By default, the value is EdgeInsets.all(8.0)
   final EdgeInsets labelBoxPadding;
-  final String title;
-  final String? body;
-  final TextStyle titleTextStyle;
-  final TextStyle bodyTextStyle;
-  final double? opacity;
-  final double width;
-  final double height;
-  final TextAlign textAlign;
-  final bool hasLabelBox;
-  final bool hasArrow;
+
+  final BoxDecoration _decoration;
+
+  /// Triangle height will be used to calculate all the side of equilateral triangle
+  /// representing the arrow
+  final double arrowHeight;
+
+  /// By the default the value is ArrowPosition.topCenter
+  /// you have to set the arrow position according to your widget position
+  /// It will not be calculated automatically
   final ArrowPosition arrowPosition;
+
+  /// By default, the value is TextAlign.start
+  final TextAlign textAlign;
+
+  final String title;
+  final TextStyle titleTextStyle;
+
+  /// By default, the value is an empty string and will not be displayed.
+  final String body;
+  final TextStyle bodyTextStyle;
+
+  /// By default, the value is false
+  final bool hasLabelBox;
+
+  /// By default, the value is false. The arrow will not be displayed if the hasLabelBox is false.
+  /// the background color and the border will be read from the the labelBoxDecoration
+  final bool hasArrow;
+
+  /// By default, the value is 1.
+  /// This property is used for fading animation of the texts and the label box
+  final double opacity;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final ParagraphBuilder builder = ParagraphBuilder(ParagraphStyle(
-      textAlign: textAlign,
-    ))
-      ..pushStyle(titleTextStyle.getTextStyle())
-      ..addText(title)
-      ..addText("\n");
+    final Paragraph paragraph = buildParagraph(size);
 
-    if (body != null && body!.isNotEmpty) {
-      builder
-        ..pushStyle(bodyTextStyle.getTextStyle())
-        ..addText(body!);
-    }
-
-    final Paragraph paragraph = builder.build()
-      ..layout(ParagraphConstraints(
-          width: width - labelBoxPadding.left - labelBoxPadding.right));
-
-    final double paragraphHeight = paragraph.height;
-    final double paragraphWidth = paragraph.width;
-
-    final Rect paraRect = Offset(
-          (size.width - paragraphWidth) / 2,
-          (size.height - paragraphHeight) / 2,
+    final Rect paragraphRect = Offset(
+          (size.width - paragraph.width) / 2,
+          (size.height - paragraph.height) / 2,
         ) &
-        Size(paragraphWidth, paragraphHeight);
+        Size(paragraph.width, paragraph.height);
 
-    final Rect paddingBox = rectWithPadding(paraRect, labelBoxPadding);
+    final Rect paddingBox = rectWithPadding(paragraphRect, labelBoxPadding);
+
+    final Paint paintBody = Paint()
+      ..isAntiAlias = true
+      ..color = _decoration.color?.withOpacity(opacity) ?? transparentColor;
+
+    final Paint paintBorder = Paint()
+      ..isAntiAlias = true
+      ..strokeWidth = 2.0
+      ..style = PaintingStyle.stroke
+      ..color = _decoration.border?.top.color.withOpacity(opacity) ??
+          transparentColor;
 
     if (hasLabelBox) {
-      final Rect rect = Rect.fromLTWH(
-        paraRect.left - labelBoxPadding.left,
-        paraRect.top - labelBoxPadding.top,
+      final Offset labelOffset = Offset(
+        paragraphRect.left - labelBoxPadding.left,
+        paragraphRect.top - labelBoxPadding.top,
+      );
+
+      final Size labelSize = Size(
         paddingBox.width,
         paddingBox.height,
       );
-      final RRect rrect = RRect.fromRectAndRadius(rect, labelBoxRadius);
-      final Paint labelBoxPaint = Paint()..color = labelBoxColor;
-      canvas.drawRRect(rrect, labelBoxPaint);
-    }
-    if (hasArrow) {
-      final Paint paintBody = Paint()..color = labelBoxColor;
-      const double a = 16;
-      final double c = a / math.sin(radians(60));
-      final double b = math.cos(radians(60)) * c;
+
+      Path labelBoxPath = _decoration.getClipPath(
+        labelOffset & labelSize,
+        TextDirection.ltr,
+      );
 
       Path arrowPath = Path();
 
-      switch (arrowPosition) {
-        case ArrowPosition.bottomCenter:
-          arrowPath = drawBottomCenterArrow(paddingBox, a, b);
-          break;
-        case ArrowPosition.topCenter:
-          arrowPath = drawTopCenterArrow(paddingBox, a, b);
-          break;
-        case ArrowPosition.centerLeft:
-          arrowPath = drawCenterLeftArrow(paddingBox, a, b);
-          break;
-        case ArrowPosition.centerRight:
-          arrowPath = drawCenterRightArrow(paddingBox, a, b);
-          break;
-        default:
+      if (hasArrow) {
+        final double a = arrowHeight;
+        final double c = a / math.sin(radians(60));
+        final double b = math.cos(radians(60)) * c;
+
+        switch (arrowPosition) {
+          case ArrowPosition.bottomCenter:
+            arrowPath = drawBottomCenterArrow(paddingBox, a, b);
+            break;
+          case ArrowPosition.topCenter:
+            arrowPath = drawTopCenterArrow(paddingBox, a, b);
+            break;
+          case ArrowPosition.centerLeft:
+            arrowPath = drawCenterLeftArrow(paddingBox, a, b);
+            break;
+          case ArrowPosition.centerRight:
+            arrowPath = drawCenterRightArrow(paddingBox, a, b);
+            break;
+          default:
+        }
+
+        labelBoxPath =
+            Path.combine(PathOperation.union, labelBoxPath, arrowPath);
       }
 
-      canvas.drawPath(arrowPath, paintBody);
+      canvas.drawPath(labelBoxPath, paintBorder);
+      canvas.drawPath(labelBoxPath, paintBody);
     }
 
     canvas.drawParagraph(
         paragraph,
         Offset(
-          (size.width - paragraphWidth) / 2,
-          (size.height - paragraphHeight) / 2,
+          (size.width - paragraph.width) / 2,
+          (size.height - paragraph.height) / 2,
         ));
+  }
+
+  Paragraph buildParagraph(Size size) {
+    final ParagraphBuilder builder = ParagraphBuilder(ParagraphStyle(
+      textAlign: textAlign,
+    ))
+      ..pushStyle(titleTextStyle
+          .copyWith(color: titleTextStyle.color?.withOpacity(opacity))
+          .getTextStyle())
+      ..addText(title)
+      ..addText("\n");
+
+    if (body.isNotEmpty) {
+      builder
+        ..pushStyle(bodyTextStyle
+            .copyWith(color: bodyTextStyle.color?.withOpacity(opacity))
+            .getTextStyle())
+        ..addText(body);
+    }
+
+    final Paragraph paragraph = builder.build()
+      ..layout(ParagraphConstraints(
+        width: size.width - labelBoxPadding.left - labelBoxPadding.right,
+      ));
+
+    return paragraph;
   }
 
   Path drawCenterRightArrow(Rect paddingBox, double a, double b) {
     return Path()
       ..moveTo(
-        paddingBox.centerRight.dx,
-        paddingBox.centerRight.dy,
-      )
-      ..lineTo(
         paddingBox.centerRight.dx,
         paddingBox.centerRight.dy - b,
       )
@@ -135,18 +200,22 @@ class LabelPainter extends CustomPainter {
         paddingBox.centerRight.dy + b,
       )
       ..lineTo(
+        paddingBox.centerRight.dx - labelBoxPadding.right,
+        paddingBox.centerRight.dy + b,
+      )
+      ..lineTo(
+        paddingBox.centerRight.dx - labelBoxPadding.right,
+        paddingBox.centerRight.dy - b,
+      )
+      ..lineTo(
         paddingBox.centerRight.dx,
-        paddingBox.centerRight.dy,
+        paddingBox.centerRight.dy - b,
       );
   }
 
   Path drawCenterLeftArrow(Rect paddingBox, double a, double b) {
     return Path()
       ..moveTo(
-        paddingBox.centerLeft.dx,
-        paddingBox.centerLeft.dy,
-      )
-      ..lineTo(
         paddingBox.centerLeft.dx,
         paddingBox.centerLeft.dy - b,
       )
@@ -159,18 +228,22 @@ class LabelPainter extends CustomPainter {
         paddingBox.centerLeft.dy + b,
       )
       ..lineTo(
+        paddingBox.centerLeft.dx + labelBoxPadding.left,
+        paddingBox.centerLeft.dy + b,
+      )
+      ..lineTo(
+        paddingBox.centerLeft.dx + labelBoxPadding.left,
+        paddingBox.centerLeft.dy - b,
+      )
+      ..lineTo(
         paddingBox.centerLeft.dx,
-        paddingBox.centerLeft.dy,
+        paddingBox.centerLeft.dy - b,
       );
   }
 
   Path drawBottomCenterArrow(Rect paddingBox, double a, double b) {
     return Path()
       ..moveTo(
-        paddingBox.bottomCenter.dx,
-        paddingBox.bottomCenter.dy,
-      )
-      ..lineTo(
         paddingBox.bottomCenter.dx - b,
         paddingBox.bottomCenter.dy,
       )
@@ -183,7 +256,15 @@ class LabelPainter extends CustomPainter {
         paddingBox.bottomCenter.dy,
       )
       ..lineTo(
-        paddingBox.bottomCenter.dx,
+        paddingBox.bottomCenter.dx + b,
+        paddingBox.bottomCenter.dy - labelBoxPadding.bottom,
+      )
+      ..lineTo(
+        paddingBox.bottomCenter.dx - b,
+        paddingBox.bottomCenter.dy - labelBoxPadding.bottom,
+      )
+      ..lineTo(
+        paddingBox.bottomCenter.dx - b,
         paddingBox.bottomCenter.dy,
       );
   }
@@ -191,10 +272,6 @@ class LabelPainter extends CustomPainter {
   Path drawTopCenterArrow(Rect paddingBox, double a, double b) {
     return Path()
       ..moveTo(
-        paddingBox.topCenter.dx,
-        paddingBox.topCenter.dy,
-      )
-      ..lineTo(
         paddingBox.topCenter.dx - b,
         paddingBox.topCenter.dy,
       )
@@ -207,7 +284,15 @@ class LabelPainter extends CustomPainter {
         paddingBox.topCenter.dy,
       )
       ..lineTo(
-        paddingBox.topCenter.dx,
+        paddingBox.topCenter.dx + b,
+        paddingBox.topCenter.dy + labelBoxPadding.top,
+      )
+      ..lineTo(
+        paddingBox.topCenter.dx - b,
+        paddingBox.topCenter.dy + labelBoxPadding.top,
+      )
+      ..lineTo(
+        paddingBox.topCenter.dx - b,
         paddingBox.topCenter.dy,
       );
   }
@@ -224,14 +309,15 @@ class LabelPainter extends CustomPainter {
   @override
   bool shouldRepaint(LabelPainter oldDelegate) =>
       opacity != oldDelegate.opacity ||
-      width != oldDelegate.width ||
-      height != oldDelegate.height ||
       title != oldDelegate.title ||
       body != oldDelegate.body ||
       titleTextStyle != oldDelegate.titleTextStyle ||
       bodyTextStyle != oldDelegate.bodyTextStyle ||
-      labelBoxColor != oldDelegate.labelBoxColor ||
       labelBoxPadding != oldDelegate.labelBoxPadding ||
-      labelBoxRadius != oldDelegate.labelBoxRadius ||
+      labelBoxDecoration != oldDelegate.labelBoxDecoration ||
+      arrowHeight != oldDelegate.arrowHeight ||
+      arrowPosition != oldDelegate.arrowPosition ||
+      textAlign != oldDelegate.textAlign ||
+      hasLabelBox != oldDelegate.hasLabelBox ||
       hasArrow != oldDelegate.hasArrow;
 }

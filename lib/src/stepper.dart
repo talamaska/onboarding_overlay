@@ -219,7 +219,9 @@ class _OnboardingStepperState extends State<OnboardingStepper>
         }
       } else {
         if (_widgetRect!.center.dy > size.height / 2) {
-          return _widgetRect!.top - boxHeight;
+          return holeRect.top -
+              boxHeight -
+              (step.hasArrow ? 16.0 + step.margin.bottom : step.margin.bottom);
         } else {
           return _widgetRect!.bottom + step.margin.bottom;
         }
@@ -242,23 +244,19 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     final TextStyle localBodyTextStyle =
         textTheme.bodyText1!.copyWith(color: step.bodyTextColor);
 
-    //         final CupertinoTextThemeData textTheme =
-    //     CupertinoTheme.of(context).textTheme;
-
-    // final TextStyle localTitleTextStyle =
-    //     textTheme.navLargeTitleTextStyle.copyWith(color: step.titleTextColor);
-    // final TextStyle localBodyTextStyle =
-    //     textTheme.textStyle.copyWith(color: step.bodyTextColor);
-
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
         _proceed();
       },
       child: Stack(
+        key: step.key,
         children: <Widget>[
           CustomPaint(
-            child: Container(),
+            child: SizedBox(
+              width: size.width,
+              height: size.height,
+            ),
             painter: HolePainter(
               fullscreen: step.fullscreen,
               shape: step.shape,
@@ -274,22 +272,21 @@ class _OnboardingStepperState extends State<OnboardingStepper>
             top: _getVerticalPosition(step, size),
             child: FadeTransition(
               opacity: _animation,
-              child: Container(
+              child: SizedBox(
                 width: boxWidth,
                 height: boxHeight,
                 child: CustomPaint(
                   painter: LabelPainter(
                     title: step.title,
-                    body: step.bodyText ?? '',
+                    body: step.bodyText,
                     titleTextStyle: step.titleTextStyle ?? localTitleTextStyle,
                     bodyTextStyle: step.bodyTextStyle ?? localBodyTextStyle,
-                    width: boxWidth,
-                    height: boxHeight,
                     opacity: _animation.value,
                     hasLabelBox: step.hasLabelBox,
                     labelBoxPadding: step.labelBoxPadding,
-                    labelBoxColor: step.labelBoxColor,
-                    labelBoxRadius: step.labelBoxRadius,
+                    // labelBoxColor: step.labelBoxColor,
+                    // labelBoxRadius: step.labelBoxRadius,
+                    labelBoxDecoration: step.labelBoxDecoration,
                     hasArrow: step.hasArrow,
                     arrowPosition: step.arrowPosition,
                     textAlign: step.textAlign,

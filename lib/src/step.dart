@@ -10,11 +10,12 @@ class OnboardingStep {
   ///
   /// At least a [bodyTextColor] or a [bodyTextStyle] should be provided.
   const OnboardingStep({
+    this.key,
     required this.focusNode,
     required this.title,
     this.titleTextStyle,
     this.titleTextColor = const Color(0xFFFFFFFF),
-    this.bodyText,
+    this.bodyText = '',
     this.bodyTextStyle,
     this.bodyTextColor = const Color(0xFFFFFFFF),
     this.textAlign = TextAlign.start,
@@ -27,16 +28,23 @@ class OnboardingStep {
       borderRadius: BorderRadius.all(Radius.circular(8.0)),
     ),
     this.hasLabelBox = false,
-    this.labelBoxColor = const Color(0x00000000),
-    this.labelBoxRadius = const Radius.circular(5.0),
     this.labelBoxPadding = const EdgeInsets.all(8.0),
+    this.labelBoxDecoration = const BoxDecoration(),
     this.hasArrow = false,
     this.fullscreen = true,
     this.delay = Duration.zero,
-    this.arrowPosition = ArrowPosition.bottomCenter,
-  })  : assert(titleTextColor != null || titleTextStyle != null),
-        assert(bodyTextColor != null || bodyTextStyle != null),
-        assert(title != null || bodyText != null);
+    this.arrowPosition = ArrowPosition.topCenter,
+  })  : assert(titleTextColor != null || titleTextStyle != null,
+            'You should provide at least one of titleTextColor or titleTextStyle'),
+        assert(bodyTextColor != null || bodyTextStyle != null,
+            'You should provide at least one of bodyTextColor or bodyTextStyle'),
+        assert(
+            (hasArrow && hasLabelBox) ||
+                (!hasArrow && !hasLabelBox) ||
+                !hasArrow && hasLabelBox,
+            'hasArrow $hasArrow cannot be true if hasLabelBox $hasLabelBox is false');
+
+  final Key? key;
 
   /// is required
   final FocusNode focusNode;
@@ -64,7 +72,7 @@ class OnboardingStep {
   /// ```
   final TextStyle? titleTextStyle;
 
-  final String? bodyText;
+  final String bodyText;
 
   /// By default, the value is
   /// ```
@@ -74,6 +82,9 @@ class OnboardingStep {
   ///   .copyWith(color: step.bodyTextColor)
   /// ```
   final TextStyle? bodyTextStyle;
+
+  /// By default, the value is BoxDecoration()
+  final BoxDecoration labelBoxDecoration;
 
   /// By default, the value is
   /// ```
@@ -106,14 +117,14 @@ class OnboardingStep {
   /// Color(0x00000000),
   ///
   /// ```
-  final Color labelBoxColor;
+  // final Color labelBoxColor;
 
   /// By default, the value is
   /// ```
   /// Radius.circular(5.0)
   ///
   /// ```
-  final Radius labelBoxRadius;
+  // final Radius labelBoxRadius;
 
   /// By default, the value used is false
   final bool hasLabelBox;
@@ -140,8 +151,6 @@ class OnboardingStep {
     ShapeBorder? overlayShape,
     EdgeInsets? margin,
     EdgeInsets? labelBoxPadding,
-    Color? labelBoxColor,
-    Radius? labelBoxRadius,
     bool? hasLabelBox,
     bool? hasArrow,
     TextAlign? textAlign,
@@ -163,8 +172,6 @@ class OnboardingStep {
       overlayShape: overlayShape ?? this.overlayShape,
       margin: margin ?? this.margin,
       labelBoxPadding: labelBoxPadding ?? this.labelBoxPadding,
-      labelBoxColor: labelBoxColor ?? this.labelBoxColor,
-      labelBoxRadius: labelBoxRadius ?? this.labelBoxRadius,
       hasLabelBox: hasLabelBox ?? this.hasLabelBox,
       hasArrow: hasArrow ?? this.hasArrow,
       arrowPosition: arrowPosition ?? this.arrowPosition,
@@ -175,23 +182,26 @@ class OnboardingStep {
 
   @override
   String toString() {
-    return '''OnboardStep(
-      focusNode: $focusNode,
-      titleTextColor: $titleTextColor, 
-      bodyTextColor: $bodyTextColor, 
+    return '''OnboardingStep(
+      key: $key, 
+      focusNode: $focusNode, 
+      arrowPosition: $arrowPosition, 
       title: $title, 
+      titleTextColor: $titleTextColor, 
       titleTextStyle: $titleTextStyle, 
       bodyText: $bodyText, 
+      bodyTextColor: $bodyTextColor, 
       bodyTextStyle: $bodyTextStyle, 
-      shape: $shape, 
+      textAlign: $textAlign, 
+      labelBoxDecoration: $labelBoxDecoration, 
+      labelBoxPadding: $labelBoxPadding, 
       overlayColor: $overlayColor, 
       overlayShape: $overlayShape, 
       margin: $margin, 
-      labelBoxPadding: $labelBoxPadding, 
-      labelBoxColor: $labelBoxColor, 
-      hasLabelBox: $hasLabelBox, 
       hasArrow: $hasArrow, 
+      hasLabelBox: $hasLabelBox, 
       fullscreen: $fullscreen, 
+      shape: $shape, 
       delay: $delay
     )''';
   }
