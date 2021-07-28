@@ -36,16 +36,23 @@ class _AppState extends State<App> {
           steps: <OnboardingStep>[
             OnboardingStep(
               focusNode: focusNodes[0],
-              title: 'Tap anywhere to continue',
-              bodyText: 'Tap anywhere to continue',
+              title: 'Tap anywhere to continue Tap anywhere to continue',
               titleTextColor: Colors.black,
-              hasLabelBox: true,
-              labelBoxPadding: const EdgeInsets.all(8.0),
-              labelBoxDecoration: const BoxDecoration(
-                color: Colors.blue,
-                borderRadius: BorderRadius.all(Radius.circular(5.0)),
-              ),
+              bodyText: 'Tap anywhere to continue Tap anywhere to continue',
+              labelBoxPadding: const EdgeInsets.all(16.0),
+              labelBoxDecoration: BoxDecoration(
+                  shape: BoxShape.rectangle,
+                  borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+                  color: const Color(0xFF00E1FF),
+                  border: Border.all(
+                    color: const Color(0xFF1E05FB),
+                    width: 1.0,
+                    style: BorderStyle.solid,
+                  )),
+              arrowPosition: ArrowPosition.bottomCenter,
               hasArrow: true,
+              hasLabelBox: true,
+              fullscreen: true,
             ),
             OnboardingStep(
               focusNode: focusNodes[1],
@@ -61,6 +68,20 @@ class _AppState extends State<App> {
               title: 'Easy to customize',
               bodyText: 'Easy to customize',
               overlayColor: Colors.red.withOpacity(0.9),
+              labelBoxPadding: const EdgeInsets.all(16.0),
+              labelBoxDecoration: BoxDecoration(
+                  shape: BoxShape.rectangle,
+                  borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+                  color: const Color(0xFF1100FF),
+                  border: Border.all(
+                    color: const Color(0xFFE2FB05),
+                    width: 1.0,
+                    style: BorderStyle.solid,
+                  )),
+              arrowPosition: ArrowPosition.bottomCenter,
+              hasArrow: true,
+              hasLabelBox: true,
+              textAlign: TextAlign.center,
             ),
             OnboardingStep(
               focusNode: focusNodes[3],

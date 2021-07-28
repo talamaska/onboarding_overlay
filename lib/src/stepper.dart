@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:onboarding_overlay/src/label_painter.dart';
 
 import 'hole_painter.dart';
 import 'step.dart';
@@ -218,7 +219,9 @@ class _OnboardingStepperState extends State<OnboardingStepper>
         }
       } else {
         if (_widgetRect!.center.dy > size.height / 2) {
-          return _widgetRect!.top - boxHeight;
+          return holeRect.top -
+              boxHeight -
+              (step.hasArrow ? 16.0 + step.margin.bottom : step.margin.bottom);
         } else {
           return _widgetRect!.bottom + step.margin.bottom;
         }
@@ -241,23 +244,19 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     final TextStyle localBodyTextStyle =
         textTheme.bodyText1!.copyWith(color: step.bodyTextColor);
 
-    //         final CupertinoTextThemeData textTheme =
-    //     CupertinoTheme.of(context).textTheme;
-
-    // final TextStyle localTitleTextStyle =
-    //     textTheme.navLargeTitleTextStyle.copyWith(color: step.titleTextColor);
-    // final TextStyle localBodyTextStyle =
-    //     textTheme.textStyle.copyWith(color: step.bodyTextColor);
-
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
         _proceed();
       },
       child: Stack(
+        key: step.key,
         children: <Widget>[
           CustomPaint(
-            child: Container(),
+            child: SizedBox(
+              width: size.width,
+              height: size.height,
+            ),
             painter: HolePainter(
               fullscreen: step.fullscreen,
               shape: step.shape,
@@ -273,35 +272,64 @@ class _OnboardingStepperState extends State<OnboardingStepper>
             top: _getVerticalPosition(step, size),
             child: FadeTransition(
               opacity: _animation,
-              child: Container(
+              child: SizedBox(
                 width: boxWidth,
                 height: boxHeight,
-                padding: step.hasLabelBox ? step.labelBoxPadding : null,
-                decoration: step.hasLabelBox ? step.labelBoxDecoration : null,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    if (step.title != null)
-                      Text(
-                        step.title!,
-                        style: step.titleTextStyle ?? localTitleTextStyle,
-                        textAlign: TextAlign.left,
-                      ),
-                    const SizedBox(
-                      height: 8.0,
-                      width: double.infinity,
-                    ),
-                    if (step.bodyText != null)
-                      Text(
-                        step.bodyText!,
-                        style: step.bodyTextStyle ?? localBodyTextStyle,
-                      ),
-                  ],
+                child: CustomPaint(
+                  painter: LabelPainter(
+                    title: step.title,
+                    body: step.bodyText,
+                    titleTextStyle: step.titleTextStyle ?? localTitleTextStyle,
+                    bodyTextStyle: step.bodyTextStyle ?? localBodyTextStyle,
+                    opacity: _animation.value,
+                    hasLabelBox: step.hasLabelBox,
+                    labelBoxPadding: step.labelBoxPadding,
+                    // labelBoxColor: step.labelBoxColor,
+                    // labelBoxRadius: step.labelBoxRadius,
+                    labelBoxDecoration: step.labelBoxDecoration,
+                    hasArrow: step.hasArrow,
+                    arrowPosition: step.arrowPosition,
+                    textAlign: step.textAlign,
+                  ),
                 ),
               ),
             ),
-          )
+          ),
+          // Positioned(
+          //   left: _getHorizontalPosition(step, size),
+          //   top: _getVerticalPosition(step, size),
+          //   child: FadeTransition(
+          //     opacity: _animation,
+          //     child: Container(
+          //       width: boxWidth,
+          //       height: boxHeight,
+          //       // padding: step.hasLabelBox ? step.labelBoxPadding : null,
+          //       // decoration: step.hasLabelBox ? step.labelBoxDecoration : null,
+          //       child: Column(
+          //         crossAxisAlignment: CrossAxisAlignment.start,
+          //         mainAxisAlignment: MainAxisAlignment.center,
+          //         children: <Widget>[
+          //           if (step.title != null)
+          //             Text(
+          //               step.title!,
+          //               style: step.titleTextStyle ?? localTitleTextStyle,
+          //               textAlign: TextAlign.start,
+          //             ),
+          //           const SizedBox(
+          //             height: 8.0,
+          //             width: double.infinity,
+          //           ),
+          //           if (step.bodyText != null)
+          //             Text(
+          //               step.bodyText!,
+          //               style: step.bodyTextStyle ?? localBodyTextStyle,
+          //               textAlign: TextAlign.start,
+          //             ),
+          //         ],
+          //       ),
+          //     ),
+          //   ),
+          // )
         ],
       ),
     );

@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
 
+import 'label_painter.dart';
+
 @immutable
 class OnboardingStep {
   /// At least a [title] or a [bodyText] should be provided.
@@ -8,13 +10,15 @@ class OnboardingStep {
   ///
   /// At least a [bodyTextColor] or a [bodyTextStyle] should be provided.
   const OnboardingStep({
+    this.key,
     required this.focusNode,
-    this.title,
+    required this.title,
     this.titleTextStyle,
     this.titleTextColor = const Color(0xFFFFFFFF),
-    this.bodyText,
+    this.bodyText = '',
     this.bodyTextStyle,
     this.bodyTextColor = const Color(0xFFFFFFFF),
+    this.textAlign = TextAlign.start,
     this.shape = const RoundedRectangleBorder(
       borderRadius: BorderRadius.all(Radius.circular(8.0)),
     ),
@@ -23,22 +27,30 @@ class OnboardingStep {
     this.overlayShape = const RoundedRectangleBorder(
       borderRadius: BorderRadius.all(Radius.circular(8.0)),
     ),
-    this.labelBoxDecoration = const BoxDecoration(
-      shape: BoxShape.rectangle,
-      borderRadius: BorderRadius.all(Radius.circular(5.0)),
-      color: Color(0x00000000),
-    ),
-    this.labelBoxPadding = EdgeInsets.zero,
     this.hasLabelBox = false,
+    this.labelBoxPadding = const EdgeInsets.all(8.0),
+    this.labelBoxDecoration = const BoxDecoration(),
     this.hasArrow = false,
     this.fullscreen = true,
     this.delay = Duration.zero,
-  })  : assert(titleTextColor != null || titleTextStyle != null),
-        assert(bodyTextColor != null || bodyTextStyle != null),
-        assert(title != null || bodyText != null);
+    this.arrowPosition = ArrowPosition.topCenter,
+  })  : assert(titleTextColor != null || titleTextStyle != null,
+            'You should provide at least one of titleTextColor or titleTextStyle'),
+        assert(bodyTextColor != null || bodyTextStyle != null,
+            'You should provide at least one of bodyTextColor or bodyTextStyle'),
+        assert(
+            (hasArrow && hasLabelBox) ||
+                (!hasArrow && !hasLabelBox) ||
+                !hasArrow && hasLabelBox,
+            'hasArrow $hasArrow cannot be true if hasLabelBox $hasLabelBox is false');
+
+  final Key? key;
 
   /// is required
   final FocusNode focusNode;
+
+  /// By default, the value used is `TextAlign.start`
+  final TextAlign textAlign;
 
   /// By default, the value used is `Color(0xFFFFFFFF)`
   final Color? titleTextColor;
@@ -46,7 +58,10 @@ class OnboardingStep {
   /// By default, the value used is `Color(0xFFFFFFFF)`
   final Color? bodyTextColor;
 
-  final String? title;
+  final String title;
+
+  /// By default, the value used is `ArrowPosition.centerLeft`
+  final ArrowPosition arrowPosition;
 
   /// By default, the value is
   /// ```
@@ -57,7 +72,7 @@ class OnboardingStep {
   /// ```
   final TextStyle? titleTextStyle;
 
-  final String? bodyText;
+  final String bodyText;
 
   /// By default, the value is
   /// ```
@@ -67,6 +82,9 @@ class OnboardingStep {
   ///   .copyWith(color: step.bodyTextColor)
   /// ```
   final TextStyle? bodyTextStyle;
+
+  /// By default, the value is BoxDecoration()
+  final BoxDecoration labelBoxDecoration;
 
   /// By default, the value is
   /// ```
@@ -96,13 +114,17 @@ class OnboardingStep {
 
   /// By default, the value is
   /// ```
-  /// BoxDecoration(
-  ///   shape: BoxShape.rectangle,
-  ///   borderRadius: BorderRadius.all(Radius.circular(5.0)),
-  ///   color: Color(0x00000000),
-  /// )
+  /// Color(0x00000000),
+  ///
   /// ```
-  final BoxDecoration labelBoxDecoration;
+  // final Color labelBoxColor;
+
+  /// By default, the value is
+  /// ```
+  /// Radius.circular(5.0)
+  ///
+  /// ```
+  // final Radius labelBoxRadius;
 
   /// By default, the value used is false
   final bool hasLabelBox;
@@ -129,9 +151,10 @@ class OnboardingStep {
     ShapeBorder? overlayShape,
     EdgeInsets? margin,
     EdgeInsets? labelBoxPadding,
-    BoxDecoration? labelBoxDecoration,
     bool? hasLabelBox,
     bool? hasArrow,
+    TextAlign? textAlign,
+    ArrowPosition? arrowPosition,
     bool? fullscreen,
     Duration? delay,
   }) {
@@ -143,14 +166,15 @@ class OnboardingStep {
       titleTextStyle: titleTextStyle ?? this.titleTextStyle,
       bodyText: bodyText ?? this.bodyText,
       bodyTextStyle: bodyTextStyle ?? this.bodyTextStyle,
+      textAlign: textAlign ?? this.textAlign,
       shape: shape ?? this.shape,
       overlayColor: overlayColor ?? this.overlayColor,
       overlayShape: overlayShape ?? this.overlayShape,
       margin: margin ?? this.margin,
       labelBoxPadding: labelBoxPadding ?? this.labelBoxPadding,
-      labelBoxDecoration: labelBoxDecoration ?? this.labelBoxDecoration,
       hasLabelBox: hasLabelBox ?? this.hasLabelBox,
       hasArrow: hasArrow ?? this.hasArrow,
+      arrowPosition: arrowPosition ?? this.arrowPosition,
       fullscreen: fullscreen ?? this.fullscreen,
       delay: delay ?? this.delay,
     );
@@ -158,23 +182,26 @@ class OnboardingStep {
 
   @override
   String toString() {
-    return '''OnboardStep(
-      focusNode: $focusNode,
-      titleTextColor: $titleTextColor, 
-      bodyTextColor: $bodyTextColor, 
+    return '''OnboardingStep(
+      key: $key, 
+      focusNode: $focusNode, 
+      arrowPosition: $arrowPosition, 
       title: $title, 
+      titleTextColor: $titleTextColor, 
       titleTextStyle: $titleTextStyle, 
       bodyText: $bodyText, 
+      bodyTextColor: $bodyTextColor, 
       bodyTextStyle: $bodyTextStyle, 
-      shape: $shape, 
+      textAlign: $textAlign, 
+      labelBoxDecoration: $labelBoxDecoration, 
+      labelBoxPadding: $labelBoxPadding, 
       overlayColor: $overlayColor, 
       overlayShape: $overlayShape, 
       margin: $margin, 
-      labelBoxPadding: $labelBoxPadding, 
-      labelBoxDecoration: $labelBoxDecoration, 
-      hasLabelBox: $hasLabelBox, 
       hasArrow: $hasArrow, 
+      hasLabelBox: $hasLabelBox, 
       fullscreen: $fullscreen, 
+      shape: $shape, 
       delay: $delay
     )''';
   }
