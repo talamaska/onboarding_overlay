@@ -1,3 +1,16 @@
+## [2.1.0]
+
+  - add: handling arrows on the label box
+  - add: default arrow height
+  - add: exports for the LabelPainter and the ArrowPosition enum
+  - add: docs
+  - change: the label box styling it is now a custom painter
+  - change: use flutter_lints from now on
+  - change: replace Container with SizeBox where possible
+  - change: the position of the Label when the overlay is not full screen
+  - change: update example app to demo the label box arrows
+
+
 ## [2.0.1+1] - add visual demo (gif).
 
 ## [2.0.1] - formatting.
