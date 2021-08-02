@@ -1,3 +1,5 @@
+[![Pub](https://img.shields.io/pub/v/onboarding_overlay)](https://pub.dev/packages/onboarding_overlay)
+
 # onboarding_overlay
 
 A flexible onboarding widget that can start and stop with an arbitrary number of steps
