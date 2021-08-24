@@ -1,3 +1,9 @@
+## [2.1.1]
+  - add: shield with the pub version
+  - fix: assert condition in the Onboarding widget when calling .of
+  - fix: update readme to demo the null-safety.
+  - fix: check for null in the example instead of '!'
+
 ## [2.1.0]
 
   - add: handling arrows on the label box

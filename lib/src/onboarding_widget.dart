@@ -37,16 +37,13 @@ class Onboarding extends StatefulWidget {
 
   /// or
   /// context.findAncestorStateOfType\<OnboardingState\>();
-  static OnboardingState? of(
-    BuildContext context, {
-    bool rootOnboarding = false,
-    Widget? debugRequiredFor,
-  }) {
+  static OnboardingState? of(BuildContext context,
+      {bool rootOnboarding = false}) {
     final OnboardingState? result = rootOnboarding
         ? context.findRootAncestorStateOfType<OnboardingState>()
         : context.findAncestorStateOfType<OnboardingState>();
     assert(() {
-      if (debugRequiredFor != null && result == null) {
+      if (result == null) {
         final List<DiagnosticsNode> information = <DiagnosticsNode>[
           ErrorSummary('No Onboarding widget found.'),
           ErrorDescription(
