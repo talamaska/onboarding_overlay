@@ -105,8 +105,11 @@ class _AppState extends State<App> {
 5. Show onboarding widget on some activity
 
 ```dart
-final OnboardingState onboading = Onboarding.of(context);
-onboading.show();
+final OnboardingState? onboading = Onboarding.of(context);
+
+if (onboarding != null) {
+  onboarding.show();
+}
 ```
 
 or immediately in initState
@@ -116,8 +119,10 @@ or immediately in initState
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((Duration timeStamp) {
-      final OnboardingState onboading = Onboarding.of(context);
-      onboading.showWithSteps(3, <int>[3,4,5,6]);
+      final OnboardingState? onboading = Onboarding.of(context);
+      if (onboarding != null) {
+        onboarding.showWithSteps(3, <int>[3,4,5,6]);
+      }
     });
   }
 

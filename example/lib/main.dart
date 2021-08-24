@@ -150,7 +150,10 @@ class _HomeState extends State<Home> {
   void _increment(BuildContext context) {
     setState(() {
       _counter++;
-      Onboarding.of(context)!.show();
+      final OnboardingState? onboarding = Onboarding.of(context);
+      if (onboarding != null) {
+        onboarding.show();
+      }
     });
   }
 
