@@ -105,7 +105,7 @@ class OnboardingStep {
   /// ```
   final ShapeBorder overlayShape;
 
-  /// This is the space around the `Widget` we want which we would clip a whole
+  /// This is the space around the `Widget` we want which we would clip a hole
   /// By default, the value is `EdgeInsets.all(8.0)`
   final EdgeInsets margin;
 
