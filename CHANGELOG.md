@@ -1,3 +1,15 @@
+## [2.2.1]
+  - add: some small optimizations
+  - add: more steps in the example app
+  - add: isTop property to the LabelPainter for better positioning of the text
+  - change: move some hard-coded numbers as consts
+  - change: text positioning algorithm
+  - change: make some props public
+  - change: separate some logic
+  - fix: some imports
+  - fix: typos
+
+
 ## [2.1.1]
   - add: shield with the pub version
   - fix: assert condition in the Onboarding widget when calling .of

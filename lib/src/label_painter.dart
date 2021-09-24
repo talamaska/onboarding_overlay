@@ -1,7 +1,9 @@
 import 'dart:math' as math;
 import 'dart:ui';
+
 import 'package:flutter/widgets.dart';
-import 'package:vector_math/vector_math.dart';
+import 'package:vector_math/vector_math.dart' as vm;
+
 import 'constants.dart';
 
 enum ArrowPosition { centerLeft, centerRight, topCenter, bottomCenter }
@@ -20,11 +22,12 @@ class LabelPainter extends CustomPainter {
     this.hasLabelBox = false,
     this.arrowPosition = ArrowPosition.topCenter,
     this.arrowHeight = kArrowHeight,
+    this.isTop = false,
     this.labelBoxPadding = const EdgeInsets.all(8.0),
     this.labelBoxDecoration = const BoxDecoration(
       shape: BoxShape.rectangle,
       borderRadius: BorderRadius.all(Radius.circular(8.0)),
-      color: Color(0x00000000),
+      color: transparentColor,
     ),
   })  : assert(
             (hasArrow && hasLabelBox) ||
@@ -81,17 +84,31 @@ class LabelPainter extends CustomPainter {
   /// This property is used for fading animation of the texts and the label box
   final double opacity;
 
+  /// Label box vertical positioning relative to the widget of interest
+  final bool isTop;
+
   @override
   void paint(Canvas canvas, Size size) {
     final Paragraph paragraph = buildParagraph(size);
-
-    final Rect paragraphRect = Offset(
-          (size.width - paragraph.width) / 2,
-          (size.height - paragraph.height) / 2,
-        ) &
-        Size(paragraph.width, paragraph.height);
-
-    final Rect paddingBox = rectWithPadding(paragraphRect, labelBoxPadding);
+    Rect paragraphRect;
+    if (isTop) {
+      paragraphRect = Rect.fromLTWH(
+        0,
+        size.height -
+            paragraph.height -
+            labelBoxPadding.top -
+            labelBoxPadding.bottom,
+        paragraph.width + labelBoxPadding.left + labelBoxPadding.right,
+        paragraph.height + labelBoxPadding.top + labelBoxPadding.bottom,
+      );
+    } else {
+      paragraphRect = Rect.fromLTWH(
+        0,
+        0,
+        paragraph.width + labelBoxPadding.left + labelBoxPadding.right,
+        paragraph.height + labelBoxPadding.top + labelBoxPadding.bottom,
+      );
+    }
 
     final Paint paintBody = Paint()
       ..isAntiAlias = true
@@ -105,40 +122,30 @@ class LabelPainter extends CustomPainter {
           transparentColor;
 
     if (hasLabelBox) {
-      final Offset labelOffset = Offset(
-        paragraphRect.left - labelBoxPadding.left,
-        paragraphRect.top - labelBoxPadding.top,
-      );
-
-      final Size labelSize = Size(
-        paddingBox.width,
-        paddingBox.height,
-      );
-
       Path labelBoxPath = _decoration.getClipPath(
-        labelOffset & labelSize,
+        paragraphRect,
         TextDirection.ltr,
       );
 
-      Path arrowPath = Path();
-
       if (hasArrow) {
+        Path arrowPath = Path();
+        final double equilateralRad = vm.radians(60);
         final double a = arrowHeight;
-        final double c = a / math.sin(radians(60));
-        final double b = math.cos(radians(60)) * c;
+        final double c = a / math.sin(equilateralRad);
+        final double b = math.cos(equilateralRad) * c;
 
         switch (arrowPosition) {
           case ArrowPosition.bottomCenter:
-            arrowPath = drawBottomCenterArrow(paddingBox, a, b);
+            arrowPath = drawBottomCenterArrow(paragraphRect, a, b);
             break;
           case ArrowPosition.topCenter:
-            arrowPath = drawTopCenterArrow(paddingBox, a, b);
+            arrowPath = drawTopCenterArrow(paragraphRect, a, b);
             break;
           case ArrowPosition.centerLeft:
-            arrowPath = drawCenterLeftArrow(paddingBox, a, b);
+            arrowPath = drawCenterLeftArrow(paragraphRect, a, b);
             break;
           case ArrowPosition.centerRight:
-            arrowPath = drawCenterRightArrow(paddingBox, a, b);
+            arrowPath = drawCenterRightArrow(paragraphRect, a, b);
             break;
           default:
         }
@@ -154,32 +161,45 @@ class LabelPainter extends CustomPainter {
     canvas.drawParagraph(
         paragraph,
         Offset(
-          (size.width - paragraph.width) / 2,
-          (size.height - paragraph.height) / 2,
+          labelBoxPadding.left,
+          isTop
+              ? size.height - paragraph.height - labelBoxPadding.bottom
+              : labelBoxPadding.top,
         ));
   }
 
   Paragraph buildParagraph(Size size) {
-    final ParagraphBuilder builder = ParagraphBuilder(ParagraphStyle(
+    final ParagraphStyle style = ParagraphStyle(
       textAlign: textAlign,
-    ))
-      ..pushStyle(titleTextStyle
-          .copyWith(color: titleTextStyle.color?.withOpacity(opacity))
-          .getTextStyle())
+    );
+    final ParagraphBuilder builder = ParagraphBuilder(style)
+      ..pushStyle(
+        titleTextStyle
+            .copyWith(
+              color: titleTextStyle.color?.withOpacity(opacity),
+            )
+            .getTextStyle(),
+      )
       ..addText(title)
       ..addText("\n");
 
     if (body.isNotEmpty) {
       builder
-        ..pushStyle(bodyTextStyle
-            .copyWith(color: bodyTextStyle.color?.withOpacity(opacity))
-            .getTextStyle())
+        ..pushStyle(
+          bodyTextStyle
+              .copyWith(
+                color: bodyTextStyle.color?.withOpacity(opacity),
+              )
+              .getTextStyle(),
+        )
         ..addText(body);
     }
 
+    final double maxParagraphWidth =
+        size.width - labelBoxPadding.left - labelBoxPadding.right;
     final Paragraph paragraph = builder.build()
       ..layout(ParagraphConstraints(
-        width: size.width - labelBoxPadding.left - labelBoxPadding.right,
+        width: maxParagraphWidth,
       ));
 
     return paragraph;
@@ -297,15 +317,6 @@ class LabelPainter extends CustomPainter {
       );
   }
 
-  Rect rectWithPadding(Rect rect, EdgeInsets padding) {
-    return Rect.fromLTRB(
-      rect.left - padding.left,
-      rect.top - padding.top,
-      rect.right + padding.right,
-      rect.bottom + padding.bottom,
-    );
-  }
-
   @override
   bool shouldRepaint(LabelPainter oldDelegate) =>
       opacity != oldDelegate.opacity ||
@@ -319,5 +330,6 @@ class LabelPainter extends CustomPainter {
       arrowPosition != oldDelegate.arrowPosition ||
       textAlign != oldDelegate.textAlign ||
       hasLabelBox != oldDelegate.hasLabelBox ||
-      hasArrow != oldDelegate.hasArrow;
+      hasArrow != oldDelegate.hasArrow ||
+      isTop != oldDelegate.isTop;
 }

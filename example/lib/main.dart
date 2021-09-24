@@ -23,7 +23,7 @@ class _AppState extends State<App> {
     super.initState();
 
     focusNodes = List<FocusNode>.generate(
-      6,
+      8,
       (int i) => FocusNode(debugLabel: 'Onboarding Focus Node $i'),
       growable: false,
     );
@@ -56,7 +56,7 @@ class _AppState extends State<App> {
             ),
             OnboardingStep(
               focusNode: focusNodes[1],
-              title: 'Tap only here to increment & continue',
+              title: 'right fab',
               bodyText: 'Tap only here to increment & continue',
               shape: const CircleBorder(),
               fullscreen: false,
@@ -65,6 +65,15 @@ class _AppState extends State<App> {
             ),
             OnboardingStep(
               focusNode: focusNodes[2],
+              title: 'left fab',
+              bodyText: 'Tap only here to increment & continue',
+              shape: const CircleBorder(),
+              fullscreen: false,
+              overlayColor: Colors.blue.withOpacity(0.9),
+              overlayShape: const CircleBorder(),
+            ),
+            OnboardingStep(
+              focusNode: focusNodes[3],
               title: 'Easy to customize',
               bodyText: 'Easy to customize',
               overlayColor: Colors.red.withOpacity(0.9),
@@ -78,19 +87,20 @@ class _AppState extends State<App> {
                     width: 1.0,
                     style: BorderStyle.solid,
                   )),
-              arrowPosition: ArrowPosition.bottomCenter,
+              arrowPosition: ArrowPosition.topCenter,
               hasArrow: true,
               hasLabelBox: true,
               textAlign: TextAlign.center,
             ),
             OnboardingStep(
-              focusNode: focusNodes[3],
+              focusNode: focusNodes[4],
               title: 'Add steps for any widget',
               bodyText: 'Add steps for any widget',
               overlayColor: Colors.green.withOpacity(0.9),
+              shape: const CircleBorder(),
             ),
             OnboardingStep(
-              focusNode: focusNodes[4],
+              focusNode: focusNodes[5],
               title: 'Settings',
               shape: const CircleBorder(),
               bodyText:
@@ -100,10 +110,30 @@ class _AppState extends State<App> {
               overlayShape: const CircleBorder(),
             ),
             OnboardingStep(
-              focusNode: focusNodes[5],
+              focusNode: focusNodes[6],
+              title: 'Counter Value',
+              bodyText: 'With automatic vertical positioning of the text',
+              // margin: EdgeInsets.all(16.0),
+              labelBoxPadding: const EdgeInsets.all(16.0),
+              labelBoxDecoration: BoxDecoration(
+                  shape: BoxShape.rectangle,
+                  borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+                  color: const Color(0xFF1100FF),
+                  border: Border.all(
+                    color: const Color(0xFFE2FB05),
+                    width: 1.0,
+                    style: BorderStyle.solid,
+                  )),
+              arrowPosition: ArrowPosition.bottomCenter,
+              hasArrow: true,
+              hasLabelBox: true,
+            ),
+            OnboardingStep(
+              focusNode: focusNodes[7],
               title: "Or no widget at all! You're all done!",
               bodyText: "Or no widget at all! You're all done!",
               margin: EdgeInsets.zero,
+              labelBoxPadding: const EdgeInsets.all(8.0),
             ),
           ],
           onChanged: (int index) {
@@ -150,10 +180,6 @@ class _HomeState extends State<Home> {
   void _increment(BuildContext context) {
     setState(() {
       _counter++;
-      final OnboardingState? onboarding = Onboarding.of(context);
-      if (onboarding != null) {
-        onboarding.show();
-      }
     });
   }
 
@@ -170,6 +196,13 @@ class _HomeState extends State<Home> {
           focusNode: widget.focusNodes[3],
           child: const Text('Title'),
         ),
+        actions: [
+          IconButton(
+            focusNode: widget.focusNodes[5],
+            icon: const Icon(Icons.add),
+            onPressed: () {},
+          )
+        ],
       ),
       body: Center(
         child: Column(
@@ -180,7 +213,7 @@ class _HomeState extends State<Home> {
               child: const Text('You have pushed the button this many times:'),
             ),
             Focus(
-              focusNode: widget.focusNodes[2],
+              focusNode: widget.focusNodes[6],
               child: Text(
                 '$_counter',
                 style: Theme.of(context).textTheme.headline4,
@@ -189,12 +222,31 @@ class _HomeState extends State<Home> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        focusNode: widget.focusNodes[1],
-        onPressed: () {
-          _increment(context);
-        },
-        child: const Icon(Icons.add),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(right: 32),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            FloatingActionButton(
+              focusNode: widget.focusNodes[1],
+              onPressed: () {
+                final OnboardingState? onboarding = Onboarding.of(context);
+                if (onboarding != null) {
+                  onboarding.show();
+                }
+              },
+              child: const Icon(Icons.add),
+            ),
+            FloatingActionButton(
+              focusNode: widget.focusNodes[2],
+              onPressed: () {
+                _increment(context);
+              },
+              child: const Icon(Icons.add),
+            ),
+          ],
+        ),
       ),
     );
   }
