@@ -223,7 +223,7 @@ class _HomeState extends State<Home> {
         ),
       ),
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(right: 32),
+        padding: const EdgeInsets.only(left: 32),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           mainAxisSize: MainAxisSize.max,
