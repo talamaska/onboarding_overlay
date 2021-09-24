@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 // import 'package:flutter/widgets.dart';
 import 'constants.dart';
-import 'hole_painter.dart';
 import 'label_painter.dart';
+import 'overlay_painter.dart';
 import 'step.dart';
 
 class OnboardingStepper extends StatefulWidget {
@@ -294,7 +294,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     final bool isTop = holeRect.center.dy > size.height / 2;
 
     return GestureDetector(
-      behavior: HitTestBehavior.translucent,
+      behavior: HitTestBehavior.opaque,
       onTap: () {
         nextStep();
       },
@@ -303,11 +303,11 @@ class _OnboardingStepperState extends State<OnboardingStepper>
         children: <Widget>[
           RepaintBoundary(
             child: CustomPaint(
-              child: SizedBox(
-                width: size.width,
-                height: size.height,
+              size: Size(
+                size.width,
+                size.height,
               ),
-              painter: HolePainter(
+              painter: OverlayPainter(
                 fullscreen: step.fullscreen,
                 shape: step.shape,
                 overlayShape: step.overlayShape,

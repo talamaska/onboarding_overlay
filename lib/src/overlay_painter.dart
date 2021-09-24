@@ -2,8 +2,8 @@ import 'package:flutter/widgets.dart';
 
 import 'constants.dart';
 
-class HolePainter extends CustomPainter {
-  HolePainter({
+class OverlayPainter extends CustomPainter {
+  OverlayPainter({
     this.shape = const RoundedRectangleBorder(
       borderRadius: BorderRadius.all(Radius.circular(8.0)),
     ),
@@ -80,7 +80,7 @@ class HolePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(HolePainter oldDelegate) =>
+  bool shouldRepaint(OverlayPainter oldDelegate) =>
       hole != oldDelegate.hole ||
       animation != oldDelegate.animation ||
       overlayColor != oldDelegate.overlayColor;
