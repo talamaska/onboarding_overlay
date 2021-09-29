@@ -1,3 +1,6 @@
+## [2.3.1-pre.2]
+  - fix: badge to include pre-release versions
+
 ## [2.3.1-pre.1]
   - add: hard limit maxLines for the title to be 2 lines
   - add: hard limit maxLines for the body to be 5 lines

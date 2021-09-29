@@ -1,4 +1,4 @@
-[![Pub](https://img.shields.io/pub/v/onboarding_overlay)](https://pub.dev/packages/onboarding_overlay)
+[![Pub](https://img.shields.io/pub/v/onboarding_overlay?include_prereleases)](https://pub.dev/packages/onboarding_overlay)
 
 # onboarding_overlay
 
@@ -6,7 +6,6 @@ A flexible onboarding widget that can start and stop with an arbitrary number of
 and arbitrary starting point
 
 ## Demo
-
 <img src="https://github.com/talamaska/onboarding_overlay/blob/master/screenshots/demo.gif?raw=true"/>
 
 ## Usage
