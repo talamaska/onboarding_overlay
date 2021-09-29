@@ -32,6 +32,7 @@
 build/
 example/.packages
 onboarding_overlay.iml
+
 # Android related
 **/android/**/gradle-wrapper.jar
 **/android/.gradle

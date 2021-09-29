@@ -7,9 +7,10 @@ void main() {
   runApp(App());
 }
 
+final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+
 class App extends StatefulWidget {
   final GlobalKey<OnboardingState> onboardingKey = GlobalKey<OnboardingState>();
-  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   _AppState createState() => _AppState();
@@ -36,7 +37,7 @@ class _AppState extends State<App> {
           steps: <OnboardingStep>[
             OnboardingStep(
               focusNode: focusNodes[0],
-              title: 'Tap anywhere to continue Tap anywhere to continue',
+              title: 'Tap anywhere to continue ',
               titleTextColor: Colors.black,
               bodyText: 'Tap anywhere to continue Tap anywhere to continue',
               labelBoxPadding: const EdgeInsets.all(16.0),
@@ -56,8 +57,8 @@ class _AppState extends State<App> {
             ),
             OnboardingStep(
               focusNode: focusNodes[1],
-              title: 'right fab',
-              bodyText: 'Tap only here to increment & continue',
+              title: 'left fab',
+              bodyText: 'Tap to continue',
               shape: const CircleBorder(),
               fullscreen: false,
               overlayColor: Colors.blue.withOpacity(0.9),
@@ -65,12 +66,13 @@ class _AppState extends State<App> {
             ),
             OnboardingStep(
               focusNode: focusNodes[2],
-              title: 'left fab',
-              bodyText: 'Tap only here to increment & continue',
+              title: 'right fab',
+              bodyText: 'Tap only here to increment',
               shape: const CircleBorder(),
               fullscreen: false,
               overlayColor: Colors.blue.withOpacity(0.9),
               overlayShape: const CircleBorder(),
+              overlayBehavior: HitTestBehavior.translucent,
             ),
             OnboardingStep(
               focusNode: focusNodes[3],
@@ -94,10 +96,11 @@ class _AppState extends State<App> {
             ),
             OnboardingStep(
               focusNode: focusNodes[4],
-              title: 'Add steps for any widget',
-              bodyText: 'Add steps for any widget',
+              title: 'Menu',
+              bodyText: 'You can open menu from here',
               overlayColor: Colors.green.withOpacity(0.9),
               shape: const CircleBorder(),
+              overlayBehavior: HitTestBehavior.translucent,
             ),
             OnboardingStep(
               focusNode: focusNodes[5],
@@ -113,7 +116,6 @@ class _AppState extends State<App> {
               focusNode: focusNodes[6],
               title: 'Counter Value',
               bodyText: 'With automatic vertical positioning of the text',
-              // margin: EdgeInsets.all(16.0),
               labelBoxPadding: const EdgeInsets.all(16.0),
               labelBoxDecoration: BoxDecoration(
                   shape: BoxShape.rectangle,
@@ -137,9 +139,11 @@ class _AppState extends State<App> {
             ),
           ],
           onChanged: (int index) {
-            if (index == 2) {
-              // widget.scaffoldKey.currentState.openDrawer();
-
+            if (index == 4) {
+              // close the drawer
+              if (scaffoldKey.currentState?.isDrawerOpen ?? false) {
+                scaffoldKey.currentState?.openEndDrawer();
+              }
               // interrupt onboarding on specific step
               // widget.onboardingKey.currentState.hide();
             }
@@ -186,11 +190,14 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
         leading: IconButton(
           focusNode: widget.focusNodes[4],
           icon: const Icon(Icons.menu),
-          onPressed: () {},
+          onPressed: () {
+            scaffoldKey.currentState?.openDrawer();
+          },
         ),
         title: Focus(
           focusNode: widget.focusNodes[3],
@@ -203,6 +210,11 @@ class _HomeState extends State<Home> {
             onPressed: () {},
           )
         ],
+      ),
+      drawer: const Drawer(
+        child: Center(
+          child: Text('Menu'),
+        ),
       ),
       body: Center(
         child: Column(

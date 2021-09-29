@@ -44,7 +44,9 @@ class OverlayPainter extends CustomPainter {
 
   @override
   bool hitTest(Offset position) {
-    return !(hole?.contains(position) ?? false);
+    final bool hit = !(hole?.contains(position) ?? false);
+    debugPrint('hit = $hit');
+    return hit;
   }
 
   @override

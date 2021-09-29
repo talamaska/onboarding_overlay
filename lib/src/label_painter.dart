@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'dart:ui';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:vector_math/vector_math.dart' as vm;
 
@@ -89,24 +90,24 @@ class LabelPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final Paragraph paragraph = buildParagraph(size);
+    final TextPainter titlePainter = buildTitle(size);
+    final TextPainter bodyPainter = buildBody(size);
+    final double textHeight = titlePainter.height + bodyPainter.height;
+    final double textWidth = math.max(titlePainter.width, bodyPainter.width);
     Rect paragraphRect;
     if (isTop) {
       paragraphRect = Rect.fromLTWH(
         0,
-        size.height -
-            paragraph.height -
-            labelBoxPadding.top -
-            labelBoxPadding.bottom,
-        paragraph.width + labelBoxPadding.left + labelBoxPadding.right,
-        paragraph.height + labelBoxPadding.top + labelBoxPadding.bottom,
+        size.height - textHeight - labelBoxPadding.top - labelBoxPadding.bottom,
+        textWidth + labelBoxPadding.left + labelBoxPadding.right,
+        textHeight + labelBoxPadding.top + labelBoxPadding.bottom,
       );
     } else {
       paragraphRect = Rect.fromLTWH(
         0,
         0,
-        paragraph.width + labelBoxPadding.left + labelBoxPadding.right,
-        paragraph.height + labelBoxPadding.top + labelBoxPadding.bottom,
+        textWidth + labelBoxPadding.left + labelBoxPadding.right,
+        textHeight + labelBoxPadding.top + labelBoxPadding.bottom,
       );
     }
 
@@ -157,52 +158,82 @@ class LabelPainter extends CustomPainter {
       canvas.drawPath(labelBoxPath, paintBorder);
       canvas.drawPath(labelBoxPath, paintBody);
     }
-
-    canvas.drawParagraph(
-        paragraph,
-        Offset(
-          labelBoxPadding.left,
-          isTop
-              ? size.height - paragraph.height - labelBoxPadding.bottom
-              : labelBoxPadding.top,
-        ));
+    // debug paint of the texts
+    // if (isTop) {
+    //   bodyPainter.paint(
+    //       canvas,
+    //       Offset(labelBoxPadding.left,
+    //           size.height - bodyPainter.height - labelBoxPadding.bottom));
+    //   titlePainter.paint(
+    //     canvas,
+    //     Offset(
+    //       labelBoxPadding.left,
+    //       size.height -
+    //           bodyPainter.height -
+    //           titlePainter.height -
+    //           labelBoxPadding.bottom,
+    //     ),
+    //   );
+    // } else {
+    //   titlePainter.paint(
+    //     canvas,
+    //     Offset(
+    //       labelBoxPadding.left,
+    //       labelBoxPadding.top,
+    //     ),
+    //   );
+    //   bodyPainter.paint(
+    //     canvas,
+    //     Offset(
+    //       labelBoxPadding.left,
+    //       labelBoxPadding.top + titlePainter.height,
+    //     ),
+    //   );
+    // }
   }
 
-  Paragraph buildParagraph(Size size) {
-    final ParagraphStyle style = ParagraphStyle(
-      textAlign: textAlign,
-    );
-    final ParagraphBuilder builder = ParagraphBuilder(style)
-      ..pushStyle(
-        titleTextStyle
-            .copyWith(
-              color: titleTextStyle.color?.withOpacity(opacity),
-            )
-            .getTextStyle(),
-      )
-      ..addText(title)
-      ..addText("\n");
-
-    if (body.isNotEmpty) {
-      builder
-        ..pushStyle(
-          bodyTextStyle
-              .copyWith(
-                color: bodyTextStyle.color?.withOpacity(opacity),
-              )
-              .getTextStyle(),
-        )
-        ..addText(body);
-    }
-
+  TextPainter buildTitle(Size size) {
     final double maxParagraphWidth =
         size.width - labelBoxPadding.left - labelBoxPadding.right;
-    final Paragraph paragraph = builder.build()
-      ..layout(ParagraphConstraints(
-        width: maxParagraphWidth,
-      ));
+    final TextSpan textSpan = TextSpan(
+      text: title,
+      style: titleTextStyle,
+    );
 
-    return paragraph;
+    final TextPainter textPainter = TextPainter(
+      text: textSpan,
+      maxLines: kTitleMaxLines,
+      textDirection: TextDirection.ltr,
+    );
+
+    textPainter.layout(
+      minWidth: 0,
+      maxWidth: maxParagraphWidth,
+    );
+
+    return textPainter;
+  }
+
+  TextPainter buildBody(Size size) {
+    final double maxParagraphWidth =
+        size.width - labelBoxPadding.left - labelBoxPadding.right;
+    final TextSpan textSpan = TextSpan(
+      text: body,
+      style: bodyTextStyle,
+    );
+
+    final TextPainter textPainter = TextPainter(
+      text: textSpan,
+      maxLines: kBodyMaxLines,
+      textDirection: TextDirection.ltr,
+    );
+
+    textPainter.layout(
+      minWidth: 0,
+      maxWidth: maxParagraphWidth,
+    );
+
+    return textPainter;
   }
 
   Path drawCenterRightArrow(Rect paddingBox, double a, double b) {

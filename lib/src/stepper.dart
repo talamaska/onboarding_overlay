@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 // import 'package:flutter/widgets.dart';
 import 'constants.dart';
@@ -61,6 +62,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
   RectTween? holeTween;
   Offset? holeOffset;
   Rect? widgetRect;
+  final GlobalKey overlayKey = GlobalKey();
 
   @override
   void initState() {
@@ -293,16 +295,27 @@ class _OnboardingStepperState extends State<OnboardingStepper>
 
     final bool isTop = holeRect.center.dy > size.height / 2;
 
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () {
-        nextStep();
+    return Listener(
+      behavior: step.overlayBehavior,
+      onPointerDown: (PointerDownEvent details) {
+        final RenderBox overlayBox =
+            overlayKey.currentContext?.findRenderObject() as RenderBox;
+
+        Offset localOverlay = overlayBox.globalToLocal(details.position);
+
+        final BoxHitTestResult result = BoxHitTestResult();
+        if (overlayBox.hitTest(result, position: localOverlay) ||
+            step.overlayBehavior != HitTestBehavior.deferToChild) {
+          nextStep();
+        }
       },
       child: Stack(
         key: step.key,
+        clipBehavior: Clip.antiAlias,
         children: <Widget>[
           RepaintBoundary(
             child: CustomPaint(
+              key: overlayKey,
               size: Size(
                 size.width,
                 size.height,
@@ -326,24 +339,58 @@ class _OnboardingStepperState extends State<OnboardingStepper>
               child: SizedBox(
                 width: boxWidth,
                 height: boxHeight,
-                child: RepaintBoundary(
-                  child: CustomPaint(
-                    painter: LabelPainter(
-                      title: step.title,
-                      body: step.bodyText,
-                      titleTextStyle:
-                          step.titleTextStyle ?? localTitleTextStyle,
-                      bodyTextStyle: step.bodyTextStyle ?? localBodyTextStyle,
-                      opacity: animation.value,
-                      hasLabelBox: step.hasLabelBox,
-                      labelBoxPadding: step.labelBoxPadding,
-                      labelBoxDecoration: step.labelBoxDecoration,
-                      hasArrow: step.hasArrow,
-                      arrowPosition: step.arrowPosition,
-                      textAlign: step.textAlign,
-                      isTop: isTop,
+                child: Stack(
+                  clipBehavior: Clip.antiAlias,
+                  children: [
+                    SizedBox(
+                      width: boxWidth,
+                      height: boxHeight,
+                      child: RepaintBoundary(
+                        child: CustomPaint(
+                          painter: LabelPainter(
+                            title: step.title,
+                            body: step.bodyText * 8,
+                            titleTextStyle:
+                                step.titleTextStyle ?? localTitleTextStyle,
+                            bodyTextStyle:
+                                step.bodyTextStyle ?? localBodyTextStyle,
+                            opacity: animation.value,
+                            hasLabelBox: step.hasLabelBox,
+                            labelBoxPadding: step.labelBoxPadding,
+                            labelBoxDecoration: step.labelBoxDecoration,
+                            hasArrow: step.hasArrow,
+                            arrowPosition: step.arrowPosition,
+                            textAlign: step.textAlign,
+                            isTop: isTop,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                    Padding(
+                      padding: step.labelBoxPadding,
+                      child: Column(
+                        mainAxisAlignment: isTop
+                            ? MainAxisAlignment.end
+                            : MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            step.title,
+                            style: step.titleTextStyle ?? localTitleTextStyle,
+                            textAlign: TextAlign.start,
+                            maxLines: kTitleMaxLines,
+                          ),
+                          Text(
+                            step.bodyText * 8,
+                            style: step.bodyTextStyle ?? localBodyTextStyle,
+                            textAlign: TextAlign.start,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: kBodyMaxLines,
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
                 ),
               ),
             ),

@@ -1,8 +1,17 @@
+## [2.3.1-pre.1]
+  - add: hard limit maxLines for the title to be 2 lines
+  - add: hard limit maxLines for the body to be 5 lines
+  - add: overlayBehavior that accepts HitTestBehavior
+  - add: logic to forward pointer events to the widget of interest.
+  - change: text is rendered by Text widgets not CustomPaint
+  - change: vertical position of the text is handled by a Column mainAxisAlignment
+  - change: not exposing constants anymore, nobody from outside needs them anyways
+
 ## [2.2.1]
   - add: some small optimizations
   - add: more steps in the example app
   - add: isTop property to the LabelPainter for better positioning of the text
-  - change: move some hard-coded numbers as consts
+  - change: move some hard-coded numbers as constants
   - change: text positioning algorithm
   - change: make some props public
   - change: separate some logic

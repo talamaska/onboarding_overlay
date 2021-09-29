@@ -34,6 +34,7 @@ class OnboardingStep {
     this.fullscreen = true,
     this.delay = Duration.zero,
     this.arrowPosition = ArrowPosition.topCenter,
+    this.overlayBehavior = HitTestBehavior.opaque,
   })  : assert(titleTextColor != null || titleTextStyle != null,
             'You should provide at least one of titleTextColor or titleTextStyle'),
         assert(bodyTextColor != null || bodyTextStyle != null,
@@ -137,6 +138,15 @@ class OnboardingStep {
 
   /// By default, the value used is `Duration.zero`
   final Duration delay;
+
+  /// By default, the value used is `HitTestBehavior.opaque`
+  /// `HitTestBehavior.opaque` is going to block the onTap on the widget
+  ///
+  /// `HitTestBehavior.translucent` is going trigger onTap callbacks on the widget and on the overlay
+  ///
+  /// `HitTestBehavior.deferToChild` is going to trigger only the onTap on the widget
+
+  final HitTestBehavior overlayBehavior;
 
   OnboardingStep copyWith({
     FocusNode? focusNode,
