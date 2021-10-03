@@ -17,11 +17,13 @@ class Onboarding extends StatefulWidget {
     this.initialIndex = 0,
     this.onChanged,
     this.onEnd,
+    this.autoSizeTexts = false,
     required this.steps,
     required this.child,
     this.duration = const Duration(milliseconds: 350),
   }) : super(key: key);
 
+  final bool autoSizeTexts;
   final int initialIndex;
   final ValueChanged<int>? onChanged;
   final ValueChanged<int>? onEnd;
@@ -104,6 +106,7 @@ class OnboardingState extends State<Onboarding> {
           steps: widget.steps,
           stepIndexes: stepIndexes,
           duration: widget.duration,
+          autoSizeTexts: widget.autoSizeTexts,
           onChanged: (int index) {
             widget.onChanged?.call(index);
           },

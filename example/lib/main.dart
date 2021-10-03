@@ -34,6 +34,7 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) => MaterialApp(
         home: Onboarding(
           key: widget.onboardingKey,
+          autoSizeTexts: false,
           steps: <OnboardingStep>[
             OnboardingStep(
               focusNode: focusNodes[0],
@@ -72,7 +73,7 @@ class _AppState extends State<App> {
               fullscreen: false,
               overlayColor: Colors.blue.withOpacity(0.9),
               overlayShape: const CircleBorder(),
-              overlayBehavior: HitTestBehavior.translucent,
+              overlayBehavior: HitTestBehavior.deferToChild,
             ),
             OnboardingStep(
               focusNode: focusNodes[3],

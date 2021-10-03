@@ -1,3 +1,6 @@
+## [2.3.1-pre.3]
+  - add: auto size text via AutoSizeText widget in which case if turned on will ignore maxLines
+
 ## [2.3.1-pre.2]
   - fix: badge to include pre-release versions
 

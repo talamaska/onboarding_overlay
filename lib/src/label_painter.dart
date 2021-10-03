@@ -13,11 +13,6 @@ const Color transparentColor = Color(0x00000000);
 
 class LabelPainter extends CustomPainter {
   LabelPainter({
-    required this.title,
-    required this.titleTextStyle,
-    this.body = '',
-    required this.bodyTextStyle,
-    this.textAlign = TextAlign.start,
     this.opacity = 1,
     this.hasArrow = false,
     this.hasLabelBox = false,
@@ -64,16 +59,6 @@ class LabelPainter extends CustomPainter {
   /// It will not be calculated automatically
   final ArrowPosition arrowPosition;
 
-  /// By default, the value is TextAlign.start
-  final TextAlign textAlign;
-
-  final String title;
-  final TextStyle titleTextStyle;
-
-  /// By default, the value is an empty string and will not be displayed.
-  final String body;
-  final TextStyle bodyTextStyle;
-
   /// By default, the value is false
   final bool hasLabelBox;
 
@@ -90,26 +75,12 @@ class LabelPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final TextPainter titlePainter = buildTitle(size);
-    final TextPainter bodyPainter = buildBody(size);
-    final double textHeight = titlePainter.height + bodyPainter.height;
-    final double textWidth = math.max(titlePainter.width, bodyPainter.width);
-    Rect paragraphRect;
-    if (isTop) {
-      paragraphRect = Rect.fromLTWH(
-        0,
-        size.height - textHeight - labelBoxPadding.top - labelBoxPadding.bottom,
-        textWidth + labelBoxPadding.left + labelBoxPadding.right,
-        textHeight + labelBoxPadding.top + labelBoxPadding.bottom,
-      );
-    } else {
-      paragraphRect = Rect.fromLTWH(
-        0,
-        0,
-        textWidth + labelBoxPadding.left + labelBoxPadding.right,
-        textHeight + labelBoxPadding.top + labelBoxPadding.bottom,
-      );
-    }
+    Rect paragraphRect = Rect.fromLTWH(
+      0,
+      0,
+      size.width,
+      size.height,
+    );
 
     final Paint paintBody = Paint()
       ..isAntiAlias = true
@@ -158,82 +129,6 @@ class LabelPainter extends CustomPainter {
       canvas.drawPath(labelBoxPath, paintBorder);
       canvas.drawPath(labelBoxPath, paintBody);
     }
-    // debug paint of the texts
-    // if (isTop) {
-    //   bodyPainter.paint(
-    //       canvas,
-    //       Offset(labelBoxPadding.left,
-    //           size.height - bodyPainter.height - labelBoxPadding.bottom));
-    //   titlePainter.paint(
-    //     canvas,
-    //     Offset(
-    //       labelBoxPadding.left,
-    //       size.height -
-    //           bodyPainter.height -
-    //           titlePainter.height -
-    //           labelBoxPadding.bottom,
-    //     ),
-    //   );
-    // } else {
-    //   titlePainter.paint(
-    //     canvas,
-    //     Offset(
-    //       labelBoxPadding.left,
-    //       labelBoxPadding.top,
-    //     ),
-    //   );
-    //   bodyPainter.paint(
-    //     canvas,
-    //     Offset(
-    //       labelBoxPadding.left,
-    //       labelBoxPadding.top + titlePainter.height,
-    //     ),
-    //   );
-    // }
-  }
-
-  TextPainter buildTitle(Size size) {
-    final double maxParagraphWidth =
-        size.width - labelBoxPadding.left - labelBoxPadding.right;
-    final TextSpan textSpan = TextSpan(
-      text: title,
-      style: titleTextStyle,
-    );
-
-    final TextPainter textPainter = TextPainter(
-      text: textSpan,
-      maxLines: kTitleMaxLines,
-      textDirection: TextDirection.ltr,
-    );
-
-    textPainter.layout(
-      minWidth: 0,
-      maxWidth: maxParagraphWidth,
-    );
-
-    return textPainter;
-  }
-
-  TextPainter buildBody(Size size) {
-    final double maxParagraphWidth =
-        size.width - labelBoxPadding.left - labelBoxPadding.right;
-    final TextSpan textSpan = TextSpan(
-      text: body,
-      style: bodyTextStyle,
-    );
-
-    final TextPainter textPainter = TextPainter(
-      text: textSpan,
-      maxLines: kBodyMaxLines,
-      textDirection: TextDirection.ltr,
-    );
-
-    textPainter.layout(
-      minWidth: 0,
-      maxWidth: maxParagraphWidth,
-    );
-
-    return textPainter;
   }
 
   Path drawCenterRightArrow(Rect paddingBox, double a, double b) {
@@ -351,15 +246,10 @@ class LabelPainter extends CustomPainter {
   @override
   bool shouldRepaint(LabelPainter oldDelegate) =>
       opacity != oldDelegate.opacity ||
-      title != oldDelegate.title ||
-      body != oldDelegate.body ||
-      titleTextStyle != oldDelegate.titleTextStyle ||
-      bodyTextStyle != oldDelegate.bodyTextStyle ||
       labelBoxPadding != oldDelegate.labelBoxPadding ||
       labelBoxDecoration != oldDelegate.labelBoxDecoration ||
       arrowHeight != oldDelegate.arrowHeight ||
       arrowPosition != oldDelegate.arrowPosition ||
-      textAlign != oldDelegate.textAlign ||
       hasLabelBox != oldDelegate.hasLabelBox ||
       hasArrow != oldDelegate.hasArrow ||
       isTop != oldDelegate.isTop;

@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -15,6 +16,7 @@ class OnboardingStepper extends StatefulWidget {
     this.duration = const Duration(milliseconds: 350),
     this.onChanged,
     this.onEnd,
+    this.autoSizeTexts = false,
     this.stepIndexes = const <int>[],
   })  : assert(() {
           if (stepIndexes.isNotEmpty && !stepIndexes.contains(initialIndex)) {
@@ -47,6 +49,9 @@ class OnboardingStepper extends StatefulWidget {
 
   /// By default, the value is `Duration(milliseconds: 350)`
   final Duration duration;
+
+  /// By default is false, turns on to usage of AutoSizeText widget and ignore maxLines
+  final bool autoSizeTexts;
 
   @override
   _OnboardingStepperState createState() => _OnboardingStepperState();
@@ -341,53 +346,70 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                 height: boxHeight,
                 child: Stack(
                   clipBehavior: Clip.antiAlias,
+                  alignment:
+                      isTop ? Alignment.bottomCenter : Alignment.topCenter,
                   children: [
-                    SizedBox(
-                      width: boxWidth,
-                      height: boxHeight,
-                      child: RepaintBoundary(
-                        child: CustomPaint(
-                          painter: LabelPainter(
-                            title: step.title,
-                            body: step.bodyText * 8,
-                            titleTextStyle:
-                                step.titleTextStyle ?? localTitleTextStyle,
-                            bodyTextStyle:
-                                step.bodyTextStyle ?? localBodyTextStyle,
-                            opacity: animation.value,
-                            hasLabelBox: step.hasLabelBox,
-                            labelBoxPadding: step.labelBoxPadding,
-                            labelBoxDecoration: step.labelBoxDecoration,
-                            hasArrow: step.hasArrow,
-                            arrowPosition: step.arrowPosition,
-                            textAlign: step.textAlign,
-                            isTop: isTop,
-                          ),
+                    RepaintBoundary(
+                      child: CustomPaint(
+                        painter: LabelPainter(
+                          opacity: animation.value,
+                          hasLabelBox: step.hasLabelBox,
+                          labelBoxPadding: step.labelBoxPadding,
+                          labelBoxDecoration: step.labelBoxDecoration,
+                          hasArrow: step.hasArrow,
+                          arrowPosition: step.arrowPosition,
+                          isTop: isTop,
                         ),
-                      ),
-                    ),
-                    Padding(
-                      padding: step.labelBoxPadding,
-                      child: Column(
-                        mainAxisAlignment: isTop
-                            ? MainAxisAlignment.end
-                            : MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            step.title,
-                            style: step.titleTextStyle ?? localTitleTextStyle,
-                            textAlign: TextAlign.start,
-                            maxLines: kTitleMaxLines,
-                          ),
-                          Text(
-                            step.bodyText * 8,
-                            style: step.bodyTextStyle ?? localBodyTextStyle,
-                            textAlign: TextAlign.start,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: kBodyMaxLines,
-                          ),
-                        ],
+                        child: Padding(
+                          padding: step.labelBoxPadding,
+                          child: widget.autoSizeTexts
+                              ? AutoSizeText.rich(
+                                  TextSpan(
+                                    text: step.title,
+                                    style: step.titleTextStyle ??
+                                        localTitleTextStyle,
+                                    children: <InlineSpan>[
+                                      const TextSpan(text: '\n'),
+                                      TextSpan(
+                                        text: step.bodyText * 8,
+                                        style: step.bodyTextStyle ??
+                                            localBodyTextStyle,
+                                      )
+                                    ],
+                                  ),
+                                  textDirection: Directionality.of(context),
+                                  textAlign: step.textAlign,
+                                  minFontSize: 12,
+                                )
+                              : Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  mainAxisAlignment: isTop
+                                      ? MainAxisAlignment.end
+                                      : MainAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      step.title,
+                                      style: step.titleTextStyle ??
+                                          localTitleTextStyle,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: step.textAlign,
+                                      textDirection: Directionality.of(context),
+                                    ),
+                                    Text(
+                                      step.bodyText * 8,
+                                      style: step.bodyTextStyle ??
+                                          localBodyTextStyle,
+                                      maxLines: 5,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: step.textAlign,
+                                      textDirection: Directionality.of(context),
+                                    )
+                                  ],
+                                ),
+                        ),
                       ),
                     )
                   ],
