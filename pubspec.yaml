@@ -1,6 +1,6 @@
 name: onboarding_overlay
 description: Flexible to control Onboarding overlay with or without target element (fork from onboard_overlay)
-version: 2.3.1-pre.3
+version: 2.3.1-pre.4
 repository: https://github.com/talamaska/onboarding_overlay
 
 environment:
