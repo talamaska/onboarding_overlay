@@ -370,7 +370,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                                       children: <InlineSpan>[
                                         const TextSpan(text: '\n'),
                                         TextSpan(
-                                          text: step.bodyText * 8,
+                                          text: step.bodyText,
                                           style: step.bodyTextStyle ??
                                               localBodyTextStyle,
                                         )
