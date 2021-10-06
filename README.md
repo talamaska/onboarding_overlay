@@ -52,7 +52,7 @@ Focus(
 )
 ```
 
-4. Add Onboarding widget to your widget tree below MaterialWidget
+4. Add Onboarding widget to your widget tree below MaterialWidget and above of everything else
 
 ```dart
 void main() {
@@ -101,24 +101,24 @@ class _AppState extends State<App> {
 }
 ```
 
-5. Show onboarding widget on some activity
+5. Show onboarding widget on some activity somewhere down the tree in another widget with a new BuildContext
 
 ```dart
-final OnboardingState? onboading = Onboarding.of(context);
+final OnboardingState? onboarding = Onboarding.of(context);
 
 if (onboarding != null) {
   onboarding.show();
 }
 ```
 
-or immediately in initState
+Or immediately in initState somewhere down the tree in another widget with a new BuildContext
 
 ```dart
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((Duration timeStamp) {
-      final OnboardingState? onboading = Onboarding.of(context);
+      final OnboardingState? onboarding = Onboarding.of(context);
       if (onboarding != null) {
         onboarding.showWithSteps(3, <int>[3,4,5,6]);
       }

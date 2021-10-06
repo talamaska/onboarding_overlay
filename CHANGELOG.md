@@ -1,3 +1,7 @@
+## [2.3.1-pre.4]
+  - add: more clear docs
+  - fix: issue with change orientation
+
 ## [2.3.1-pre.3]
   - add: auto size text via AutoSizeText widget in which case if turned on will ignore maxLines
 

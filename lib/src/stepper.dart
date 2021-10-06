@@ -210,7 +210,10 @@ class _OnboardingStepperState extends State<OnboardingStepper>
             begin: Rect.zero.shift(widgetRect!.center),
             end: step.margin.inflateRect(widgetRect!),
           )
-        : null;
+        : RectTween(
+            begin: Rect.zero,
+            end: Rect.zero,
+          );
     overlayColorTween = ColorTween(
       begin: step.overlayColor.withOpacity(animation.value),
       end: step.overlayColor,
@@ -274,151 +277,156 @@ class _OnboardingStepperState extends State<OnboardingStepper>
 
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
-    final OnboardingStep step = widget.steps[stepperIndex];
-    final double boxWidth = step.fullscreen
-        ? size.width * kLabelBoxWidthRatioLarge
-        : size.width * kLabelBoxWidthRatio;
-    final double boxHeight = size.width * kLabelBoxHeightRatio;
-    final ThemeData theme = Theme.of(context);
+    return LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+      final Size size = MediaQuery.of(context).size;
+      final OnboardingStep step = widget.steps[stepperIndex];
+      final double boxWidth = step.fullscreen
+          ? size.width * kLabelBoxWidthRatioLarge
+          : size.width * kLabelBoxWidthRatio;
+      final double boxHeight = size.width * kLabelBoxHeightRatio;
+      final ThemeData theme = Theme.of(context);
 
-    final TextTheme textTheme = theme.textTheme;
-    final TextStyle localTitleTextStyle =
-        textTheme.headline5!.copyWith(color: step.titleTextColor);
-    final TextStyle localBodyTextStyle =
-        textTheme.bodyText1!.copyWith(color: step.bodyTextColor);
+      final TextTheme textTheme = theme.textTheme;
+      final TextStyle localTitleTextStyle =
+          textTheme.headline5!.copyWith(color: step.titleTextColor);
+      final TextStyle localBodyTextStyle =
+          textTheme.bodyText1!.copyWith(color: step.bodyTextColor);
 
-    Rect holeRect = Rect.fromCenter(
-      center: Offset(size.width / 2, size.height / 2),
-      width: 0,
-      height: 0,
-    );
+      Rect holeRect = Rect.fromCenter(
+        center: Offset(size.width / 2, size.height / 2),
+        width: 0,
+        height: 0,
+      );
 
-    if (widgetRect != null) {
-      holeRect = step.margin.inflateRect(widgetRect!);
-    }
+      if (widgetRect != null) {
+        holeRect = step.margin.inflateRect(widgetRect!);
+      }
 
-    final bool isTop = holeRect.center.dy > size.height / 2;
+      final bool isTop = holeRect.center.dy > size.height / 2;
 
-    return Listener(
-      behavior: step.overlayBehavior,
-      onPointerDown: (PointerDownEvent details) {
-        final RenderBox overlayBox =
-            overlayKey.currentContext?.findRenderObject() as RenderBox;
+      return Listener(
+        behavior: step.overlayBehavior,
+        onPointerDown: (PointerDownEvent details) {
+          final RenderBox overlayBox =
+              overlayKey.currentContext?.findRenderObject() as RenderBox;
 
-        Offset localOverlay = overlayBox.globalToLocal(details.position);
+          Offset localOverlay = overlayBox.globalToLocal(details.position);
 
-        final BoxHitTestResult result = BoxHitTestResult();
-        if (overlayBox.hitTest(result, position: localOverlay) ||
-            step.overlayBehavior != HitTestBehavior.deferToChild) {
-          nextStep();
-        }
-      },
-      child: Stack(
-        key: step.key,
-        clipBehavior: Clip.antiAlias,
-        children: <Widget>[
-          RepaintBoundary(
-            child: CustomPaint(
-              key: overlayKey,
-              size: Size(
-                size.width,
-                size.height,
-              ),
-              painter: OverlayPainter(
-                fullscreen: step.fullscreen,
-                shape: step.shape,
-                overlayShape: step.overlayShape,
-                center: holeOffset,
-                hole: holeTween?.evaluate(animation),
-                animation: animation.value,
-                overlayColor: overlayColorTween.evaluate(animation),
-              ),
-            ),
-          ),
-          Positioned(
-            left: _getHorizontalPosition(step, size),
-            top: _getVerticalPosition(step, size),
-            child: FadeTransition(
-              opacity: animation,
-              child: SizedBox(
-                width: boxWidth,
-                height: boxHeight,
-                child: Stack(
-                  clipBehavior: Clip.antiAlias,
-                  alignment:
-                      isTop ? Alignment.bottomCenter : Alignment.topCenter,
-                  children: [
-                    RepaintBoundary(
-                      child: CustomPaint(
-                        painter: LabelPainter(
-                          opacity: animation.value,
-                          hasLabelBox: step.hasLabelBox,
-                          labelBoxPadding: step.labelBoxPadding,
-                          labelBoxDecoration: step.labelBoxDecoration,
-                          hasArrow: step.hasArrow,
-                          arrowPosition: step.arrowPosition,
-                          isTop: isTop,
-                        ),
-                        child: Padding(
-                          padding: step.labelBoxPadding,
-                          child: widget.autoSizeTexts
-                              ? AutoSizeText.rich(
-                                  TextSpan(
-                                    text: step.title,
-                                    style: step.titleTextStyle ??
-                                        localTitleTextStyle,
-                                    children: <InlineSpan>[
-                                      const TextSpan(text: '\n'),
-                                      TextSpan(
-                                        text: step.bodyText * 8,
-                                        style: step.bodyTextStyle ??
-                                            localBodyTextStyle,
-                                      )
-                                    ],
-                                  ),
-                                  textDirection: Directionality.of(context),
-                                  textAlign: step.textAlign,
-                                  minFontSize: 12,
-                                )
-                              : Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  mainAxisAlignment: isTop
-                                      ? MainAxisAlignment.end
-                                      : MainAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      step.title,
-                                      style: step.titleTextStyle ??
-                                          localTitleTextStyle,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      textAlign: step.textAlign,
-                                      textDirection: Directionality.of(context),
-                                    ),
-                                    Text(
-                                      step.bodyText * 8,
-                                      style: step.bodyTextStyle ??
-                                          localBodyTextStyle,
-                                      maxLines: 5,
-                                      overflow: TextOverflow.ellipsis,
-                                      textAlign: step.textAlign,
-                                      textDirection: Directionality.of(context),
-                                    )
-                                  ],
-                                ),
-                        ),
-                      ),
-                    )
-                  ],
+          final BoxHitTestResult result = BoxHitTestResult();
+          if (overlayBox.hitTest(result, position: localOverlay) ||
+              step.overlayBehavior != HitTestBehavior.deferToChild) {
+            nextStep();
+          }
+        },
+        child: Stack(
+          key: step.key,
+          clipBehavior: Clip.antiAlias,
+          children: <Widget>[
+            RepaintBoundary(
+              child: CustomPaint(
+                key: overlayKey,
+                size: Size(
+                  size.width,
+                  size.height,
+                ),
+                painter: OverlayPainter(
+                  fullscreen: step.fullscreen,
+                  shape: step.shape,
+                  overlayShape: step.overlayShape,
+                  center: holeOffset,
+                  hole: holeTween?.evaluate(animation),
+                  animation: animation.value,
+                  overlayColor: overlayColorTween.evaluate(animation),
                 ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
+            Positioned(
+              left: _getHorizontalPosition(step, size),
+              top: _getVerticalPosition(step, size),
+              child: FadeTransition(
+                opacity: animation,
+                child: SizedBox(
+                  width: boxWidth,
+                  height: boxHeight,
+                  child: Stack(
+                    clipBehavior: Clip.antiAlias,
+                    alignment:
+                        isTop ? Alignment.bottomCenter : Alignment.topCenter,
+                    children: [
+                      RepaintBoundary(
+                        child: CustomPaint(
+                          painter: LabelPainter(
+                            opacity: animation.value,
+                            hasLabelBox: step.hasLabelBox,
+                            labelBoxPadding: step.labelBoxPadding,
+                            labelBoxDecoration: step.labelBoxDecoration,
+                            hasArrow: step.hasArrow,
+                            arrowPosition: step.arrowPosition,
+                            isTop: isTop,
+                          ),
+                          child: Padding(
+                            padding: step.labelBoxPadding,
+                            child: widget.autoSizeTexts
+                                ? AutoSizeText.rich(
+                                    TextSpan(
+                                      text: step.title,
+                                      style: step.titleTextStyle ??
+                                          localTitleTextStyle,
+                                      children: <InlineSpan>[
+                                        const TextSpan(text: '\n'),
+                                        TextSpan(
+                                          text: step.bodyText * 8,
+                                          style: step.bodyTextStyle ??
+                                              localBodyTextStyle,
+                                        )
+                                      ],
+                                    ),
+                                    textDirection: Directionality.of(context),
+                                    textAlign: step.textAlign,
+                                    minFontSize: 12,
+                                  )
+                                : Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    mainAxisAlignment: isTop
+                                        ? MainAxisAlignment.end
+                                        : MainAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        step.title,
+                                        style: step.titleTextStyle ??
+                                            localTitleTextStyle,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        textAlign: step.textAlign,
+                                        textDirection:
+                                            Directionality.of(context),
+                                      ),
+                                      Text(
+                                        step.bodyText * 8,
+                                        style: step.bodyTextStyle ??
+                                            localBodyTextStyle,
+                                        maxLines: 5,
+                                        overflow: TextOverflow.ellipsis,
+                                        textAlign: step.textAlign,
+                                        textDirection:
+                                            Directionality.of(context),
+                                      )
+                                    ],
+                                  ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    });
   }
 }
