@@ -192,7 +192,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     super.dispose();
   }
 
-  void setTweensAndAnimate(OnboardingStep step) {
+  void calcWidgetRect(OnboardingStep step) {
     final RenderBox? box =
         step.focusNode.context?.findRenderObject() as RenderBox?;
 
@@ -204,6 +204,9 @@ class _OnboardingStepperState extends State<OnboardingStepper>
             end: step.margin.inflateRect(widgetRect!),
           )
         : null;
+  }
+
+  void setTweensAndAnimate(OnboardingStep step) {
     overlayColorTween = ColorTween(
       begin: step.overlayColor.withOpacity(animation.value),
       end: step.overlayColor,
@@ -267,89 +270,93 @@ class _OnboardingStepperState extends State<OnboardingStepper>
 
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
-    final OnboardingStep step = widget.steps[stepperIndex];
-    final double boxWidth = step.fullscreen
-        ? size.width * kLabelBoxWidthRatioLarge
-        : size.width * kLabelBoxWidthRatio;
-    final double boxHeight = size.width * kLabelBoxHeightRatio;
-    final ThemeData theme = Theme.of(context);
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final Size size = MediaQuery.of(context).size;
+        final OnboardingStep step = widget.steps[stepperIndex];
+        final double boxWidth = step.fullscreen
+            ? size.width * kLabelBoxWidthRatioLarge
+            : size.width * kLabelBoxWidthRatio;
+        final double boxHeight = size.width * kLabelBoxHeightRatio;
+        final ThemeData theme = Theme.of(context);
 
-    final TextTheme textTheme = theme.textTheme;
-    final TextStyle localTitleTextStyle =
-        textTheme.headline5!.copyWith(color: step.titleTextColor);
-    final TextStyle localBodyTextStyle =
-        textTheme.bodyText1!.copyWith(color: step.bodyTextColor);
+        final TextTheme textTheme = theme.textTheme;
+        final TextStyle localTitleTextStyle =
+            textTheme.headline5!.copyWith(color: step.titleTextColor);
+        final TextStyle localBodyTextStyle =
+            textTheme.bodyText1!.copyWith(color: step.bodyTextColor);
 
-    Rect holeRect = Rect.fromCenter(
-      center: Offset(size.width / 2, size.height / 2),
-      width: 0,
-      height: 0,
-    );
+        Rect holeRect = Rect.fromCenter(
+          center: Offset(size.width / 2, size.height / 2),
+          width: 0,
+          height: 0,
+        );
 
-    if (widgetRect != null) {
-      holeRect = step.margin.inflateRect(widgetRect!);
-    }
+        calcWidgetRect(step);
+        if (widgetRect != null) {
+          holeRect = step.margin.inflateRect(widgetRect!);
+        }
 
-    final bool isTop = holeRect.center.dy > size.height / 2;
-
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () {
-        nextStep();
-      },
-      child: Stack(
-        key: step.key,
-        children: <Widget>[
-          RepaintBoundary(
-            child: CustomPaint(
-              size: Size(
-                size.width,
-                size.height,
+        final bool isTop = holeRect.center.dy > size.height / 2;
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            nextStep();
+          },
+          child: Stack(
+            key: step.key,
+            children: <Widget>[
+              RepaintBoundary(
+                child: CustomPaint(
+                  size: Size(
+                    size.width,
+                    size.height,
+                  ),
+                  painter: OverlayPainter(
+                    fullscreen: step.fullscreen,
+                    shape: step.shape,
+                    overlayShape: step.overlayShape,
+                    center: holeOffset,
+                    hole: holeTween?.evaluate(animation),
+                    animation: animation.value,
+                    overlayColor: overlayColorTween.evaluate(animation),
+                  ),
+                ),
               ),
-              painter: OverlayPainter(
-                fullscreen: step.fullscreen,
-                shape: step.shape,
-                overlayShape: step.overlayShape,
-                center: holeOffset,
-                hole: holeTween?.evaluate(animation),
-                animation: animation.value,
-                overlayColor: overlayColorTween.evaluate(animation),
-              ),
-            ),
-          ),
-          Positioned(
-            left: _getHorizontalPosition(step, size),
-            top: _getVerticalPosition(step, size),
-            child: FadeTransition(
-              opacity: animation,
-              child: SizedBox(
-                width: boxWidth,
-                height: boxHeight,
-                child: RepaintBoundary(
-                  child: CustomPaint(
-                    painter: LabelPainter(
-                      title: step.title,
-                      body: step.bodyText,
-                      titleTextStyle:
-                          step.titleTextStyle ?? localTitleTextStyle,
-                      bodyTextStyle: step.bodyTextStyle ?? localBodyTextStyle,
-                      opacity: animation.value,
-                      hasLabelBox: step.hasLabelBox,
-                      labelBoxPadding: step.labelBoxPadding,
-                      labelBoxDecoration: step.labelBoxDecoration,
-                      hasArrow: step.hasArrow,
-                      arrowPosition: step.arrowPosition,
-                      textAlign: step.textAlign,
-                      isTop: isTop,
+              Positioned(
+                left: _getHorizontalPosition(step, size),
+                top: _getVerticalPosition(step, size),
+                child: FadeTransition(
+                  opacity: animation,
+                  child: SizedBox(
+                    width: boxWidth,
+                    height: boxHeight,
+                    child: RepaintBoundary(
+                      child: CustomPaint(
+                        painter: LabelPainter(
+                          title: step.title,
+                          body: step.bodyText,
+                          titleTextStyle:
+                              step.titleTextStyle ?? localTitleTextStyle,
+                          bodyTextStyle: step.bodyTextStyle ?? localBodyTextStyle,
+                          opacity: animation.value,
+                          hasLabelBox: step.hasLabelBox,
+                          labelBoxPadding: step.labelBoxPadding,
+                          labelBoxDecoration: step.labelBoxDecoration,
+                          hasArrow: step.hasArrow,
+                          arrowPosition: step.arrowPosition,
+                          textAlign: step.textAlign,
+                          isTop: isTop,
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      }
     );
   }
 }
