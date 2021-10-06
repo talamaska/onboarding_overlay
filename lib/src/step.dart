@@ -33,7 +33,7 @@ class OnboardingStep {
     this.hasArrow = false,
     this.fullscreen = true,
     this.delay = Duration.zero,
-    this.arrowPosition = ArrowPosition.topCenter,
+    this.arrowPosition = ArrowPosition.top,
     this.overlayBehavior = HitTestBehavior.opaque,
   })  : assert(titleTextColor != null || titleTextStyle != null,
             'You should provide at least one of titleTextColor or titleTextStyle'),

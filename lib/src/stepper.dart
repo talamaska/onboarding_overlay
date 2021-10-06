@@ -64,7 +64,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
   late AnimationController controller;
   late Animation<double> animation;
   late List<int> _stepIndexes;
-  RectTween? holeTween;
+  late RectTween holeTween;
   Offset? holeOffset;
   Rect? widgetRect;
   final GlobalKey overlayKey = GlobalKey();
@@ -199,7 +199,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     super.dispose();
   }
 
-  void setTweensAndAnimate(OnboardingStep step) {
+  void calcWidgetRect(OnboardingStep step) {
     final RenderBox? box =
         step.focusNode.context?.findRenderObject() as RenderBox?;
 
@@ -214,6 +214,9 @@ class _OnboardingStepperState extends State<OnboardingStepper>
             begin: Rect.zero,
             end: Rect.zero,
           );
+  }
+
+  void setTweensAndAnimate(OnboardingStep step) {
     overlayColorTween = ColorTween(
       begin: step.overlayColor.withOpacity(animation.value),
       end: step.overlayColor,
@@ -226,21 +229,16 @@ class _OnboardingStepperState extends State<OnboardingStepper>
 
   double _getHorizontalPosition(OnboardingStep step, Size size) {
     final double boxWidth = step.fullscreen
-        ? size.width * kLabelBoxWidthRatioLarge
+        ? size.shortestSide * kLabelBoxWidthRatioLarge
         : size.width * kLabelBoxWidthRatio;
     if (widgetRect != null) {
-      // final Rect holeRect = step.margin.inflateRect(_widgetRect);
-      if (step.fullscreen) {
-        return ((size.width - boxWidth) / 2).clamp(0, size.width);
+      if (widgetRect!.center.dx > size.width / 2) {
+        return (widgetRect!.right - boxWidth).clamp(0, size.width - boxWidth);
+      } else if (widgetRect!.center.dx == size.width / 2) {
+        return (widgetRect!.center.dx - boxWidth / 2)
+            .clamp(0, size.width - boxWidth);
       } else {
-        if (widgetRect!.center.dx > size.width / 2) {
-          return (widgetRect!.right - boxWidth).clamp(0, size.width - boxWidth);
-        } else if (widgetRect!.center.dx == size.width / 2) {
-          return (widgetRect!.center.dx - boxWidth / 2)
-              .clamp(0, size.width - boxWidth);
-        } else {
-          return widgetRect!.left.clamp(0, size.width - boxWidth);
-        }
+        return widgetRect!.left.clamp(0, size.width - boxWidth);
       }
     } else {
       return size.width / 2 - boxWidth / 2;
@@ -248,27 +246,18 @@ class _OnboardingStepperState extends State<OnboardingStepper>
   }
 
   double _getVerticalPosition(OnboardingStep step, Size size) {
-    final double boxHeight = size.width * kLabelBoxHeightRatio;
+    final double boxHeight = size.shortestSide * kLabelBoxHeightRatio;
     final double bottomSpace = (step.hasArrow ? kArrowHeight + kSpace : kSpace);
     final double topSpace = (step.hasArrow ? kArrowHeight + kSpace : kSpace);
     if (widgetRect != null) {
       final Rect holeRect = step.margin.inflateRect(widgetRect!);
-      if (step.fullscreen) {
-        if (holeRect.center.dy > size.height / 2) {
-          return (holeRect.top - boxHeight - topSpace)
-              .clamp(0, size.height - boxHeight);
-        } else {
-          return (holeRect.bottom + bottomSpace)
-              .clamp(0, size.height - boxHeight);
-        }
+
+      if (widgetRect!.center.dy > size.height / 2) {
+        return (holeRect.top - boxHeight - topSpace)
+            .clamp(0, size.height - boxHeight);
       } else {
-        if (widgetRect!.center.dy > size.height / 2) {
-          return (holeRect.top - boxHeight - topSpace)
-              .clamp(0, size.height - boxHeight);
-        } else {
-          return (holeRect.bottom + bottomSpace)
-              .clamp(0, size.height - boxHeight);
-        }
+        return (holeRect.bottom + bottomSpace)
+            .clamp(0, size.height - boxHeight);
       }
     } else {
       return size.height / 2 - boxHeight / 2;
@@ -282,9 +271,9 @@ class _OnboardingStepperState extends State<OnboardingStepper>
       final Size size = MediaQuery.of(context).size;
       final OnboardingStep step = widget.steps[stepperIndex];
       final double boxWidth = step.fullscreen
-          ? size.width * kLabelBoxWidthRatioLarge
+          ? size.shortestSide * kLabelBoxWidthRatioLarge
           : size.width * kLabelBoxWidthRatio;
-      final double boxHeight = size.width * kLabelBoxHeightRatio;
+      final double boxHeight = size.shortestSide * kLabelBoxHeightRatio;
       final ThemeData theme = Theme.of(context);
 
       final TextTheme textTheme = theme.textTheme;
@@ -294,16 +283,21 @@ class _OnboardingStepperState extends State<OnboardingStepper>
           textTheme.bodyText1!.copyWith(color: step.bodyTextColor);
 
       Rect holeRect = Rect.fromCenter(
-        center: Offset(size.width / 2, size.height / 2),
+        center: Offset(size.shortestSide / 2, size.longestSide / 2),
         width: 0,
         height: 0,
       );
+
+      calcWidgetRect(step);
 
       if (widgetRect != null) {
         holeRect = step.margin.inflateRect(widgetRect!);
       }
 
       final bool isTop = holeRect.center.dy > size.height / 2;
+      final double leftPos = _getHorizontalPosition(step, size);
+      final double topPos = _getVerticalPosition(step, size);
+      final Rect? hole = holeTween.evaluate(animation);
 
       return Listener(
         behavior: step.overlayBehavior,
@@ -335,15 +329,15 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                   shape: step.shape,
                   overlayShape: step.overlayShape,
                   center: holeOffset,
-                  hole: holeTween?.evaluate(animation),
+                  hole: hole,
                   animation: animation.value,
                   overlayColor: overlayColorTween.evaluate(animation),
                 ),
               ),
             ),
             Positioned(
-              left: _getHorizontalPosition(step, size),
-              top: _getVerticalPosition(step, size),
+              left: leftPos,
+              top: topPos,
               child: FadeTransition(
                 opacity: animation,
                 child: SizedBox(
@@ -363,7 +357,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                             labelBoxDecoration: step.labelBoxDecoration,
                             hasArrow: step.hasArrow,
                             arrowPosition: step.arrowPosition,
-                            isTop: isTop,
+                            hole: hole!.shift(Offset(-leftPos, -topPos)),
                           ),
                           child: Padding(
                             padding: step.labelBoxPadding,

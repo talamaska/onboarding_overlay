@@ -7,7 +7,14 @@ import 'package:vector_math/vector_math.dart' as vm;
 
 import 'constants.dart';
 
-enum ArrowPosition { centerLeft, centerRight, topCenter, bottomCenter }
+enum ArrowPosition {
+  centerLeft,
+  centerRight,
+  topCenter,
+  bottomCenter,
+  top,
+  bottom
+}
 
 const Color transparentColor = Color(0x00000000);
 
@@ -16,15 +23,15 @@ class LabelPainter extends CustomPainter {
     this.opacity = 1,
     this.hasArrow = false,
     this.hasLabelBox = false,
-    this.arrowPosition = ArrowPosition.topCenter,
+    this.arrowPosition = ArrowPosition.top,
     this.arrowHeight = kArrowHeight,
-    this.isTop = false,
     this.labelBoxPadding = const EdgeInsets.all(8.0),
     this.labelBoxDecoration = const BoxDecoration(
       shape: BoxShape.rectangle,
       borderRadius: BorderRadius.all(Radius.circular(8.0)),
       color: transparentColor,
     ),
+    required this.hole,
   })  : assert(
             (hasArrow && hasLabelBox) ||
                 (!hasArrow && !hasLabelBox) ||
@@ -70,8 +77,7 @@ class LabelPainter extends CustomPainter {
   /// This property is used for fading animation of the texts and the label box
   final double opacity;
 
-  /// Label box vertical positioning relative to the widget of interest
-  final bool isTop;
+  final Rect hole;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -107,6 +113,12 @@ class LabelPainter extends CustomPainter {
         final double b = math.cos(equilateralRad) * c;
 
         switch (arrowPosition) {
+          case ArrowPosition.bottom:
+            arrowPath = drawBottomArrow(paragraphRect, a, b);
+            break;
+          case ArrowPosition.top:
+            arrowPath = drawTopArrow(paragraphRect, a, b);
+            break;
           case ArrowPosition.bottomCenter:
             arrowPath = drawBottomCenterArrow(paragraphRect, a, b);
             break;
@@ -187,7 +199,78 @@ class LabelPainter extends CustomPainter {
       );
   }
 
+  Path drawBottomArrow(Rect paddingBox, double a, double b) {
+    Rect hPB = paddingBox;
+    if (hole.width != 0) {
+      hPB = hole;
+    }
+
+    return Path()
+      ..moveTo(
+        hPB.bottomCenter.dx - b,
+        paddingBox.bottomCenter.dy,
+      )
+      ..lineTo(
+        hPB.bottomCenter.dx,
+        paddingBox.bottomCenter.dy + a,
+      )
+      ..lineTo(
+        hPB.bottomCenter.dx + b,
+        paddingBox.bottomCenter.dy,
+      )
+      ..lineTo(
+        hPB.bottomCenter.dx + b,
+        paddingBox.bottomCenter.dy - labelBoxPadding.bottom,
+      )
+      ..lineTo(
+        hPB.bottomCenter.dx - b,
+        paddingBox.bottomCenter.dy - labelBoxPadding.bottom,
+      )
+      ..lineTo(
+        hPB.bottomCenter.dx - b,
+        paddingBox.bottomCenter.dy,
+      );
+  }
+
+  Path drawTopArrow(Rect paddingBox, double a, double b) {
+    Rect hPB = paddingBox;
+    if (hole.width != 0) {
+      hPB = hole;
+    }
+
+    return Path()
+      ..moveTo(
+        hPB.topCenter.dx - b,
+        paddingBox.topCenter.dy,
+      )
+      ..lineTo(
+        hPB.topCenter.dx,
+        paddingBox.topCenter.dy - a,
+      )
+      ..lineTo(
+        hPB.topCenter.dx + b,
+        paddingBox.topCenter.dy,
+      )
+      ..lineTo(
+        hPB.topCenter.dx + b,
+        paddingBox.topCenter.dy + labelBoxPadding.top,
+      )
+      ..lineTo(
+        hPB.topCenter.dx - b,
+        paddingBox.topCenter.dy + labelBoxPadding.top,
+      )
+      ..lineTo(
+        hPB.topCenter.dx - b,
+        paddingBox.topCenter.dy,
+      );
+  }
+
   Path drawBottomCenterArrow(Rect paddingBox, double a, double b) {
+    Rect hPB = paddingBox;
+    if (hole.width != 0) {
+      hPB = hole;
+    }
+
     return Path()
       ..moveTo(
         paddingBox.bottomCenter.dx - b,
@@ -251,6 +334,5 @@ class LabelPainter extends CustomPainter {
       arrowHeight != oldDelegate.arrowHeight ||
       arrowPosition != oldDelegate.arrowPosition ||
       hasLabelBox != oldDelegate.hasLabelBox ||
-      hasArrow != oldDelegate.hasArrow ||
-      isTop != oldDelegate.isTop;
+      hasArrow != oldDelegate.hasArrow;
 }

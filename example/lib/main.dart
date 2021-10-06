@@ -34,7 +34,7 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) => MaterialApp(
         home: Onboarding(
           key: widget.onboardingKey,
-          autoSizeTexts: false,
+          autoSizeTexts: true,
           steps: <OnboardingStep>[
             OnboardingStep(
               focusNode: focusNodes[0],
@@ -51,7 +51,7 @@ class _AppState extends State<App> {
                     width: 1.0,
                     style: BorderStyle.solid,
                   )),
-              arrowPosition: ArrowPosition.bottomCenter,
+              arrowPosition: ArrowPosition.bottom,
               hasArrow: true,
               hasLabelBox: true,
               fullscreen: true,
@@ -90,7 +90,7 @@ class _AppState extends State<App> {
                     width: 1.0,
                     style: BorderStyle.solid,
                   )),
-              arrowPosition: ArrowPosition.topCenter,
+              arrowPosition: ArrowPosition.top,
               hasArrow: true,
               hasLabelBox: true,
               textAlign: TextAlign.center,
@@ -127,7 +127,7 @@ class _AppState extends State<App> {
                     width: 1.0,
                     style: BorderStyle.solid,
                   )),
-              arrowPosition: ArrowPosition.bottomCenter,
+              arrowPosition: ArrowPosition.bottom,
               hasArrow: true,
               hasLabelBox: true,
             ),
@@ -202,7 +202,7 @@ class _HomeState extends State<Home> {
         ),
         title: Focus(
           focusNode: widget.focusNodes[3],
-          child: const Text('Title'),
+          child: const Text('Super Long Title'),
         ),
         actions: [
           IconButton(
