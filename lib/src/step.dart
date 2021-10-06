@@ -34,6 +34,7 @@ class OnboardingStep {
     this.fullscreen = true,
     this.delay = Duration.zero,
     this.arrowPosition = ArrowPosition.topCenter,
+    this.allowTapThrough = false,
   })  : assert(titleTextColor != null || titleTextStyle != null,
             'You should provide at least one of titleTextColor or titleTextStyle'),
         assert(bodyTextColor != null || bodyTextStyle != null,
@@ -137,6 +138,15 @@ class OnboardingStep {
 
   /// By default, the value used is `Duration.zero`
   final Duration delay;
+
+  /// If ```true``` - taps on selected [focusNode] will be propogated to it (and you 
+  /// have to manually control finishing of step), and taps outside [focusNode]
+  /// will end step.
+  /// 
+  /// If ```false``` - tap to any place will finish this step.
+  /// 
+  /// By default, the value used is ```false```
+  final bool allowTapThrough;
 
   OnboardingStep copyWith({
     FocusNode? focusNode,

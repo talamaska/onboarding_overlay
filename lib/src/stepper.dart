@@ -201,7 +201,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     holeTween = widgetRect != null
         ? RectTween(
             begin: Rect.zero.shift(widgetRect!.center),
-            end: step.margin.inflateRect(widgetRect!),
+            end: widgetRect!,
           )
         : null;
     overlayColorTween = ColorTween(
@@ -294,7 +294,9 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     final bool isTop = holeRect.center.dy > size.height / 2;
 
     return GestureDetector(
-      behavior: HitTestBehavior.opaque,
+      behavior: step.allowTapThrough 
+        ? HitTestBehavior.deferToChild 
+        : HitTestBehavior.opaque,
       onTap: () {
         nextStep();
       },
@@ -313,6 +315,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                 overlayShape: step.overlayShape,
                 center: holeOffset,
                 hole: holeTween?.evaluate(animation),
+                margin: step.margin,
                 animation: animation.value,
                 overlayColor: overlayColorTween.evaluate(animation),
               ),
