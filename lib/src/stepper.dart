@@ -48,10 +48,10 @@ class OnboardingStepper extends StatefulWidget {
   final Duration duration;
 
   @override
-  _OnboardingStepperState createState() => _OnboardingStepperState();
+  OnboardingStepperState createState() => OnboardingStepperState();
 }
 
-class _OnboardingStepperState extends State<OnboardingStepper>
+class OnboardingStepperState extends State<OnboardingStepper>
     with SingleTickerProviderStateMixin {
   late int stepperIndex;
   late ColorTween overlayColorTween;

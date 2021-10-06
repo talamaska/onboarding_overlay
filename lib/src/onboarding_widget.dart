@@ -20,6 +20,7 @@ class Onboarding extends StatefulWidget {
     required this.steps,
     required this.child,
     this.duration = const Duration(milliseconds: 350),
+    this.controller,
   }) : super(key: key);
 
   final int initialIndex;
@@ -34,6 +35,8 @@ class Onboarding extends StatefulWidget {
 
   /// By default, the value used is `Duration(milliseconds: 350)`
   final Duration duration;
+
+  final OnboardingController? controller;
 
   /// or
   /// context.findAncestorStateOfType\<OnboardingState\>();
@@ -67,6 +70,31 @@ class Onboarding extends StatefulWidget {
 
 class OnboardingState extends State<Onboarding> {
   late OverlayEntry _overlayEntry;
+  final GlobalKey _stepperKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller?._attach(this);
+  }
+
+  @override
+  void deactivate() {
+    widget.controller?._detach();
+    super.deactivate();
+  }
+
+  @override
+  void didUpdateWidget(Onboarding oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller?._onboardingState == this) {
+      oldWidget.controller?._detach();
+    }
+    if (widget.controller?._onboardingState != this) {
+      widget.controller?._detach();
+      widget.controller?._attach(this);
+    }
+  }
 
   /// Shows an onboarding session with all steps provided and initial index passed via the widget
   void show() {
@@ -100,6 +128,7 @@ class OnboardingState extends State<Onboarding> {
       opaque: false,
       builder: (BuildContext context) {
         return OnboardingStepper(
+          key: _stepperKey,
           initialIndex: initialIndex,
           steps: widget.steps,
           stepIndexes: stepIndexes,
@@ -119,5 +148,47 @@ class OnboardingState extends State<Onboarding> {
   @override
   Widget build(BuildContext context) {
     return widget.child;
+  }
+}
+
+class OnboardingController {
+  OnboardingState? _onboardingState;
+
+  bool get isAttached => _onboardingState != null;
+
+  /// Shows an onboarding session with all steps provided and initial index passed via the widget
+  void show() {
+    _onboardingState!.show();
+  }
+
+  /// Shows an onboarding session from a specific step index
+  void showFromIndex(int index) {
+    _onboardingState!.showFromIndex(index);
+  }
+
+  /// Shows an onboarding session from a specific step index and a specific order and set of step indexes
+  void showWithSteps(int index, List<int> stepIndexes) {
+    _onboardingState!.showWithSteps(index, stepIndexes);
+  }
+
+  /// Hides the onboarding session overlay
+  void hide() {
+    _onboardingState!.hide();
+  }
+
+  void nextStep() {
+    // if overlay already hidden - dont do anything
+    if (_onboardingState!._overlayEntry.mounted) {
+      (_onboardingState!._stepperKey.currentState as OnboardingStepperState).nextStep();
+    }
+  }
+
+  void _attach(OnboardingState state) {
+    assert(_onboardingState == null);
+    _onboardingState = state;
+  }
+
+  void _detach() {
+    _onboardingState = null;
   }
 }
