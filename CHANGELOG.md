@@ -1,3 +1,7 @@
+## [2.3.1-pre.7]
+ - update demo gif
+ - fix docs
+
 ## [2.3.1-pre.6]
   - add more documentation in the readme
   - fix docs for the arrowPosition

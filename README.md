@@ -132,7 +132,7 @@ if (onboarding != null) {
 6. The text can be wrapped in a box, than support all kind of decorations and only shape: BoxShape.rectangle
 For this to happen, you have to set `hasLabelBox` equal to `true`, `labelBoxDecoration`, which supports only `BoxDecoration`
 
-7. The Label box also supports having an arrow. This is controlled by `hasArrow`, the position is not calculated automatically, the default position is top. You will have to specify the direction via arrowPosition by using the enum `ArrowPosition`. The `ArrowPosition.top` and `ArrowPosition.bottom` calculates the horizontal position automatically according to the widget of interest (the focused one which is visible through the overlay), the other arrow positions are centered in the label box e.g. topCenter, bottomCenter, leftCenter and rightCenter.
+7. The Label box also supports having an arrow. This is controlled by `hasArrow`. The position is not calculated automatically. The default position is top. You will have to specify the position via arrowPosition by using the enum `ArrowPosition`. The `ArrowPosition.top` and `ArrowPosition.bottom` calculates the horizontal position automatically according to the widget of interest (the focused one which is visible through the overlay), the other arrow positions are centered in the label box e.g. topCenter, bottomCenter, leftCenter and rightCenter.
 
 8. The onboarding also supports forwarding the onTap event to the widget of interest. You can control the behavior for each step using the overlayBehavior. It accepts the Flutter enum HitTestBehavior. By default, the value used is `HitTestBehavior.opaque`.
   - `HitTestBehavior.opaque` blocks the onTap on the widget and will trigger the onTap only on the overlay
