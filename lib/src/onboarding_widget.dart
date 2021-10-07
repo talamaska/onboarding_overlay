@@ -1,9 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:onboarding_overlay/src/stepper.dart';
 
 import 'step.dart';
+import 'stepper.dart';
 
 class Onboarding extends StatefulWidget {
   /// Onboarding is a widget that hold all the logic about reading the provided steps,

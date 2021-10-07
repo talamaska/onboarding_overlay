@@ -101,7 +101,9 @@ class _AppState extends State<App> {
 }
 ```
 
-5. Show onboarding widget on some activity somewhere down the tree in another widget with a new BuildContext
+5. Showing the onboarding 
+
+  - On some activity somewhere down the widget tree in another widget with a new BuildContext
 
 ```dart
 final OnboardingState? onboarding = Onboarding.of(context);
@@ -110,8 +112,36 @@ if (onboarding != null) {
   onboarding.show();
 }
 ```
+ - Or immediately in initState somewhere down the widget tree in another widget with a new BuildContext
 
-Or immediately in initState somewhere down the tree in another widget with a new BuildContext
+
+```dart
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((Duration timeStamp) {
+      final OnboardingState? onboarding = Onboarding.of(context);
+      if (onboarding != null) {
+        onboarding.show();
+      }
+    });
+  }
+
+```
+
+6. The text can be wrapped in a box, than support all kind of decorations and only shape: BoxShape.rectangle
+For this to happen, you have to set `hasLabelBox` equal to `true`, `labelBoxDecoration`, which supports only `BoxDecoration`
+
+7. The Label box also supports having an arrow. This is controlled by `hasArrow`, the position is not calculated automatically, the default position is top. You will have to specify the direction via arrowPosition by using the enum `ArrowPosition`. The `ArrowPosition.top` and `ArrowPosition.bottom` calculates the horizontal position automatically according to the widget of interest (the focused one which is visible through the overlay), the other arrow positions are centered in the label box e.g. topCenter, bottomCenter, leftCenter and rightCenter.
+
+8. The onboarding also supports forwarding the onTap event to the widget of interest. You can control the behavior for each step using the overlayBehavior. It accepts the Flutter enum HitTestBehavior. By default, the value used is `HitTestBehavior.opaque`.
+  - `HitTestBehavior.opaque` blocks the onTap on the widget and will trigger the onTap only on the overlay
+  - `HitTestBehavior.translucent` triggers onTap callbacks on the widget and on the overlay
+  - `HitTestBehavior.deferToChild` triggers only the onTap on the widget
+
+9. Sometimes the title and the bodyText might not fit well in the constrained label box, because of the long texts, longer translations or smaller screens. There are 2 behaviors for this scenario. The default one will limit the title to 2 lines and the bodyText to 5 lines and will overflow both with ellipsis, the second one is to automatically resize the texts. This is controlled by the Onboarding property `autoSizeTexts`, which default value is `false`. 
+
+10. The onboarding can show only a portion of the defined steps with a specific start index. Use `showWithSteps` method. Remember that the steps indexes are 0-based (starting from zero)
 
 ```dart
   @override
@@ -121,6 +151,22 @@ Or immediately in initState somewhere down the tree in another widget with a new
       final OnboardingState? onboarding = Onboarding.of(context);
       if (onboarding != null) {
         onboarding.showWithSteps(3, <int>[3,4,5,6]);
+      }
+    });
+  }
+
+```
+
+11. The onboarding can start from a specific index and play until the end step is reached. Use `showFromIndex` method. Remember that the steps indexes are 0-based (starting from zero)
+
+```dart
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((Duration timeStamp) {
+      final OnboardingState? onboarding = Onboarding.of(context);
+      if (onboarding != null) {
+        onboarding.showFromIndex(3);
       }
     });
   }

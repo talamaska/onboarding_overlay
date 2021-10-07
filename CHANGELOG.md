@@ -1,3 +1,12 @@
+## [2.3.1-pre.6]
+  - add more documentation in the readme
+  - fix docs for the arrowPosition
+  - fix imports
+
+## [2.3.1-pre.5]
+  - expand the examples
+  - fix: multiplication of the bodyText
+
 ## [2.3.1-pre.4]
   - add: more clear docs
   - fix: issue with change orientation (thanks to [IgorKhramtsov](https://github.com/IgorKhramtsov))

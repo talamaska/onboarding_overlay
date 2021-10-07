@@ -61,7 +61,7 @@ class OnboardingStep {
 
   final String title;
 
-  /// By default, the value used is `ArrowPosition.centerLeft`
+  /// By default, the value used is `ArrowPosition.top`
   final ArrowPosition arrowPosition;
 
   /// By default, the value is
@@ -145,7 +145,6 @@ class OnboardingStep {
   /// `HitTestBehavior.translucent` is going trigger Gesture callbacks on the widget and on the overlay
   ///
   /// `HitTestBehavior.deferToChild` is going to trigger only the Gesture on the widget
-
   final HitTestBehavior overlayBehavior;
 
   OnboardingStep copyWith({
