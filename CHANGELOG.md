@@ -1,3 +1,6 @@
+## [2.3.1-pre.8]
+ - fix docs
+
 ## [2.3.1-pre.7]
  - update demo gif
  - fix docs

@@ -140,6 +140,7 @@ class OnboardingStep {
   final Duration delay;
 
   /// By default, the value used is `HitTestBehavior.opaque`
+  ///
   /// `HitTestBehavior.opaque` is going to block the Gesture on the widget
   ///
   /// `HitTestBehavior.translucent` is going trigger Gesture callbacks on the widget and on the overlay
