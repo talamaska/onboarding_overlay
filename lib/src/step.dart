@@ -141,11 +141,11 @@ class OnboardingStep {
 
   /// By default, the value used is `HitTestBehavior.opaque`
   ///
-  /// `HitTestBehavior.opaque` is going to block the Gesture on the widget
+  /// `HitTestBehavior.opaque` blocks the onTap on the widget and will trigger the onTap only on the overlay
   ///
-  /// `HitTestBehavior.translucent` is going trigger Gesture callbacks on the widget and on the overlay
+  /// `HitTestBehavior.translucent` triggers onTap callbacks on the widget and on the overlay
   ///
-  /// `HitTestBehavior.deferToChild` is going to trigger only the Gesture on the widget
+  /// `HitTestBehavior.deferToChild` triggers only the onTap on the widget
   final HitTestBehavior overlayBehavior;
 
   OnboardingStep copyWith({
