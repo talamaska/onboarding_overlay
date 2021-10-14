@@ -6,7 +6,7 @@ A flexible onboarding widget that can start and stop with an arbitrary number of
 and arbitrary starting point
 
 ## Demo
-<img src="https://github.com/talamaska/onboarding_overlay/blob/master/screenshots/demo.gif?raw=true"/>
+<img src="https://github.com/talamaska/onboarding_overlay/blob/master/screenshots/demo.gif?raw=true" width="320"/>
 
 ## Usage
 
