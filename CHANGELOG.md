@@ -1,41 +1,23 @@
-## [2.3.1-pre.9]
- - fix docs
-
-## [2.3.1-pre.8]
- - fix docs
-
-## [2.3.1-pre.7]
- - update demo gif
- - fix docs
-
-## [2.3.1-pre.6]
-  - add more documentation in the readme
-  - fix docs for the arrowPosition
-  - fix imports
-
-## [2.3.1-pre.5]
-  - expand the examples
-  - fix: multiplication of the bodyText
-
-## [2.3.1-pre.4]
+## [2.3.1]
+  - update demo gif
   - add: more clear docs
-  - fix: issue with change orientation (thanks to [IgorKhramtsov](https://github.com/IgorKhramtsov))
-  - fix: landscape positions and sizes
-
-## [2.3.1-pre.3]
+  - add: more documentation in the readme
+  - add: expand the examples
   - add: auto size text via AutoSizeText widget in which case if turned on will ignore maxLines
-
-## [2.3.1-pre.2]
-  - fix: badge to include pre-release versions
-
-## [2.3.1-pre.1]
   - add: hard limit maxLines for the title to be 2 lines
   - add: hard limit maxLines for the body to be 5 lines
   - add: overlayBehavior that accepts HitTestBehavior
   - add: logic to forward pointer events to the widget of interest.
-  - change: text is rendered by Text widgets not CustomPaint
+  - change: text is rendered by RichText or AutoSizeText.rich not CustomPaint
   - change: vertical position of the text is handled by a Column mainAxisAlignment
   - change: not exposing constants anymore, nobody from outside needs them anyways
+  - fix: docs
+  - fix: docs for the arrowPosition
+  - fix: imports
+  - fix: multiplication of the bodyText
+  - fix: issue with change orientation (thanks to [IgorKhramtsov](https://github.com/IgorKhramtsov))
+  - fix: landscape positions and sizes
+  - fix: badge to include pre-release versions
 
 ## [2.2.1]
   - add: some small optimizations
