@@ -1,8 +1,29 @@
+## [2.3.1]
+  - update demo gif
+  - add: more clear docs
+  - add: more documentation in the readme
+  - add: expand the examples
+  - add: auto size text via AutoSizeText widget in which case if turned on will ignore maxLines
+  - add: hard limit maxLines for the title to be 2 lines
+  - add: hard limit maxLines for the body to be 5 lines
+  - add: overlayBehavior that accepts HitTestBehavior
+  - add: logic to forward pointer events to the widget of interest.
+  - change: text is rendered by RichText or AutoSizeText.rich not CustomPaint
+  - change: vertical position of the text is handled by a Column mainAxisAlignment
+  - change: not exposing constants anymore, nobody from outside needs them anyways
+  - fix: docs
+  - fix: docs for the arrowPosition
+  - fix: imports
+  - fix: multiplication of the bodyText
+  - fix: issue with change orientation (thanks to [IgorKhramtsov](https://github.com/IgorKhramtsov))
+  - fix: landscape positions and sizes
+  - fix: badge to include pre-release versions
+
 ## [2.2.1]
   - add: some small optimizations
   - add: more steps in the example app
   - add: isTop property to the LabelPainter for better positioning of the text
-  - change: move some hard-coded numbers as consts
+  - change: move some hard-coded numbers as constants
   - change: text positioning algorithm
   - change: make some props public
   - change: separate some logic

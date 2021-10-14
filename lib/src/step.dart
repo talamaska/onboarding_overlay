@@ -33,7 +33,8 @@ class OnboardingStep {
     this.hasArrow = false,
     this.fullscreen = true,
     this.delay = Duration.zero,
-    this.arrowPosition = ArrowPosition.topCenter,
+    this.arrowPosition = ArrowPosition.top,
+    this.overlayBehavior = HitTestBehavior.opaque,
   })  : assert(titleTextColor != null || titleTextStyle != null,
             'You should provide at least one of titleTextColor or titleTextStyle'),
         assert(bodyTextColor != null || bodyTextStyle != null,
@@ -60,7 +61,7 @@ class OnboardingStep {
 
   final String title;
 
-  /// By default, the value used is `ArrowPosition.centerLeft`
+  /// By default, the value used is `ArrowPosition.top`
   final ArrowPosition arrowPosition;
 
   /// By default, the value is
@@ -137,6 +138,15 @@ class OnboardingStep {
 
   /// By default, the value used is `Duration.zero`
   final Duration delay;
+
+  /// By default, the value used is `HitTestBehavior.opaque`
+  ///
+  /// `HitTestBehavior.opaque` blocks the onTap on the widget and will trigger the onTap only on the overlay
+  ///
+  /// `HitTestBehavior.translucent` triggers onTap callbacks on the widget and on the overlay
+  ///
+  /// `HitTestBehavior.deferToChild` triggers only the onTap on the widget
+  final HitTestBehavior overlayBehavior;
 
   OnboardingStep copyWith({
     FocusNode? focusNode,

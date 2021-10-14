@@ -29,9 +29,11 @@
 .packages
 .pub-cache/
 .pub/
-build/
+build
 example/.packages
-onboarding_overlay.iml
+screenshots
+windows
+
 # Android related
 **/android/**/gradle-wrapper.jar
 **/android/.gradle
