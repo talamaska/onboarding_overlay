@@ -10,7 +10,6 @@ dependencies:
   flutter:
     sdk: flutter
   vector_math: ^2.1.0
-  auto_size_text: ^3.0.0-nullsafety.0
   
 dev_dependencies:
   flutter_test:
