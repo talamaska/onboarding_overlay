@@ -173,5 +173,4 @@ For this to happen, you have to set `hasLabelBox` equal to `true`, `labelBoxDeco
 
 ```
 
-12. ***AutoSizeText*** - I have made a local copy of the package, as it is stuck on pre-release null-safe version. This fact throws a warning from dart publish that it is not recommended to publish a stable version of a package that depends on a pre-released package and can only be published as a pre-release version as well. The License of the original AutoSizeText Package is included and I'm not hiding that it is not my work. The package is used internally to auto resize texts if the texts are too long. As soon the original author [@lisim](https://github.com/leisim) publish a stable null-safe version of his package I'm going to remove the internal copy and publish a new minor version with the dependency included in the pubspec. The original package can be found [here](https://github.com/leisim/auto_size_text) 
 
