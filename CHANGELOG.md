@@ -1,6 +1,6 @@
 ## [2.3.2]
   - change: use aut_size_text library again because a stable null-safe version was published
-  - fix: Issue #14, remove a repeated text for debugging purposes
+  - fix: remove a repeated text for debugging purposes reported in #14
 
 ## [2.3.1]
   - update demo gif
