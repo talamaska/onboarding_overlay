@@ -1,7 +1,7 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-import 'auto_size_text/auto_size_text.dart';
 import 'constants.dart';
 import 'label_painter.dart';
 import 'overlay_painter.dart';
@@ -395,13 +395,13 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                                         overflow: TextOverflow.ellipsis,
                                         textAlign: step.textAlign,
                                         textDirection:
-                                            Directionality.of(context),
-                                      ),
-                                      Text(
-                                        step.bodyText * 8,
-                                        style: step.bodyTextStyle ??
-                                            localBodyTextStyle,
-                                        maxLines: 5,
+                                              Directionality.of(context),
+                                        ),
+                                        Text(
+                                          step.bodyText,
+                                          style: step.bodyTextStyle ??
+                                              localBodyTextStyle,
+                                          maxLines: 5,
                                         overflow: TextOverflow.ellipsis,
                                         textAlign: step.textAlign,
                                         textDirection:
@@ -417,9 +417,10 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                 ),
               ),
             ),
-          ],
-        ),
-      );
-    });
+            ],
+          ),
+        );
+      },
+    );
   }
 }
