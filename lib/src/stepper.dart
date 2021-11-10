@@ -283,6 +283,12 @@ class _OnboardingStepperState extends State<OnboardingStepper>
         final TextStyle localBodyTextStyle =
             textTheme.bodyText1!.copyWith(color: step.bodyTextColor);
 
+        final TextStyle stepTitleTextStyle = textTheme.headline5!
+            .copyWith(color: step.titleTextStyle?.color ?? step.titleTextColor);
+
+        final TextStyle stepBodyTextStyle = textTheme.bodyText1!
+            .copyWith(color: step.bodyTextStyle?.color ?? step.bodyTextColor);
+
         Rect holeRect = Rect.fromCenter(
           center: Offset(size.shortestSide / 2, size.longestSide / 2),
           width: 0,
@@ -371,15 +377,17 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                                         TextSpan(
                                           text: step.title,
                                           style: textTheme.headline5!.merge(
-                                              step.titleTextStyle ??
-                                                  localTitleTextStyle),
+                                              step.titleTextStyle != null
+                                                  ? stepTitleTextStyle
+                                                  : localTitleTextStyle),
                                           children: <InlineSpan>[
                                             const TextSpan(text: '\n'),
                                             TextSpan(
                                               text: step.bodyText,
                                               style: textTheme.bodyText1!.merge(
-                                                  step.bodyTextStyle ??
-                                                      localBodyTextStyle),
+                                                  step.bodyTextStyle != null
+                                                      ? stepBodyTextStyle
+                                                      : localBodyTextStyle),
                                             )
                                           ],
                                         ),

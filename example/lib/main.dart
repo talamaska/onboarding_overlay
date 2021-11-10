@@ -90,12 +90,13 @@ class _AppState extends State<App> {
             OnboardingStep(
               focusNode: focusNodes[3],
               title: 'Easy to customize Easy to customize',
+              titleTextColor: Colors.greenAccent,
               titleTextStyle: const TextStyle(
-                color: Colors.red,
                 fontSize: 16.0,
               ),
               bodyText:
-                  'Easy to customize Easy to customizeEasy to customizeEasy to customize',
+                  'Easy to customize Easy to customize Easy to customize Easy to customize',
+              bodyTextColor: Colors.greenAccent,
               bodyTextStyle: const TextStyle(
                 color: Colors.red,
                 fontSize: 12.0,
@@ -226,7 +227,7 @@ class _AppState extends State<App> {
               overlayShape: const CircleBorder(),
               hasArrow: true,
               hasLabelBox: true,
-              labelBoxDecoration: BoxDecoration(color: Colors.green),
+              labelBoxDecoration: const BoxDecoration(color: Colors.green),
               arrowPosition: ArrowPosition.top,
             ),
             OnboardingStep(
@@ -247,7 +248,7 @@ class _AppState extends State<App> {
               overlayColor: Colors.black.withOpacity(0.8),
               hasArrow: true,
               hasLabelBox: true,
-              labelBoxDecoration: BoxDecoration(color: Colors.purple),
+              labelBoxDecoration: const BoxDecoration(color: Colors.purple),
               arrowPosition: ArrowPosition.bottom,
             ),
             OnboardingStep(
