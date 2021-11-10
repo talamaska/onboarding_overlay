@@ -43,15 +43,16 @@ class _AppState extends State<App> {
               bodyText: 'Tap anywhere to continue Tap anywhere to continue',
               labelBoxPadding: const EdgeInsets.all(16.0),
               labelBoxDecoration: BoxDecoration(
-                  shape: BoxShape.rectangle,
-                  borderRadius: const BorderRadius.all(Radius.circular(8.0)),
-                  color: const Color(0xFF00E1FF),
-                  border: Border.all(
-                    color: const Color(0xFF1E05FB),
-                    width: 1.0,
-                    style: BorderStyle.solid,
-                  )),
-              arrowPosition: ArrowPosition.bottom,
+                shape: BoxShape.rectangle,
+                borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+                color: const Color(0xFF00E1FF),
+                border: Border.all(
+                  color: const Color(0xFF1E05FB),
+                  width: 1.0,
+                  style: BorderStyle.solid,
+                ),
+              ),
+              arrowPosition: ArrowPosition.top,
               hasArrow: true,
               hasLabelBox: true,
               fullscreen: true,
@@ -64,6 +65,17 @@ class _AppState extends State<App> {
               fullscreen: false,
               overlayColor: Colors.blue.withOpacity(0.9),
               overlayShape: const CircleBorder(),
+              hasLabelBox: true,
+              labelBoxDecoration: BoxDecoration(
+                shape: BoxShape.rectangle,
+                borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+                color: const Color(0xFF1100FF),
+                border: Border.all(
+                  color: const Color(0xFFE2FB05),
+                  width: 1.0,
+                  style: BorderStyle.solid,
+                ),
+              ),
             ),
             OnboardingStep(
               focusNode: focusNodes[2],
@@ -77,19 +89,30 @@ class _AppState extends State<App> {
             ),
             OnboardingStep(
               focusNode: focusNodes[3],
-              title: 'Easy to customize',
-              bodyText: 'Easy to customize',
+              title: 'Easy to customize Easy to customize',
+              titleTextStyle: const TextStyle(
+                color: Colors.red,
+                fontSize: 16.0,
+              ),
+              bodyText:
+                  'Easy to customize Easy to customizeEasy to customizeEasy to customize',
+              bodyTextStyle: const TextStyle(
+                color: Colors.red,
+                fontSize: 12.0,
+                fontStyle: FontStyle.italic,
+              ),
               overlayColor: Colors.red.withOpacity(0.9),
               labelBoxPadding: const EdgeInsets.all(16.0),
               labelBoxDecoration: BoxDecoration(
-                  shape: BoxShape.rectangle,
-                  borderRadius: const BorderRadius.all(Radius.circular(8.0)),
-                  color: const Color(0xFF1100FF),
-                  border: Border.all(
-                    color: const Color(0xFFE2FB05),
-                    width: 1.0,
-                    style: BorderStyle.solid,
-                  )),
+                shape: BoxShape.rectangle,
+                borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+                color: const Color(0xFF1100FF),
+                border: Border.all(
+                  color: const Color(0xFFE2FB05),
+                  width: 1.0,
+                  style: BorderStyle.solid,
+                ),
+              ),
               arrowPosition: ArrowPosition.top,
               hasArrow: true,
               hasLabelBox: true,
@@ -112,6 +135,17 @@ class _AppState extends State<App> {
               fullscreen: false,
               overlayColor: Colors.black.withOpacity(0.8),
               overlayShape: const CircleBorder(),
+              labelBoxDecoration: BoxDecoration(
+                shape: BoxShape.rectangle,
+                borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+                color: const Color(0xFF1100FF),
+                border: Border.all(
+                  color: const Color(0xFFE2FB05),
+                  width: 1.0,
+                  style: BorderStyle.solid,
+                ),
+              ),
+              hasLabelBox: true,
             ),
             OnboardingStep(
               focusNode: focusNodes[6],
@@ -119,14 +153,15 @@ class _AppState extends State<App> {
               bodyText: 'With automatic vertical positioning of the text',
               labelBoxPadding: const EdgeInsets.all(16.0),
               labelBoxDecoration: BoxDecoration(
-                  shape: BoxShape.rectangle,
-                  borderRadius: const BorderRadius.all(Radius.circular(8.0)),
-                  color: const Color(0xFF1100FF),
-                  border: Border.all(
-                    color: const Color(0xFFE2FB05),
-                    width: 1.0,
-                    style: BorderStyle.solid,
-                  )),
+                shape: BoxShape.rectangle,
+                borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+                color: const Color(0xFF1100FF),
+                border: Border.all(
+                  color: const Color(0xFFE2FB05),
+                  width: 1.0,
+                  style: BorderStyle.solid,
+                ),
+              ),
               arrowPosition: ArrowPosition.bottom,
               hasArrow: true,
               hasLabelBox: true,
@@ -137,6 +172,9 @@ class _AppState extends State<App> {
               bodyText: "Or no widget at all! You're all done!",
               margin: EdgeInsets.zero,
               labelBoxPadding: const EdgeInsets.all(8.0),
+              shape: const CircleBorder(),
+              overlayShape: const CircleBorder(),
+              fullscreen: false,
             ),
             OnboardingStep(
               focusNode: focusNodes[8],
@@ -333,6 +371,16 @@ class _HomeState extends State<Home> {
         actions: [
           IconButton(
             focusNode: widget.focusNodes[5],
+            icon: const Icon(Icons.mic),
+            onPressed: () {},
+          ),
+          IconButton(
+            // focusNode: widget.focusNodes[5],
+            icon: const Icon(Icons.subscript),
+            onPressed: () {},
+          ),
+          IconButton(
+            // focusNode: widget.focusNodes[5],
             icon: const Icon(Icons.add),
             onPressed: () {},
           )
