@@ -1,3 +1,11 @@
+## [2.3.4]
+  - fix: position of the overlay when no focus node is attached and the setting of the overlay is fullscreen: false - issue #16
+  - fix: merging text styles was done incorrectly - issue #14
+
+
+## [2.3.3]
+  - fix: formatting
+
 ## [2.3.2]
   - change: use aut_size_text library again because a stable null-safe version was published
   - fix: remove a repeated text for debugging purposes reported in #14

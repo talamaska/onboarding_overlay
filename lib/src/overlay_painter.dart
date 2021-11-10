@@ -10,7 +10,7 @@ class OverlayPainter extends CustomPainter {
     this.overlayShape = const RoundedRectangleBorder(
       borderRadius: BorderRadius.all(Radius.circular(8.0)),
     ),
-    this.hole,
+    required this.hole,
     this.center,
     this.animation,
     this.fullscreen = true,
@@ -32,7 +32,7 @@ class OverlayPainter extends CustomPainter {
   /// )
   /// ````
   final ShapeBorder overlayShape;
-  final Rect? hole;
+  final Rect hole;
   final double? animation;
 
   /// By default, value is `Color(0xaa000000)`
@@ -44,8 +44,7 @@ class OverlayPainter extends CustomPainter {
 
   @override
   bool hitTest(Offset position) {
-    final bool hit = !(hole?.contains(position) ?? false);
-    // debugPrint('hit = $hit');
+    final bool hit = !(hole.contains(position));
     return hit;
   }
 
@@ -57,14 +56,15 @@ class OverlayPainter extends CustomPainter {
       ..lineTo(0, size.height)
       ..close();
 
-    final Path holePath = shape.getOuterPath(hole ?? Rect.zero);
+    final Path holePath = shape.getOuterPath(hole);
     final Rect overlayRect =
         EdgeInsets.all(size.width * kOverlayRatio * animation!).inflateRect(
-      hole ??
-          Rect.fromCircle(
-            center: Offset(size.width / 2, size.height / 2),
-            radius: 0.0,
-          ),
+      center != null
+          ? Rect.fromCircle(
+              center: center!,
+              radius: 0.0,
+            )
+          : hole,
     );
     final Path overlayPath = overlayShape.getOuterPath(overlayRect);
 

@@ -228,16 +228,18 @@ class _OnboardingStepperState extends State<OnboardingStepper>
 
   double _getHorizontalPosition(OnboardingStep step, Size size) {
     final double boxWidth = step.fullscreen
-        ? size.shortestSide * kLabelBoxWidthRatioLarge
+        ? size.width * kLabelBoxWidthRatioLarge
         : size.width * kLabelBoxWidthRatio;
     if (widgetRect != null) {
       if (widgetRect!.center.dx > size.width / 2) {
-        return (widgetRect!.right - boxWidth).clamp(0, size.width - boxWidth);
+        return (widgetRect!.center.dx - boxWidth / 2)
+            .clamp(0, size.width - boxWidth);
       } else if (widgetRect!.center.dx == size.width / 2) {
         return (widgetRect!.center.dx - boxWidth / 2)
             .clamp(0, size.width - boxWidth);
       } else {
-        return widgetRect!.left.clamp(0, size.width - boxWidth);
+        return (widgetRect!.center.dx - boxWidth / 2)
+            .clamp(0, size.width - boxWidth);
       }
     } else {
       return size.width / 2 - boxWidth / 2;
@@ -270,7 +272,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
         final Size size = MediaQuery.of(context).size;
         final OnboardingStep step = widget.steps[stepperIndex];
         final double boxWidth = step.fullscreen
-            ? size.shortestSide * kLabelBoxWidthRatioLarge
+            ? size.width * kLabelBoxWidthRatioLarge
             : size.width * kLabelBoxWidthRatio;
         final double boxHeight = size.shortestSide * kLabelBoxHeightRatio;
         final ThemeData theme = Theme.of(context);
@@ -297,7 +299,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
         final double leftPos = _getHorizontalPosition(step, size);
         final double topPos = _getVerticalPosition(step, size);
         final Rect? hole = holeTween.evaluate(animation);
-
+        // print('hole $hole');
         return Listener(
           behavior: step.overlayBehavior,
           onPointerDown: (PointerDownEvent details) {
@@ -327,8 +329,10 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                     fullscreen: step.fullscreen,
                     shape: step.shape,
                     overlayShape: step.overlayShape,
-                    center: holeOffset,
-                    hole: hole,
+                    center: step.focusNode.context == null
+                        ? size.center(Offset.zero)
+                        : null,
+                    hole: hole ?? Rect.zero,
                     animation: animation.value,
                     overlayColor: overlayColorTween.evaluate(animation),
                   ),
@@ -358,57 +362,65 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                               arrowPosition: step.arrowPosition,
                               hole: hole!.shift(Offset(-leftPos, -topPos)),
                             ),
-                            child: Padding(
-                              padding: step.labelBoxPadding,
-                              child: widget.autoSizeTexts
-                                  ? AutoSizeText.rich(
-                                      TextSpan(
-                                        text: step.title,
-                                        style: step.titleTextStyle ??
-                                            localTitleTextStyle,
-                                        children: <InlineSpan>[
-                                          const TextSpan(text: '\n'),
-                                          TextSpan(
-                                            text: step.bodyText,
-                                            style: step.bodyTextStyle ??
-                                                localBodyTextStyle,
+                            child: SizedBox(
+                              width: boxWidth,
+                              child: Padding(
+                                padding: step.labelBoxPadding,
+                                child: widget.autoSizeTexts
+                                    ? AutoSizeText.rich(
+                                        TextSpan(
+                                          text: step.title,
+                                          style: textTheme.headline5!.merge(
+                                              step.titleTextStyle ??
+                                                  localTitleTextStyle),
+                                          children: <InlineSpan>[
+                                            const TextSpan(text: '\n'),
+                                            TextSpan(
+                                              text: step.bodyText,
+                                              style: textTheme.bodyText1!.merge(
+                                                  step.bodyTextStyle ??
+                                                      localBodyTextStyle),
+                                            )
+                                          ],
+                                        ),
+                                        textDirection:
+                                            Directionality.of(context),
+                                        textAlign: step.textAlign,
+                                        minFontSize: 12,
+                                      )
+                                    : Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        mainAxisAlignment: isTop
+                                            ? MainAxisAlignment.end
+                                            : MainAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            step.title,
+                                            style: textTheme.headline5!.merge(
+                                                step.titleTextStyle ??
+                                                    localTitleTextStyle),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            textAlign: step.textAlign,
+                                            textDirection:
+                                                Directionality.of(context),
+                                          ),
+                                          Text(
+                                            step.bodyText,
+                                            style: textTheme.bodyText1!.merge(
+                                                step.bodyTextStyle ??
+                                                    localBodyTextStyle),
+                                            maxLines: 5,
+                                            overflow: TextOverflow.ellipsis,
+                                            textAlign: step.textAlign,
+                                            textDirection:
+                                                Directionality.of(context),
                                           )
                                         ],
                                       ),
-                                      textDirection: Directionality.of(context),
-                                      textAlign: step.textAlign,
-                                      minFontSize: 12,
-                                    )
-                                  : Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
-                                      mainAxisAlignment: isTop
-                                          ? MainAxisAlignment.end
-                                          : MainAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          step.title,
-                                          style: step.titleTextStyle ??
-                                              localTitleTextStyle,
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                          textAlign: step.textAlign,
-                                          textDirection:
-                                              Directionality.of(context),
-                                        ),
-                                        Text(
-                                          step.bodyText,
-                                          style: step.bodyTextStyle ??
-                                              localBodyTextStyle,
-                                          maxLines: 5,
-                                          overflow: TextOverflow.ellipsis,
-                                          textAlign: step.textAlign,
-                                          textDirection:
-                                              Directionality.of(context),
-                                        )
-                                      ],
-                                    ),
+                              ),
                             ),
                           ),
                         )
