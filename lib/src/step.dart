@@ -6,15 +6,19 @@ import 'label_painter.dart';
 class OnboardingStep {
   /// At least a [title] or a [bodyText] should be provided.
   ///
-  /// At least a [titleTextColor] or a [titleTextStyle] should be provided.
+  /// [titleTextColor] has a default value of `Color(0xFFFFFFFF),
+  /// if a [titleTextStyle] is provided with a color it takes a precendence
+  /// over the [titleTextColor].
   ///
-  /// At least a [bodyTextColor] or a [bodyTextStyle] should be provided.
+  /// [bodyTextColor] has a default value of `Color(0xFFFFFFFF),
+  /// if a [bodyTextStyle] is provided with a color it takes a precendence
+  /// over the [bodyTextColor].
   const OnboardingStep({
     this.key,
     required this.focusNode,
     required this.title,
-    this.titleTextStyle,
     this.titleTextColor = const Color(0xFFFFFFFF),
+    this.titleTextStyle,
     this.bodyText = '',
     this.bodyTextStyle,
     this.bodyTextColor = const Color(0xFFFFFFFF),
@@ -56,9 +60,6 @@ class OnboardingStep {
   /// By default, the value used is `Color(0xFFFFFFFF)`
   final Color? titleTextColor;
 
-  /// By default, the value used is `Color(0xFFFFFFFF)`
-  final Color? bodyTextColor;
-
   final String title;
 
   /// By default, the value used is `ArrowPosition.top`
@@ -71,9 +72,14 @@ class OnboardingStep {
   ///   .heading5
   ///   .copyWith(color: step.titleTextColor)
   /// ```
+  /// if a [titleTextStyle] is provided with a color it takes a precendence
+  /// over the [titleTextColor].
   final TextStyle? titleTextStyle;
 
   final String bodyText;
+
+  /// By default, the value used is `Color(0xFFFFFFFF)`
+  final Color? bodyTextColor;
 
   /// By default, the value is
   /// ```
@@ -82,6 +88,8 @@ class OnboardingStep {
   ///   .bodyText1
   ///   .copyWith(color: step.bodyTextColor)
   /// ```
+  /// if a [bodyTextStyle] is provided with a color it takes a precendence
+  /// over the [bodyTextColor].
   final TextStyle? bodyTextStyle;
 
   /// By default, the value is BoxDecoration()

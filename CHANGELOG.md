@@ -1,3 +1,7 @@
+## [2.3.5]
+  - add: more docs around the titleTextStyle and bodyTextStyle
+  - fix: make sure that if a color is not set in the titleTextStyle and bodyTextStyle properties they will fallback to titleTextColor or bodyTextColor accordingly
+
 ## [2.3.4]
   - fix: position of the overlay when no focus node is attached and the setting of the overlay is fullscreen: false - issue #16
   - fix: merging text styles was done incorrectly - issue #14
