@@ -283,11 +283,23 @@ class _OnboardingStepperState extends State<OnboardingStepper>
         final TextStyle localBodyTextStyle =
             textTheme.bodyText1!.copyWith(color: step.bodyTextColor);
 
-        final TextStyle stepTitleTextStyle = textTheme.headline5!
-            .copyWith(color: step.titleTextStyle?.color ?? step.titleTextColor);
+        final TextStyle stepTitleTextStyle = textTheme.headline5!.copyWith(
+          color: step.titleTextStyle?.color ?? step.titleTextColor,
+        );
 
-        final TextStyle stepBodyTextStyle = textTheme.bodyText1!
-            .copyWith(color: step.bodyTextStyle?.color ?? step.bodyTextColor);
+        final TextStyle stepBodyTextStyle = textTheme.bodyText1!.copyWith(
+          color: step.bodyTextStyle?.color ?? step.bodyTextColor,
+        );
+
+        final TextStyle activeTitleStyle = textTheme.headline5!.merge(
+            step.titleTextStyle != null
+                ? stepTitleTextStyle
+                : localTitleTextStyle);
+
+        final TextStyle activeBodyStyle = textTheme.bodyText1!.merge(
+            step.bodyTextStyle != null
+                ? stepBodyTextStyle
+                : localBodyTextStyle);
 
         Rect holeRect = Rect.fromCenter(
           center: Offset(size.shortestSide / 2, size.longestSide / 2),
@@ -376,18 +388,12 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                                     ? AutoSizeText.rich(
                                         TextSpan(
                                           text: step.title,
-                                          style: textTheme.headline5!.merge(
-                                              step.titleTextStyle != null
-                                                  ? stepTitleTextStyle
-                                                  : localTitleTextStyle),
+                                          style: activeTitleStyle,
                                           children: <InlineSpan>[
                                             const TextSpan(text: '\n'),
                                             TextSpan(
                                               text: step.bodyText,
-                                              style: textTheme.bodyText1!.merge(
-                                                  step.bodyTextStyle != null
-                                                      ? stepBodyTextStyle
-                                                      : localBodyTextStyle),
+                                              style: activeBodyStyle,
                                             )
                                           ],
                                         ),
@@ -406,9 +412,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                                         children: [
                                           Text(
                                             step.title,
-                                            style: textTheme.headline5!.merge(
-                                                step.titleTextStyle ??
-                                                    localTitleTextStyle),
+                                            style: activeTitleStyle,
                                             maxLines: 2,
                                             overflow: TextOverflow.ellipsis,
                                             textAlign: step.textAlign,
@@ -417,9 +421,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                                           ),
                                           Text(
                                             step.bodyText,
-                                            style: textTheme.bodyText1!.merge(
-                                                step.bodyTextStyle ??
-                                                    localBodyTextStyle),
+                                            style: activeBodyStyle,
                                             maxLines: 5,
                                             overflow: TextOverflow.ellipsis,
                                             textAlign: step.textAlign,
