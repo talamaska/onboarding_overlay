@@ -12,9 +12,12 @@ class OverlayPainter extends CustomPainter {
     ),
     required this.hole,
     this.center,
-    this.animation,
+    required this.animation,
+    required this.pulseAnimation,
+    required this.pulseAnimationOuter,
     this.fullscreen = true,
     this.overlayColor = const Color(0xaa000000),
+    this.pulseColor = const Color(0xFFFFFFFF),
   });
 
   /// By default, the value is
@@ -33,7 +36,12 @@ class OverlayPainter extends CustomPainter {
   /// ````
   final ShapeBorder overlayShape;
   final Rect hole;
-  final double? animation;
+  final double animation;
+  final double pulseAnimation;
+  final double pulseAnimationOuter;
+
+  /// By default, value is `Color(0xFFFFFFFF)`
+  final Color pulseColor;
 
   /// By default, value is `Color(0xaa000000)`
   final Color? overlayColor;
@@ -58,7 +66,7 @@ class OverlayPainter extends CustomPainter {
 
     final Path holePath = shape.getOuterPath(hole);
     final Rect overlayRect =
-        EdgeInsets.all(size.width * kOverlayRatio * animation!).inflateRect(
+        EdgeInsets.all(size.width * kOverlayRatio * animation).inflateRect(
       center != null
           ? Rect.fromCircle(
               center: center!,
@@ -79,11 +87,39 @@ class OverlayPainter extends CustomPainter {
         ..color = overlayColor!
         ..style = PaintingStyle.fill,
     );
+
+    final Path pulse1 = shape.getOuterPath(hole.inflate(20 * pulseAnimation));
+    final Path pulsePath1 = Path.combine(
+      PathOperation.difference,
+      pulse1,
+      holePath,
+    );
+    canvas.drawPath(
+      pulsePath1,
+      Paint()
+        ..color = pulseColor.withOpacity(0.5)
+        ..style = PaintingStyle.fill,
+    );
+    final Path pulse2 =
+        shape.getOuterPath(hole.inflate(35 * pulseAnimationOuter));
+    final Path pulsePath2 = Path.combine(
+      PathOperation.difference,
+      pulse2,
+      holePath,
+    );
+    canvas.drawPath(
+      pulsePath2,
+      Paint()
+        ..color = pulseColor.withOpacity(0.2)
+        ..style = PaintingStyle.fill,
+    );
   }
 
   @override
   bool shouldRepaint(OverlayPainter oldDelegate) =>
       hole != oldDelegate.hole ||
       animation != oldDelegate.animation ||
+      pulseAnimation != oldDelegate.pulseAnimation ||
+      pulseAnimationOuter != oldDelegate.pulseAnimationOuter ||
       overlayColor != oldDelegate.overlayColor;
 }

@@ -39,6 +39,8 @@ class OnboardingStep {
     this.delay = Duration.zero,
     this.arrowPosition = ArrowPosition.top,
     this.overlayBehavior = HitTestBehavior.opaque,
+    this.showPulseAnimation = false,
+    this.pulseColor = const Color(0x0fffffff),
   })  : assert(titleTextColor != null || titleTextStyle != null,
             'You should provide at least one of titleTextColor or titleTextStyle'),
         assert(bodyTextColor != null || bodyTextStyle != null,
@@ -156,14 +158,26 @@ class OnboardingStep {
   /// `HitTestBehavior.deferToChild` triggers only the onTap on the widget
   final HitTestBehavior overlayBehavior;
 
+  /// By default, the value used is false
+  ///
+  /// Enables a pulsing animation around a widget in focus
+  final bool showPulseAnimation;
+
+  /// By default, the value used is white
+  final Color pulseColor;
+
   OnboardingStep copyWith({
+    Key? key,
     FocusNode? focusNode,
+    TextAlign? textAlign,
     Color? titleTextColor,
-    Color? bodyTextColor,
     String? title,
+    ArrowPosition? arrowPosition,
     TextStyle? titleTextStyle,
     String? bodyText,
+    Color? bodyTextColor,
     TextStyle? bodyTextStyle,
+    BoxDecoration? labelBoxDecoration,
     ShapeBorder? shape,
     Color? overlayColor,
     ShapeBorder? overlayShape,
@@ -171,20 +185,24 @@ class OnboardingStep {
     EdgeInsets? labelBoxPadding,
     bool? hasLabelBox,
     bool? hasArrow,
-    TextAlign? textAlign,
-    ArrowPosition? arrowPosition,
     bool? fullscreen,
     Duration? delay,
+    HitTestBehavior? overlayBehavior,
+    bool? showPulseAnimation,
+    Color? pulseColor,
   }) {
     return OnboardingStep(
+      key: key ?? this.key,
       focusNode: focusNode ?? this.focusNode,
+      textAlign: textAlign ?? this.textAlign,
       titleTextColor: titleTextColor ?? this.titleTextColor,
-      bodyTextColor: bodyTextColor ?? this.bodyTextColor,
       title: title ?? this.title,
+      arrowPosition: arrowPosition ?? this.arrowPosition,
       titleTextStyle: titleTextStyle ?? this.titleTextStyle,
       bodyText: bodyText ?? this.bodyText,
+      bodyTextColor: bodyTextColor ?? this.bodyTextColor,
       bodyTextStyle: bodyTextStyle ?? this.bodyTextStyle,
-      textAlign: textAlign ?? this.textAlign,
+      labelBoxDecoration: labelBoxDecoration ?? this.labelBoxDecoration,
       shape: shape ?? this.shape,
       overlayColor: overlayColor ?? this.overlayColor,
       overlayShape: overlayShape ?? this.overlayShape,
@@ -192,35 +210,16 @@ class OnboardingStep {
       labelBoxPadding: labelBoxPadding ?? this.labelBoxPadding,
       hasLabelBox: hasLabelBox ?? this.hasLabelBox,
       hasArrow: hasArrow ?? this.hasArrow,
-      arrowPosition: arrowPosition ?? this.arrowPosition,
       fullscreen: fullscreen ?? this.fullscreen,
       delay: delay ?? this.delay,
+      overlayBehavior: overlayBehavior ?? this.overlayBehavior,
+      showPulseAnimation: showPulseAnimation ?? this.showPulseAnimation,
+      pulseColor: pulseColor ?? this.pulseColor,
     );
   }
 
   @override
   String toString() {
-    return '''OnboardingStep(
-      key: $key, 
-      focusNode: $focusNode, 
-      arrowPosition: $arrowPosition, 
-      title: $title, 
-      titleTextColor: $titleTextColor, 
-      titleTextStyle: $titleTextStyle, 
-      bodyText: $bodyText, 
-      bodyTextColor: $bodyTextColor, 
-      bodyTextStyle: $bodyTextStyle, 
-      textAlign: $textAlign, 
-      labelBoxDecoration: $labelBoxDecoration, 
-      labelBoxPadding: $labelBoxPadding, 
-      overlayColor: $overlayColor, 
-      overlayShape: $overlayShape, 
-      margin: $margin, 
-      hasArrow: $hasArrow, 
-      hasLabelBox: $hasLabelBox, 
-      fullscreen: $fullscreen, 
-      shape: $shape, 
-      delay: $delay
-    )''';
+    return 'OnboardingStep(key: $key, focusNode: $focusNode, textAlign: $textAlign, titleTextColor: $titleTextColor, title: $title, arrowPosition: $arrowPosition, titleTextStyle: $titleTextStyle, bodyText: $bodyText, bodyTextColor: $bodyTextColor, bodyTextStyle: $bodyTextStyle, labelBoxDecoration: $labelBoxDecoration, shape: $shape, overlayColor: $overlayColor, overlayShape: $overlayShape, margin: $margin, labelBoxPadding: $labelBoxPadding, hasLabelBox: $hasLabelBox, hasArrow: $hasArrow, fullscreen: $fullscreen, delay: $delay, overlayBehavior: $overlayBehavior, showPulseAnimation: $showPulseAnimation, pulseColor: $pulseColor)';
   }
 }

@@ -57,11 +57,14 @@ class OnboardingStepper extends StatefulWidget {
 }
 
 class _OnboardingStepperState extends State<OnboardingStepper>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late int stepperIndex;
   late ColorTween overlayColorTween;
   late AnimationController controller;
+  late AnimationController pulseController;
   late Animation<double> animation;
+  late Animation<double> pulseAnimation;
+  late Animation<double> pulseAnimationOuter;
   late List<int> _stepIndexes;
   late RectTween holeTween;
   Offset? holeOffset;
@@ -79,6 +82,16 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     );
     animation = const AlwaysStoppedAnimation<double>(0.0);
     controller.addListener(() => setState(() {}));
+
+    pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+    pulseAnimation = const AlwaysStoppedAnimation<double>(0.0);
+    pulseAnimationOuter = const AlwaysStoppedAnimation<double>(0.0);
+    pulseController.addListener(() {
+      setState(() {});
+    });
 
     holeTween = RectTween(
       begin: Rect.zero,
@@ -195,6 +208,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
   @override
   void dispose() {
     controller.dispose();
+    pulseController.dispose();
     super.dispose();
   }
 
@@ -221,7 +235,58 @@ class _OnboardingStepperState extends State<OnboardingStepper>
       end: step.overlayColor,
     );
 
-    animation = CurvedAnimation(curve: Curves.ease, parent: controller);
+    animation = CurvedAnimation(
+      curve: Curves.ease,
+      parent: controller,
+    );
+
+    controller.addStatusListener((AnimationStatus status) {
+      print('controller $status');
+      if (step.overlayBehavior != HitTestBehavior.opaque &&
+          step.showPulseAnimation) {
+        // completed is finished after forward
+        if (status == AnimationStatus.completed) {
+          pulseController.forward();
+        }
+
+        if (status == AnimationStatus.reverse &&
+            step.overlayBehavior != HitTestBehavior.opaque) {
+          pulseController
+            ..reverse()
+            ..stop(canceled: false);
+        }
+      }
+
+      // dismissed is finished after reverse
+    });
+
+    pulseController.addStatusListener((AnimationStatus status) {
+      if (step.overlayBehavior != HitTestBehavior.opaque &&
+          step.showPulseAnimation) {
+        if (status == AnimationStatus.completed) {
+          print('pulseController $status');
+          pulseController.reverse();
+        }
+
+        if (status == AnimationStatus.dismissed) {
+          print('pulseController $status');
+          pulseController.forward();
+        }
+      }
+    });
+
+    pulseAnimation = CurvedAnimation(
+      curve: Curves.easeInOutCubic,
+      parent: pulseController,
+    );
+    pulseAnimationOuter = CurvedAnimation(
+      curve: const Interval(
+        0.0,
+        0.9,
+        curve: Curves.easeInOutCubic,
+      ),
+      parent: pulseController,
+    );
 
     controller.forward(from: 0.0);
   }
@@ -352,6 +417,9 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                         : null,
                     hole: hole ?? Rect.zero,
                     animation: animation.value,
+                    pulseColor: step.pulseColor,
+                    pulseAnimation: pulseAnimation.value,
+                    pulseAnimationOuter: pulseAnimationOuter.value,
                     overlayColor: overlayColorTween.evaluate(animation),
                   ),
                 ),
