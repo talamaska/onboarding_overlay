@@ -52,7 +52,7 @@ class _AppState extends State<App> {
                   style: BorderStyle.solid,
                 ),
               ),
-              arrowPosition: ArrowPosition.top,
+              arrowPosition: ArrowPosition.autoVertical,
               hasArrow: true,
               hasLabelBox: true,
               fullscreen: true,
