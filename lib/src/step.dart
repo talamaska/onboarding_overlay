@@ -60,6 +60,7 @@ class OnboardingStep {
   /// By default, the value used is `Color(0xFFFFFFFF)`
   final Color? titleTextColor;
 
+  /// is required
   final String title;
 
   /// By default, the value used is `ArrowPosition.top`
@@ -76,6 +77,7 @@ class OnboardingStep {
   /// over the [titleTextColor].
   final TextStyle? titleTextStyle;
 
+  /// By default, the value an empty string
   final String bodyText;
 
   /// By default, the value used is `Color(0xFFFFFFFF)`
