@@ -318,13 +318,14 @@ class _OnboardingStepperState extends State<OnboardingStepper>
         final double topPos = _getVerticalPosition(step, size);
         final Rect? hole = holeTween.evaluate(animation);
         // print('hole $hole');
-        return Listener(
+        return GestureDetector(
           behavior: step.overlayBehavior,
-          onPointerDown: (PointerDownEvent details) {
+          onTapDown: (TapDownDetails details) {
             final RenderBox overlayBox =
                 overlayKey.currentContext?.findRenderObject() as RenderBox;
 
-            Offset localOverlay = overlayBox.globalToLocal(details.position);
+            Offset localOverlay =
+                overlayBox.globalToLocal(details.globalPosition);
 
             final BoxHitTestResult result = BoxHitTestResult();
             if (overlayBox.hitTest(result, position: localOverlay) ||
@@ -384,52 +385,60 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                               width: boxWidth,
                               child: Padding(
                                 padding: step.labelBoxPadding,
-                                child: widget.autoSizeTexts
-                                    ? AutoSizeText.rich(
-                                        TextSpan(
-                                          text: step.title,
-                                          style: activeTitleStyle,
-                                          children: <InlineSpan>[
-                                            const TextSpan(text: '\n'),
-                                            TextSpan(
-                                              text: step.bodyText,
-                                              style: activeBodyStyle,
-                                            )
-                                          ],
-                                        ),
-                                        textDirection:
-                                            Directionality.of(context),
-                                        textAlign: step.textAlign,
-                                        minFontSize: 12,
+                                child: step.builder != null
+                                    ? step.builder!(
+                                        context,
+                                        step.title,
+                                        activeTitleStyle,
+                                        step.bodyText,
+                                        activeBodyStyle,
                                       )
-                                    : Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        mainAxisAlignment: isTop
-                                            ? MainAxisAlignment.end
-                                            : MainAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            step.title,
-                                            style: activeTitleStyle,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                            textAlign: step.textAlign,
+                                    : widget.autoSizeTexts
+                                        ? AutoSizeText.rich(
+                                            TextSpan(
+                                              text: step.title,
+                                              style: activeTitleStyle,
+                                              children: <InlineSpan>[
+                                                const TextSpan(text: '\n'),
+                                                TextSpan(
+                                                  text: step.bodyText,
+                                                  style: activeBodyStyle,
+                                                )
+                                              ],
+                                            ),
                                             textDirection:
                                                 Directionality.of(context),
-                                          ),
-                                          Text(
-                                            step.bodyText,
-                                            style: activeBodyStyle,
-                                            maxLines: 5,
-                                            overflow: TextOverflow.ellipsis,
                                             textAlign: step.textAlign,
-                                            textDirection:
-                                                Directionality.of(context),
+                                            minFontSize: 12,
                                           )
-                                        ],
-                                      ),
+                                        : Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.stretch,
+                                            mainAxisAlignment: isTop
+                                                ? MainAxisAlignment.end
+                                                : MainAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                step.title,
+                                                style: activeTitleStyle,
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                                textAlign: step.textAlign,
+                                                textDirection:
+                                                    Directionality.of(context),
+                                              ),
+                                              Text(
+                                                step.bodyText,
+                                                style: activeBodyStyle,
+                                                maxLines: 5,
+                                                overflow: TextOverflow.ellipsis,
+                                                textAlign: step.textAlign,
+                                                textDirection:
+                                                    Directionality.of(context),
+                                              )
+                                            ],
+                                          ),
                               ),
                             ),
                           ),

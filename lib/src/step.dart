@@ -2,6 +2,9 @@ import 'package:flutter/widgets.dart';
 
 import 'label_painter.dart';
 
+typedef StepWidgetBuilder = Widget Function(
+    BuildContext, String, TextStyle, String, TextStyle);
+
 @immutable
 class OnboardingStep {
   /// At least a [title] or a [bodyText] should be provided.
@@ -39,6 +42,7 @@ class OnboardingStep {
     this.delay = Duration.zero,
     this.arrowPosition = ArrowPosition.top,
     this.overlayBehavior = HitTestBehavior.opaque,
+    this.builder,
   })  : assert(titleTextColor != null || titleTextStyle != null,
             'You should provide at least one of titleTextColor or titleTextStyle'),
         assert(bodyTextColor != null || bodyTextStyle != null,
@@ -155,6 +159,8 @@ class OnboardingStep {
   ///
   /// `HitTestBehavior.deferToChild` triggers only the onTap on the widget
   final HitTestBehavior overlayBehavior;
+
+  final StepWidgetBuilder? builder;
 
   OnboardingStep copyWith({
     FocusNode? focusNode,

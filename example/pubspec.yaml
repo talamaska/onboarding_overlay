@@ -20,6 +20,7 @@ dependencies:
   cupertino_icons:
   flutter:
     sdk: flutter
+  auto_size_text: ^3.0.0
   onboarding_overlay:
     path: ../
 
@@ -29,3 +30,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/demo.gif

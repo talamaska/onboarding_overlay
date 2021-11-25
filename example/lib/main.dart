@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:onboarding_overlay/onboarding_overlay.dart';
 
@@ -37,26 +38,60 @@ class _AppState extends State<App> {
           autoSizeTexts: true,
           steps: <OnboardingStep>[
             OnboardingStep(
-              focusNode: focusNodes[0],
-              title: 'Tap anywhere to continue ',
-              titleTextColor: Colors.black,
-              bodyText: 'Tap anywhere to continue Tap anywhere to continue',
-              labelBoxPadding: const EdgeInsets.all(16.0),
-              labelBoxDecoration: BoxDecoration(
-                shape: BoxShape.rectangle,
-                borderRadius: const BorderRadius.all(Radius.circular(8.0)),
-                color: const Color(0xFF00E1FF),
-                border: Border.all(
-                  color: const Color(0xFF1E05FB),
-                  width: 1.0,
-                  style: BorderStyle.solid,
+                focusNode: focusNodes[0],
+                title: 'Tap anywhere to continue ',
+                titleTextColor: Colors.black,
+                bodyText: 'Tap anywhere to continue Tap anywhere to continue',
+                labelBoxPadding: const EdgeInsets.all(16.0),
+                labelBoxDecoration: BoxDecoration(
+                  shape: BoxShape.rectangle,
+                  borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+                  color: const Color(0xFF00E1FF),
+                  border: Border.all(
+                    color: const Color(0xFF1E05FB),
+                    width: 1.0,
+                    style: BorderStyle.solid,
+                  ),
                 ),
-              ),
-              arrowPosition: ArrowPosition.top,
-              hasArrow: true,
-              hasLabelBox: true,
-              fullscreen: true,
-            ),
+                arrowPosition: ArrowPosition.bottom,
+                hasArrow: true,
+                hasLabelBox: true,
+                fullscreen: true,
+                builder: (
+                  BuildContext context,
+                  String title,
+                  TextStyle titleStyle,
+                  String body,
+                  TextStyle bodyStyle,
+                ) {
+                  return SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Text(
+                          title,
+                          style: titleStyle,
+                        ),
+                        Row(
+                          children: [
+                            Image.asset(
+                              'assets/demo.gif',
+                              width: 50,
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Flexible(
+                              child: AutoSizeText(
+                                body,
+                                style: bodyStyle,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                }),
             OnboardingStep(
               focusNode: focusNodes[1],
               title: 'left fab',
