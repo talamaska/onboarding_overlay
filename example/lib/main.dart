@@ -13,6 +13,8 @@ final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 class App extends StatefulWidget {
   final GlobalKey<OnboardingState> onboardingKey = GlobalKey<OnboardingState>();
 
+  App({Key? key}) : super(key: key);
+
   @override
   _AppState createState() => _AppState();
 }

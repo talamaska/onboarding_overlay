@@ -317,7 +317,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
         final double leftPos = _getHorizontalPosition(step, size);
         final double topPos = _getVerticalPosition(step, size);
         final Rect? hole = holeTween.evaluate(animation);
-        // print('hole $hole');
+
         return GestureDetector(
           behavior: step.overlayBehavior,
           onTapDown: (TapDownDetails details) {
