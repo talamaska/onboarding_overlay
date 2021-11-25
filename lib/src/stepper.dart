@@ -380,7 +380,6 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                               hasArrow: step.hasArrow,
                               arrowPosition: step.arrowPosition,
                               hole: hole!.shift(Offset(-leftPos, -topPos)),
-                              isTop: isTop,
                             ),
                             child: SizedBox(
                               width: boxWidth,
