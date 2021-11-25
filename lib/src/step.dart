@@ -2,8 +2,8 @@ import 'package:flutter/widgets.dart';
 
 import 'label_painter.dart';
 
-typedef StepWidgetBuilder = Widget Function(
-    BuildContext, String, TextStyle, String, TextStyle);
+typedef StepWidgetBuilder = Widget Function(BuildContext context, String title,
+    TextStyle titleStyle, String body, TextStyle bodyStyle);
 
 @immutable
 class OnboardingStep {
@@ -16,6 +16,14 @@ class OnboardingStep {
   /// [bodyTextColor] has a default value of `Color(0xFFFFFFFF),
   /// if a [bodyTextStyle] is provided with a color it takes a precendence
   /// over the [bodyTextColor].
+  ///
+  /// [stepBuilder] is a callback funtion that passes the context, the title `String`, the actual title `TextStyle`,
+  /// the bodyText `String` and the actual bodytext `TextStyle`.
+  /// By default it is `null`. If you decide to use it you are on your own - there will be no safety measures.
+  /// If the content is too much you might get overflow error. To mitigate such issues try using `SingleChildScrollView`,
+  /// but remember that you will not be able to actually scroll it, as there is already an `GestureDetector` upper in the tree that will catch the gestures
+  /// The non full-screen overlays provide significantly smaller available space
+
   const OnboardingStep({
     this.key,
     required this.focusNode,
@@ -42,7 +50,7 @@ class OnboardingStep {
     this.delay = Duration.zero,
     this.arrowPosition = ArrowPosition.top,
     this.overlayBehavior = HitTestBehavior.opaque,
-    this.builder,
+    this.stepBuilder,
   })  : assert(titleTextColor != null || titleTextStyle != null,
             'You should provide at least one of titleTextColor or titleTextStyle'),
         assert(bodyTextColor != null || bodyTextStyle != null,
@@ -160,16 +168,20 @@ class OnboardingStep {
   /// `HitTestBehavior.deferToChild` triggers only the onTap on the widget
   final HitTestBehavior overlayBehavior;
 
-  final StepWidgetBuilder? builder;
+  final StepWidgetBuilder? stepBuilder;
 
   OnboardingStep copyWith({
+    Key? key,
     FocusNode? focusNode,
+    TextAlign? textAlign,
     Color? titleTextColor,
-    Color? bodyTextColor,
     String? title,
+    ArrowPosition? arrowPosition,
     TextStyle? titleTextStyle,
     String? bodyText,
+    Color? bodyTextColor,
     TextStyle? bodyTextStyle,
+    BoxDecoration? labelBoxDecoration,
     ShapeBorder? shape,
     Color? overlayColor,
     ShapeBorder? overlayShape,
@@ -177,20 +189,23 @@ class OnboardingStep {
     EdgeInsets? labelBoxPadding,
     bool? hasLabelBox,
     bool? hasArrow,
-    TextAlign? textAlign,
-    ArrowPosition? arrowPosition,
     bool? fullscreen,
     Duration? delay,
+    HitTestBehavior? overlayBehavior,
+    StepWidgetBuilder? stepBuilder,
   }) {
     return OnboardingStep(
+      key: key ?? this.key,
       focusNode: focusNode ?? this.focusNode,
+      textAlign: textAlign ?? this.textAlign,
       titleTextColor: titleTextColor ?? this.titleTextColor,
-      bodyTextColor: bodyTextColor ?? this.bodyTextColor,
       title: title ?? this.title,
+      arrowPosition: arrowPosition ?? this.arrowPosition,
       titleTextStyle: titleTextStyle ?? this.titleTextStyle,
       bodyText: bodyText ?? this.bodyText,
+      bodyTextColor: bodyTextColor ?? this.bodyTextColor,
       bodyTextStyle: bodyTextStyle ?? this.bodyTextStyle,
-      textAlign: textAlign ?? this.textAlign,
+      labelBoxDecoration: labelBoxDecoration ?? this.labelBoxDecoration,
       shape: shape ?? this.shape,
       overlayColor: overlayColor ?? this.overlayColor,
       overlayShape: overlayShape ?? this.overlayShape,
@@ -198,35 +213,70 @@ class OnboardingStep {
       labelBoxPadding: labelBoxPadding ?? this.labelBoxPadding,
       hasLabelBox: hasLabelBox ?? this.hasLabelBox,
       hasArrow: hasArrow ?? this.hasArrow,
-      arrowPosition: arrowPosition ?? this.arrowPosition,
       fullscreen: fullscreen ?? this.fullscreen,
       delay: delay ?? this.delay,
+      overlayBehavior: overlayBehavior ?? this.overlayBehavior,
+      stepBuilder: stepBuilder ?? this.stepBuilder,
     );
   }
 
   @override
   String toString() {
-    return '''OnboardingStep(
-      key: $key, 
-      focusNode: $focusNode, 
-      arrowPosition: $arrowPosition, 
-      title: $title, 
-      titleTextColor: $titleTextColor, 
-      titleTextStyle: $titleTextStyle, 
-      bodyText: $bodyText, 
-      bodyTextColor: $bodyTextColor, 
-      bodyTextStyle: $bodyTextStyle, 
-      textAlign: $textAlign, 
-      labelBoxDecoration: $labelBoxDecoration, 
-      labelBoxPadding: $labelBoxPadding, 
-      overlayColor: $overlayColor, 
-      overlayShape: $overlayShape, 
-      margin: $margin, 
-      hasArrow: $hasArrow, 
-      hasLabelBox: $hasLabelBox, 
-      fullscreen: $fullscreen, 
-      shape: $shape, 
-      delay: $delay
-    )''';
+    return 'OnboardingStep(key: $key, focusNode: $focusNode, textAlign: $textAlign, titleTextColor: $titleTextColor, title: $title, arrowPosition: $arrowPosition, titleTextStyle: $titleTextStyle, bodyText: $bodyText, bodyTextColor: $bodyTextColor, bodyTextStyle: $bodyTextStyle, labelBoxDecoration: $labelBoxDecoration, shape: $shape, overlayColor: $overlayColor, overlayShape: $overlayShape, margin: $margin, labelBoxPadding: $labelBoxPadding, hasLabelBox: $hasLabelBox, hasArrow: $hasArrow, fullscreen: $fullscreen, delay: $delay, overlayBehavior: $overlayBehavior, stepBuilder: $stepBuilder)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is OnboardingStep &&
+        other.key == key &&
+        other.focusNode == focusNode &&
+        other.textAlign == textAlign &&
+        other.titleTextColor == titleTextColor &&
+        other.title == title &&
+        other.arrowPosition == arrowPosition &&
+        other.titleTextStyle == titleTextStyle &&
+        other.bodyText == bodyText &&
+        other.bodyTextColor == bodyTextColor &&
+        other.bodyTextStyle == bodyTextStyle &&
+        other.labelBoxDecoration == labelBoxDecoration &&
+        other.shape == shape &&
+        other.overlayColor == overlayColor &&
+        other.overlayShape == overlayShape &&
+        other.margin == margin &&
+        other.labelBoxPadding == labelBoxPadding &&
+        other.hasLabelBox == hasLabelBox &&
+        other.hasArrow == hasArrow &&
+        other.fullscreen == fullscreen &&
+        other.delay == delay &&
+        other.overlayBehavior == overlayBehavior &&
+        other.stepBuilder == stepBuilder;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode ^
+        focusNode.hashCode ^
+        textAlign.hashCode ^
+        titleTextColor.hashCode ^
+        title.hashCode ^
+        arrowPosition.hashCode ^
+        titleTextStyle.hashCode ^
+        bodyText.hashCode ^
+        bodyTextColor.hashCode ^
+        bodyTextStyle.hashCode ^
+        labelBoxDecoration.hashCode ^
+        shape.hashCode ^
+        overlayColor.hashCode ^
+        overlayShape.hashCode ^
+        margin.hashCode ^
+        labelBoxPadding.hashCode ^
+        hasLabelBox.hashCode ^
+        hasArrow.hashCode ^
+        fullscreen.hashCode ^
+        delay.hashCode ^
+        overlayBehavior.hashCode ^
+        stepBuilder.hashCode;
   }
 }

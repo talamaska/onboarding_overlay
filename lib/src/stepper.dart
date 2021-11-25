@@ -380,13 +380,14 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                               hasArrow: step.hasArrow,
                               arrowPosition: step.arrowPosition,
                               hole: hole!.shift(Offset(-leftPos, -topPos)),
+                              isTop: isTop,
                             ),
                             child: SizedBox(
                               width: boxWidth,
                               child: Padding(
                                 padding: step.labelBoxPadding,
-                                child: step.builder != null
-                                    ? step.builder!(
+                                child: step.stepBuilder != null
+                                    ? step.stepBuilder!(
                                         context,
                                         step.title,
                                         activeTitleStyle,

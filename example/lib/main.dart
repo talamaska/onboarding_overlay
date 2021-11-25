@@ -57,7 +57,7 @@ class _AppState extends State<App> {
                 hasArrow: true,
                 hasLabelBox: true,
                 fullscreen: true,
-                builder: (
+                stepBuilder: (
                   BuildContext context,
                   String title,
                   TextStyle titleStyle,
@@ -72,6 +72,7 @@ class _AppState extends State<App> {
                           style: titleStyle,
                         ),
                         Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Image.asset(
                               'assets/demo.gif',
