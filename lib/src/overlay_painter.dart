@@ -12,12 +12,13 @@ class OverlayPainter extends CustomPainter {
     ),
     required this.hole,
     this.center,
-    required this.animation,
-    required this.pulseAnimation,
+    required this.overlayAnimation,
+    required this.pulseAnimationInner,
     required this.pulseAnimationOuter,
     this.fullscreen = true,
     this.overlayColor = const Color(0xaa000000),
-    this.pulseColor = const Color(0xFFFFFFFF),
+    this.pulseInnerColor = const Color(0xFFFFFFFF),
+    this.pulseOuterColor = const Color(0xFFFFFFFF),
   });
 
   /// By default, the value is
@@ -36,12 +37,15 @@ class OverlayPainter extends CustomPainter {
   /// ````
   final ShapeBorder overlayShape;
   final Rect hole;
-  final double animation;
-  final double pulseAnimation;
+  final double overlayAnimation;
+  final double pulseAnimationInner;
   final double pulseAnimationOuter;
 
   /// By default, value is `Color(0xFFFFFFFF)`
-  final Color pulseColor;
+  final Color pulseInnerColor;
+
+  /// By default, value is `Color(0xFFFFFFFF)`
+  final Color pulseOuterColor;
 
   /// By default, value is `Color(0xaa000000)`
   final Color? overlayColor;
@@ -49,12 +53,6 @@ class OverlayPainter extends CustomPainter {
 
   /// By default value is `true`
   final bool fullscreen;
-
-  @override
-  bool hitTest(Offset position) {
-    final bool hit = !(hole.contains(position));
-    return hit;
-  }
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -65,8 +63,9 @@ class OverlayPainter extends CustomPainter {
       ..close();
 
     final Path holePath = shape.getOuterPath(hole);
-    final Rect overlayRect =
-        EdgeInsets.all(size.width * kOverlayRatio * animation).inflateRect(
+    final EdgeInsets overlayInsets =
+        EdgeInsets.all(size.width * kOverlayRatio * overlayAnimation);
+    final Rect overlayRect = overlayInsets.inflateRect(
       center != null
           ? Rect.fromCircle(
               center: center!,
@@ -76,50 +75,55 @@ class OverlayPainter extends CustomPainter {
     );
     final Path overlayPath = overlayShape.getOuterPath(overlayRect);
 
-    final Path path = Path.combine(
+    final Path mainPath = Path.combine(
       PathOperation.difference,
       fullscreen ? canvasPath : overlayPath,
       holePath,
     );
+
     canvas.drawPath(
-      path,
+      mainPath,
       Paint()
         ..color = overlayColor!
         ..style = PaintingStyle.fill,
     );
 
-    final Path pulse1 = shape.getOuterPath(hole.inflate(20 * pulseAnimation));
-    final Path pulsePath1 = Path.combine(
+    final Rect pulseInnerRect = hole.inflate(20 * pulseAnimationInner);
+    final Path pulseInnerPath = shape.getOuterPath(pulseInnerRect);
+    final Path pulseInnerPathHole = Path.combine(
       PathOperation.difference,
-      pulse1,
+      pulseInnerPath,
       holePath,
     );
-    canvas.drawPath(
-      pulsePath1,
-      Paint()
-        ..color = pulseColor.withOpacity(0.5)
-        ..style = PaintingStyle.fill,
-    );
-    final Path pulse2 =
-        shape.getOuterPath(hole.inflate(35 * pulseAnimationOuter));
-    final Path pulsePath2 = Path.combine(
+    final Paint pulseInnerPaint = Paint()
+      ..color = pulseInnerColor.withOpacity(0.5)
+      ..style = PaintingStyle.fill;
+    canvas.drawPath(pulseInnerPathHole, pulseInnerPaint);
+
+    final Rect pulseOuterRect = hole.inflate(35 * pulseAnimationOuter);
+    final Path pulseOuterPath = shape.getOuterPath(pulseOuterRect);
+    final Path pulseOuterPathHole = Path.combine(
       PathOperation.difference,
-      pulse2,
-      holePath,
+      pulseOuterPath,
+      pulseInnerPath,
     );
-    canvas.drawPath(
-      pulsePath2,
-      Paint()
-        ..color = pulseColor.withOpacity(0.2)
-        ..style = PaintingStyle.fill,
-    );
+    final Paint pulseOuterPaint = Paint()
+      ..color = pulseOuterColor.withOpacity(0.2)
+      ..style = PaintingStyle.fill;
+    canvas.drawPath(pulseOuterPathHole, pulseOuterPaint);
   }
 
   @override
   bool shouldRepaint(OverlayPainter oldDelegate) =>
       hole != oldDelegate.hole ||
-      animation != oldDelegate.animation ||
-      pulseAnimation != oldDelegate.pulseAnimation ||
+      overlayAnimation != oldDelegate.overlayAnimation ||
+      pulseAnimationInner != oldDelegate.pulseAnimationInner ||
       pulseAnimationOuter != oldDelegate.pulseAnimationOuter ||
       overlayColor != oldDelegate.overlayColor;
+
+  @override
+  bool hitTest(Offset position) {
+    final bool hit = !(hole.contains(position));
+    return hit;
+  }
 }

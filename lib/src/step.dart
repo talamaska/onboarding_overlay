@@ -39,8 +39,9 @@ class OnboardingStep {
     this.delay = Duration.zero,
     this.arrowPosition = ArrowPosition.top,
     this.overlayBehavior = HitTestBehavior.opaque,
-    this.showPulseAnimation = false,
-    this.pulseColor = const Color(0x0fffffff),
+    this.showPulseAnimation = true,
+    this.pulseInnerColor = const Color(0x0fffffff),
+    this.pulseOuterColor = const Color(0x0fffffff),
   })  : assert(titleTextColor != null || titleTextStyle != null,
             'You should provide at least one of titleTextColor or titleTextStyle'),
         assert(bodyTextColor != null || bodyTextStyle != null,
@@ -164,7 +165,10 @@ class OnboardingStep {
   final bool showPulseAnimation;
 
   /// By default, the value used is white
-  final Color pulseColor;
+  final Color pulseInnerColor;
+
+  /// By default, the value used is white
+  final Color pulseOuterColor;
 
   OnboardingStep copyWith({
     Key? key,
@@ -189,7 +193,8 @@ class OnboardingStep {
     Duration? delay,
     HitTestBehavior? overlayBehavior,
     bool? showPulseAnimation,
-    Color? pulseColor,
+    Color? pulseInnerColor,
+    Color? pulseOuterColor,
   }) {
     return OnboardingStep(
       key: key ?? this.key,
@@ -214,12 +219,13 @@ class OnboardingStep {
       delay: delay ?? this.delay,
       overlayBehavior: overlayBehavior ?? this.overlayBehavior,
       showPulseAnimation: showPulseAnimation ?? this.showPulseAnimation,
-      pulseColor: pulseColor ?? this.pulseColor,
+      pulseInnerColor: pulseInnerColor ?? this.pulseInnerColor,
+      pulseOuterColor: pulseOuterColor ?? this.pulseOuterColor,
     );
   }
 
   @override
   String toString() {
-    return 'OnboardingStep(key: $key, focusNode: $focusNode, textAlign: $textAlign, titleTextColor: $titleTextColor, title: $title, arrowPosition: $arrowPosition, titleTextStyle: $titleTextStyle, bodyText: $bodyText, bodyTextColor: $bodyTextColor, bodyTextStyle: $bodyTextStyle, labelBoxDecoration: $labelBoxDecoration, shape: $shape, overlayColor: $overlayColor, overlayShape: $overlayShape, margin: $margin, labelBoxPadding: $labelBoxPadding, hasLabelBox: $hasLabelBox, hasArrow: $hasArrow, fullscreen: $fullscreen, delay: $delay, overlayBehavior: $overlayBehavior, showPulseAnimation: $showPulseAnimation, pulseColor: $pulseColor)';
+    return 'OnboardingStep(key: $key, focusNode: $focusNode, textAlign: $textAlign, titleTextColor: $titleTextColor, title: $title, arrowPosition: $arrowPosition, titleTextStyle: $titleTextStyle, bodyText: $bodyText, bodyTextColor: $bodyTextColor, bodyTextStyle: $bodyTextStyle, labelBoxDecoration: $labelBoxDecoration, shape: $shape, overlayColor: $overlayColor, overlayShape: $overlayShape, margin: $margin, labelBoxPadding: $labelBoxPadding, hasLabelBox: $hasLabelBox, hasArrow: $hasArrow, fullscreen: $fullscreen, delay: $delay, overlayBehavior: $overlayBehavior, showPulseAnimation: $showPulseAnimation, pulseInnerColor: $pulseInnerColor, pulseOuterColor: $pulseOuterColor)';
   }
 }
