@@ -73,18 +73,26 @@ class Onboarding extends StatefulWidget {
 
 class OnboardingState extends State<Onboarding> {
   late OverlayEntry _overlayEntry;
-  OnboardingController controller = OnboardingController();
+  late OnboardingController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = OnboardingController(steps: widget.steps);
+  }
 
   /// Shows an onboarding session with all steps provided and initial index passed via the widget
   void show() {
     _overlayEntry = _createOverlayEntry(initialIndex: widget.initialIndex);
     Overlay.of(context)!.insert(_overlayEntry);
+    controller.setIsVisible(true);
   }
 
   /// Shows an onboarding session from a specific step index
   void showFromIndex(int index) {
     _overlayEntry = _createOverlayEntry(initialIndex: index);
     Overlay.of(context)!.insert(_overlayEntry);
+    controller.setIsVisible(true);
   }
 
   /// Shows an onboarding session from a specific step index and a specific order and set of step indexes
@@ -92,11 +100,13 @@ class OnboardingState extends State<Onboarding> {
     _overlayEntry =
         _createOverlayEntry(initialIndex: index, stepIndexes: stepIndexes);
     Overlay.of(context)!.insert(_overlayEntry);
+    controller.setIsVisible(true);
   }
 
   /// Hides the onboarding session overlay
   void hide() {
     _overlayEntry.remove();
+    controller.setIsVisible(false);
   }
 
   OverlayEntry _createOverlayEntry({
