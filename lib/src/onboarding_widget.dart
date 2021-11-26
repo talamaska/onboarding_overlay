@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import 'onboarding_controller.dart';
 import 'step.dart';
 import 'stepper.dart';
 
@@ -20,12 +21,16 @@ class Onboarding extends StatefulWidget {
     required this.steps,
     required this.child,
     this.duration = const Duration(milliseconds: 350),
+    this.debugBoundaries = false,
   }) : super(key: key);
 
   final bool autoSizeTexts;
   final int initialIndex;
   final ValueChanged<int>? onChanged;
   final ValueChanged<int>? onEnd;
+
+  /// By default, the value used is `false`
+  final bool debugBoundaries;
 
   /// is required
   final List<OnboardingStep> steps;
@@ -68,17 +73,26 @@ class Onboarding extends StatefulWidget {
 
 class OnboardingState extends State<Onboarding> {
   late OverlayEntry _overlayEntry;
+  late OnboardingController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = OnboardingController(steps: widget.steps);
+  }
 
   /// Shows an onboarding session with all steps provided and initial index passed via the widget
   void show() {
     _overlayEntry = _createOverlayEntry(initialIndex: widget.initialIndex);
     Overlay.of(context)!.insert(_overlayEntry);
+    controller.setIsVisible(true);
   }
 
   /// Shows an onboarding session from a specific step index
   void showFromIndex(int index) {
     _overlayEntry = _createOverlayEntry(initialIndex: index);
     Overlay.of(context)!.insert(_overlayEntry);
+    controller.setIsVisible(true);
   }
 
   /// Shows an onboarding session from a specific step index and a specific order and set of step indexes
@@ -86,11 +100,13 @@ class OnboardingState extends State<Onboarding> {
     _overlayEntry =
         _createOverlayEntry(initialIndex: index, stepIndexes: stepIndexes);
     Overlay.of(context)!.insert(_overlayEntry);
+    controller.setIsVisible(true);
   }
 
   /// Hides the onboarding session overlay
   void hide() {
     _overlayEntry.remove();
+    controller.setIsVisible(false);
   }
 
   OverlayEntry _createOverlayEntry({
@@ -106,10 +122,16 @@ class OnboardingState extends State<Onboarding> {
           stepIndexes: stepIndexes,
           duration: widget.duration,
           autoSizeTexts: widget.autoSizeTexts,
+          debugBoundaries: widget.debugBoundaries,
+          setupIndex: (int index) {
+            controller.setCurrentIndex(index);
+          },
           onChanged: (int index) {
+            controller.setCurrentIndex(index);
             widget.onChanged?.call(index);
           },
           onEnd: (int index) {
+            controller.setCurrentIndex(index);
             widget.onEnd?.call(index);
             hide();
           },

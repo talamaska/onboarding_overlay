@@ -7,6 +7,8 @@ import 'label_painter.dart';
 import 'overlay_painter.dart';
 import 'step.dart';
 
+const double sideGap = 5;
+
 class OnboardingStepper extends StatefulWidget {
   OnboardingStepper({
     Key? key,
@@ -17,6 +19,8 @@ class OnboardingStepper extends StatefulWidget {
     this.onEnd,
     this.autoSizeTexts = false,
     this.stepIndexes = const <int>[],
+    this.debugBoundaries = false,
+    required this.setupIndex,
   })  : assert(() {
           if (stepIndexes.isNotEmpty && !stepIndexes.contains(initialIndex)) {
             final List<DiagnosticsNode> information = <DiagnosticsNode>[
@@ -46,11 +50,16 @@ class OnboardingStepper extends StatefulWidget {
   /// `onEnd` is called when there are no more steps to transition to
   final ValueChanged<int>? onEnd;
 
+  final ValueChanged<int> setupIndex;
+
   /// By default, the value is `Duration(milliseconds: 350)`
   final Duration duration;
 
-  /// By default is false, turns on to usage of AutoSizeText widget and ignore maxLines
+  /// By default is `false`, turns on to usage of `AutoSizeText` widget and ignore `maxLines`
   final bool autoSizeTexts;
+
+  /// By default the value is false
+  final bool debugBoundaries;
 
   @override
   _OnboardingStepperState createState() => _OnboardingStepperState();
@@ -128,12 +137,13 @@ class _OnboardingStepperState extends State<OnboardingStepper>
       _stepIndexes.removeAt(0);
       step = widget.steps[stepperIndex];
     }
+    widget.setupIndex(stepperIndex);
 
     setTweensAndAnimate(step);
     step.focusNode.requestFocus();
   }
 
-  Future<void> nextStep() async {
+  Future<void> _nextStep() async {
     assert(() {
       if (widget.stepIndexes.isNotEmpty &&
           !widget.stepIndexes.contains(widget.initialIndex)) {
@@ -226,55 +236,56 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     controller.forward(from: 0.0);
   }
 
-  double _getHorizontalPosition(OnboardingStep step, Size size) {
-    final double boxWidth = step.fullscreen
-        ? size.width * kLabelBoxWidthRatioLarge
-        : size.width * kLabelBoxWidthRatio;
+  double _getHorizontalPosition(
+      OnboardingStep step, Size size, double boxWidth) {
     if (widgetRect != null) {
       if (widgetRect!.center.dx > size.width / 2) {
         return (widgetRect!.center.dx - boxWidth / 2)
-            .clamp(0, size.width - boxWidth);
+            .clamp(sideGap, size.width - boxWidth - sideGap);
       } else if (widgetRect!.center.dx == size.width / 2) {
         return (widgetRect!.center.dx - boxWidth / 2)
-            .clamp(0, size.width - boxWidth);
+            .clamp(sideGap, size.width - boxWidth - sideGap);
       } else {
         return (widgetRect!.center.dx - boxWidth / 2)
-            .clamp(0, size.width - boxWidth);
+            .clamp(sideGap, size.width - boxWidth - sideGap);
       }
     } else {
       return size.width / 2 - boxWidth / 2;
     }
   }
 
-  double _getVerticalPosition(OnboardingStep step, Size size) {
-    final double boxHeight = size.shortestSide * kLabelBoxHeightRatio;
-    final double bottomSpace = (step.hasArrow ? kArrowHeight + kSpace : kSpace);
-    final double topSpace = (step.hasArrow ? kArrowHeight + kSpace : kSpace);
+  double _getVerticalPosition(
+      OnboardingStep step, Size size, double boxHeight) {
+    // final double boxHeight = size.shortestSide * kLabelBoxHeightRatio;
+
+    final double spacer = (step.hasArrow ? kArrowHeight + kSpace : kSpace);
+
     if (widgetRect != null) {
       final Rect holeRect = step.margin.inflateRect(widgetRect!);
 
       if (widgetRect!.center.dy > size.height / 2) {
-        return (holeRect.top - boxHeight - topSpace)
+        return (holeRect.top - boxHeight - spacer)
             .clamp(0, size.height - boxHeight);
       } else {
-        return (holeRect.bottom + bottomSpace)
-            .clamp(0, size.height - boxHeight);
+        return (holeRect.bottom + spacer).clamp(0, size.height - boxHeight);
       }
     } else {
       return size.height / 2 - boxHeight / 2;
     }
   }
 
+  void _close() {
+    widget.onEnd?.call(stepperIndex);
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        final Size size = MediaQuery.of(context).size;
+        final MediaQueryData media = MediaQuery.of(context);
+        final Size size = media.size;
         final OnboardingStep step = widget.steps[stepperIndex];
-        final double boxWidth = step.fullscreen
-            ? size.width * kLabelBoxWidthRatioLarge
-            : size.width * kLabelBoxWidthRatio;
-        final double boxHeight = size.shortestSide * kLabelBoxHeightRatio;
+
         final ThemeData theme = Theme.of(context);
 
         final TextTheme textTheme = theme.textTheme;
@@ -314,22 +325,53 @@ class _OnboardingStepperState extends State<OnboardingStepper>
         }
 
         final bool isTop = holeRect.center.dy > size.height / 2;
-        final double leftPos = _getHorizontalPosition(step, size);
-        final double topPos = _getVerticalPosition(step, size);
+
+        final double boxWidth = step.fullscreen
+            ? size.width - 2 * sideGap
+            : size.width * kLabelBoxWidthRatio;
+
+        double boxHeight = 0;
+        if (step.fullscreen) {
+          if (holeRect.height > 0) {
+            boxHeight = (isTop
+                    ? holeRect.top -
+                        sideGap -
+                        (step.hasArrow ? kArrowHeight + sideGap : sideGap)
+                    : size.height -
+                        holeRect.bottom -
+                        sideGap -
+                        (step.hasArrow ? kArrowHeight + sideGap : sideGap)) -
+                media.padding.top;
+          } else {
+            boxHeight = size.height -
+                sideGap -
+                (step.hasArrow ? kArrowHeight + sideGap : sideGap) -
+                2 * media.padding.top;
+          }
+        } else {
+          boxHeight = size.width * 0.5 -
+              kSpace -
+              (step.hasArrow ? kArrowHeight + sideGap : sideGap);
+        }
+
+        final double leftPos = _getHorizontalPosition(step, size, boxWidth);
+        final double topPos = _getVerticalPosition(step, size, boxHeight);
         final Rect? hole = holeTween.evaluate(animation);
-        // print('hole $hole');
-        return Listener(
+
+        return GestureDetector(
           behavior: step.overlayBehavior,
-          onPointerDown: (PointerDownEvent details) {
+          onTapDown: (TapDownDetails details) {
             final RenderBox overlayBox =
                 overlayKey.currentContext?.findRenderObject() as RenderBox;
 
-            Offset localOverlay = overlayBox.globalToLocal(details.position);
+            Offset localOverlay =
+                overlayBox.globalToLocal(details.globalPosition);
 
             final BoxHitTestResult result = BoxHitTestResult();
-            if (overlayBox.hitTest(result, position: localOverlay) ||
-                step.overlayBehavior != HitTestBehavior.deferToChild) {
-              nextStep();
+            if ((overlayBox.hitTest(result, position: localOverlay) ||
+                    step.overlayBehavior != HitTestBehavior.deferToChild) &&
+                !step.manualControl) {
+              _nextStep();
             }
           },
           child: Stack(
@@ -361,7 +403,12 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                 top: topPos,
                 child: FadeTransition(
                   opacity: animation,
-                  child: SizedBox(
+                  child: Container(
+                    decoration: widget.debugBoundaries
+                        ? BoxDecoration(
+                            border: Border.all(color: const Color(0xFFFF0000)),
+                          )
+                        : null,
                     width: boxWidth,
                     height: boxHeight,
                     child: Stack(
@@ -379,57 +426,72 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                               hasArrow: step.hasArrow,
                               arrowPosition: step.arrowPosition,
                               hole: hole!.shift(Offset(-leftPos, -topPos)),
+                              isTop: isTop,
                             ),
                             child: SizedBox(
                               width: boxWidth,
                               child: Padding(
                                 padding: step.labelBoxPadding,
-                                child: widget.autoSizeTexts
-                                    ? AutoSizeText.rich(
-                                        TextSpan(
-                                          text: step.title,
-                                          style: activeTitleStyle,
-                                          children: <InlineSpan>[
-                                            const TextSpan(text: '\n'),
-                                            TextSpan(
-                                              text: step.bodyText,
-                                              style: activeBodyStyle,
-                                            )
-                                          ],
+                                child: step.stepBuilder != null
+                                    ? step.stepBuilder!(
+                                        context,
+                                        OnboardingStepRenderInfo(
+                                          titleText: step.titleText,
+                                          titleStyle: activeTitleStyle,
+                                          bodyText: step.bodyText,
+                                          bodyStyle: activeBodyStyle,
+                                          size: Size(boxWidth, boxHeight),
+                                          nextStep: _nextStep,
+                                          close: _close,
+                                          manualControl: step.manualControl,
                                         ),
-                                        textDirection:
-                                            Directionality.of(context),
-                                        textAlign: step.textAlign,
-                                        minFontSize: 12,
                                       )
-                                    : Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        mainAxisAlignment: isTop
-                                            ? MainAxisAlignment.end
-                                            : MainAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            step.title,
-                                            style: activeTitleStyle,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                            textAlign: step.textAlign,
+                                    : widget.autoSizeTexts
+                                        ? AutoSizeText.rich(
+                                            TextSpan(
+                                              text: step.titleText,
+                                              style: activeTitleStyle,
+                                              children: <InlineSpan>[
+                                                const TextSpan(text: '\n'),
+                                                TextSpan(
+                                                  text: step.bodyText,
+                                                  style: activeBodyStyle,
+                                                )
+                                              ],
+                                            ),
                                             textDirection:
                                                 Directionality.of(context),
-                                          ),
-                                          Text(
-                                            step.bodyText,
-                                            style: activeBodyStyle,
-                                            maxLines: 5,
-                                            overflow: TextOverflow.ellipsis,
                                             textAlign: step.textAlign,
-                                            textDirection:
-                                                Directionality.of(context),
+                                            minFontSize: 12,
                                           )
-                                        ],
-                                      ),
+                                        : Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.stretch,
+                                            mainAxisAlignment: isTop
+                                                ? MainAxisAlignment.end
+                                                : MainAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                step.titleText,
+                                                style: activeTitleStyle,
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                                textAlign: step.textAlign,
+                                                textDirection:
+                                                    Directionality.of(context),
+                                              ),
+                                              Text(
+                                                step.bodyText,
+                                                style: activeBodyStyle,
+                                                maxLines: 5,
+                                                overflow: TextOverflow.ellipsis,
+                                                textAlign: step.textAlign,
+                                                textDirection:
+                                                    Directionality.of(context),
+                                              )
+                                            ],
+                                          ),
                               ),
                             ),
                           ),

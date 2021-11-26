@@ -8,12 +8,12 @@ import 'package:vector_math/vector_math.dart' as vm;
 import 'constants.dart';
 
 enum ArrowPosition {
-  centerLeft,
-  centerRight,
   topCenter,
   bottomCenter,
   top,
-  bottom
+  bottom,
+  autoVertical,
+  autoVerticalCenter,
 }
 
 const Color transparentColor = Color(0x00000000);
@@ -32,6 +32,7 @@ class LabelPainter extends CustomPainter {
       color: transparentColor,
     ),
     required this.hole,
+    required this.isTop,
   })  : assert(
             (hasArrow && hasLabelBox) ||
                 (!hasArrow && !hasLabelBox) ||
@@ -79,6 +80,8 @@ class LabelPainter extends CustomPainter {
 
   final Rect hole;
 
+  final bool isTop;
+
   @override
   void paint(Canvas canvas, Size size) {
     Rect paragraphRect = Rect.fromLTWH(
@@ -125,11 +128,25 @@ class LabelPainter extends CustomPainter {
           case ArrowPosition.topCenter:
             arrowPath = drawTopCenterArrow(paragraphRect, a, b);
             break;
-          case ArrowPosition.centerLeft:
-            arrowPath = drawCenterLeftArrow(paragraphRect, a, b);
+          // case ArrowPosition.centerLeft:
+          //   arrowPath = drawCenterLeftArrow(paragraphRect, a, b);
+          //   break;
+          // case ArrowPosition.centerRight:
+          //   arrowPath = drawCenterRightArrow(paragraphRect, a, b);
+          //   break;
+          case ArrowPosition.autoVertical:
+            if (isTop) {
+              arrowPath = drawBottomArrow(paragraphRect, a, b);
+            } else {
+              arrowPath = drawTopArrow(paragraphRect, a, b);
+            }
             break;
-          case ArrowPosition.centerRight:
-            arrowPath = drawCenterRightArrow(paragraphRect, a, b);
+          case ArrowPosition.autoVerticalCenter:
+            if (isTop) {
+              arrowPath = drawBottomCenterArrow(paragraphRect, a, b);
+            } else {
+              arrowPath = drawTopCenterArrow(paragraphRect, a, b);
+            }
             break;
           default:
         }
