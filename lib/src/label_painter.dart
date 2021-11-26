@@ -13,7 +13,9 @@ enum ArrowPosition {
   topCenter,
   bottomCenter,
   top,
-  bottom
+  bottom,
+  autoVertical,
+  autoVerticalCenter,
 }
 
 const Color transparentColor = Color(0x00000000);
@@ -32,6 +34,7 @@ class LabelPainter extends CustomPainter {
       color: transparentColor,
     ),
     required this.hole,
+    required this.isTop,
   })  : assert(
             (hasArrow && hasLabelBox) ||
                 (!hasArrow && !hasLabelBox) ||
@@ -78,6 +81,8 @@ class LabelPainter extends CustomPainter {
   final double opacity;
 
   final Rect hole;
+
+  final bool isTop;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -130,6 +135,20 @@ class LabelPainter extends CustomPainter {
             break;
           case ArrowPosition.centerRight:
             arrowPath = drawCenterRightArrow(paragraphRect, a, b);
+            break;
+          case ArrowPosition.autoVertical:
+            if (isTop) {
+              arrowPath = drawBottomArrow(paragraphRect, a, b);
+            } else {
+              arrowPath = drawTopArrow(paragraphRect, a, b);
+            }
+            break;
+          case ArrowPosition.autoVerticalCenter:
+            if (isTop) {
+              arrowPath = drawBottomCenterArrow(paragraphRect, a, b);
+            } else {
+              arrowPath = drawTopCenterArrow(paragraphRect, a, b);
+            }
             break;
           default:
         }
