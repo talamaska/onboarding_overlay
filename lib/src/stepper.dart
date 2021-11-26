@@ -436,9 +436,9 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                                     ? step.stepBuilder!(
                                         context,
                                         OnboardingStepRenderInfo(
-                                          title: step.title,
+                                          titleText: step.titleText,
                                           titleStyle: activeTitleStyle,
-                                          body: step.bodyText,
+                                          bodyText: step.bodyText,
                                           bodyStyle: activeBodyStyle,
                                           size: Size(boxWidth, boxHeight),
                                           nextStep: _nextStep,
@@ -449,7 +449,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                                     : widget.autoSizeTexts
                                         ? AutoSizeText.rich(
                                             TextSpan(
-                                              text: step.title,
+                                              text: step.titleText,
                                               style: activeTitleStyle,
                                               children: <InlineSpan>[
                                                 const TextSpan(text: '\n'),
@@ -473,7 +473,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                                                 : MainAxisAlignment.start,
                                             children: [
                                               Text(
-                                                step.title,
+                                                step.titleText,
                                                 style: activeTitleStyle,
                                                 maxLines: 2,
                                                 overflow: TextOverflow.ellipsis,

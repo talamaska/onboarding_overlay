@@ -3,19 +3,34 @@ import 'package:flutter/widgets.dart';
 import 'label_painter.dart';
 
 class OnboardingStepRenderInfo {
-  final String title;
+  /// The `title` for the current step
+  final String titleText;
+
+  /// The resolved active [TextStyle] for this `title`
   final TextStyle titleStyle;
-  final String body;
+
+  /// The `bodyText` for the current step
+  final String bodyText;
+
+  /// The resolved active [TextStyle] for `bodyText`
   final TextStyle bodyStyle;
+
+  /// The calculated max size for the current step label box
   final Size size;
+
+  /// Callback for navigating to next step. Won't work if `manualControl` is `false`
   final VoidCallback nextStep;
+
+  /// Callback for closing the Onboarding. Won't work if `manualControl` is `false`
   final VoidCallback close;
+
+  /// the `manualControl` for the current step
   final bool manualControl;
 
   OnboardingStepRenderInfo({
-    required this.title,
+    required this.titleText,
     required this.titleStyle,
-    required this.body,
+    required this.bodyText,
     required this.bodyStyle,
     required this.size,
     required this.nextStep,
@@ -29,7 +44,7 @@ typedef StepWidgetBuilder = Widget Function(
 
 @immutable
 class OnboardingStep {
-  /// At least a [title] or a [bodyText] should be provided.
+  /// At least a [titleText] or a [bodyText] should be provided.
   ///
   /// [titleTextColor] has a default value of `Color(0xFFFFFFFF),
   /// if a [titleTextStyle] is provided with a color it takes a precendence
@@ -49,7 +64,7 @@ class OnboardingStep {
   const OnboardingStep({
     this.key,
     required this.focusNode,
-    required this.title,
+    required this.titleText,
     this.titleTextColor = const Color(0xFFFFFFFF),
     this.titleTextStyle,
     this.bodyText = '',
@@ -70,7 +85,7 @@ class OnboardingStep {
     this.hasArrow = false,
     this.fullscreen = true,
     this.delay = Duration.zero,
-    this.arrowPosition = ArrowPosition.top,
+    this.arrowPosition = ArrowPosition.autoVertical,
     this.overlayBehavior = HitTestBehavior.opaque,
     this.stepBuilder,
     this.manualControl = false,
@@ -96,9 +111,9 @@ class OnboardingStep {
   final Color? titleTextColor;
 
   /// is required
-  final String title;
+  final String titleText;
 
-  /// By default, the value used is `ArrowPosition.top`
+  /// By default, the value used is `ArrowPosition.autoVertical`
   final ArrowPosition arrowPosition;
 
   /// By default, the value is
@@ -201,6 +216,9 @@ class OnboardingStep {
   /// The non full-screen overlays provide significantly smaller available space
   final StepWidgetBuilder? stepBuilder;
 
+  /// [manualControl] is by default `false`. If you change it to `true` the global `GestureDetector` is disabled
+  /// and you will be able to navigate to next step or to close the Onboarding
+  /// using the nextStep and close callbacks in the `stepBuilder`.
   final bool manualControl;
 
   OnboardingStep copyWith({
@@ -232,7 +250,7 @@ class OnboardingStep {
       focusNode: focusNode ?? this.focusNode,
       textAlign: textAlign ?? this.textAlign,
       titleTextColor: titleTextColor ?? this.titleTextColor,
-      title: title ?? this.title,
+      titleText: title ?? titleText,
       arrowPosition: arrowPosition ?? this.arrowPosition,
       titleTextStyle: titleTextStyle ?? this.titleTextStyle,
       bodyText: bodyText ?? this.bodyText,
@@ -260,7 +278,7 @@ class OnboardingStep {
       focusNode: $focusNode, 
       textAlign: $textAlign, 
       titleTextColor: $titleTextColor, 
-      title: $title, 
+      title: $titleText, 
       arrowPosition: $arrowPosition, 
       titleTextStyle: $titleTextStyle, 
       bodyText: $bodyText, 
@@ -290,7 +308,7 @@ class OnboardingStep {
         other.focusNode == focusNode &&
         other.textAlign == textAlign &&
         other.titleTextColor == titleTextColor &&
-        other.title == title &&
+        other.titleText == titleText &&
         other.arrowPosition == arrowPosition &&
         other.titleTextStyle == titleTextStyle &&
         other.bodyText == bodyText &&
@@ -316,7 +334,7 @@ class OnboardingStep {
         focusNode.hashCode ^
         textAlign.hashCode ^
         titleTextColor.hashCode ^
-        title.hashCode ^
+        titleText.hashCode ^
         arrowPosition.hashCode ^
         titleTextStyle.hashCode ^
         bodyText.hashCode ^

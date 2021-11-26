@@ -8,8 +8,6 @@ import 'package:vector_math/vector_math.dart' as vm;
 import 'constants.dart';
 
 enum ArrowPosition {
-  centerLeft,
-  centerRight,
   topCenter,
   bottomCenter,
   top,
@@ -130,12 +128,12 @@ class LabelPainter extends CustomPainter {
           case ArrowPosition.topCenter:
             arrowPath = drawTopCenterArrow(paragraphRect, a, b);
             break;
-          case ArrowPosition.centerLeft:
-            arrowPath = drawCenterLeftArrow(paragraphRect, a, b);
-            break;
-          case ArrowPosition.centerRight:
-            arrowPath = drawCenterRightArrow(paragraphRect, a, b);
-            break;
+          // case ArrowPosition.centerLeft:
+          //   arrowPath = drawCenterLeftArrow(paragraphRect, a, b);
+          //   break;
+          // case ArrowPosition.centerRight:
+          //   arrowPath = drawCenterRightArrow(paragraphRect, a, b);
+          //   break;
           case ArrowPosition.autoVertical:
             if (isTop) {
               arrowPath = drawBottomArrow(paragraphRect, a, b);

@@ -42,7 +42,7 @@ class _AppState extends State<App> {
           steps: <OnboardingStep>[
             OnboardingStep(
                 focusNode: focusNodes[0],
-                title: 'Tap anywhere to continue ',
+                titleText: 'Tap anywhere to continue ',
                 titleTextColor: Colors.black,
                 bodyText: 'Tap anywhere to continue Tap anywhere to continue',
                 labelBoxPadding: const EdgeInsets.all(16.0),
@@ -69,7 +69,7 @@ class _AppState extends State<App> {
                     child: Column(
                       children: [
                         Text(
-                          renderInfo.title,
+                          renderInfo.titleText,
                           style: renderInfo.titleStyle,
                         ),
                         Row(
@@ -84,7 +84,7 @@ class _AppState extends State<App> {
                             ),
                             Flexible(
                               child: AutoSizeText(
-                                renderInfo.body,
+                                renderInfo.bodyText,
                                 style: renderInfo.bodyStyle,
                               ),
                             ),
@@ -108,7 +108,7 @@ class _AppState extends State<App> {
                 }),
             OnboardingStep(
               focusNode: focusNodes[1],
-              title: 'left fab',
+              titleText: 'left fab',
               bodyText: 'Tap to continue',
               shape: const CircleBorder(),
               fullscreen: false,
@@ -128,7 +128,7 @@ class _AppState extends State<App> {
             ),
             OnboardingStep(
               focusNode: focusNodes[2],
-              title: 'right fab',
+              titleText: 'right fab',
               bodyText: 'Tap only here to increment',
               shape: const CircleBorder(),
               fullscreen: false,
@@ -138,7 +138,7 @@ class _AppState extends State<App> {
             ),
             OnboardingStep(
               focusNode: focusNodes[3],
-              title: 'Easy to customize Easy to customize',
+              titleText: 'Easy to customize Easy to customize',
               titleTextColor: Colors.greenAccent,
               titleTextStyle: const TextStyle(
                 fontSize: 16.0,
@@ -170,7 +170,7 @@ class _AppState extends State<App> {
             ),
             OnboardingStep(
               focusNode: focusNodes[4],
-              title: 'Menu',
+              titleText: 'Menu',
               bodyText: 'You can open menu from here',
               overlayColor: Colors.green.withOpacity(0.9),
               shape: const CircleBorder(),
@@ -178,7 +178,7 @@ class _AppState extends State<App> {
             ),
             OnboardingStep(
               focusNode: focusNodes[5],
-              title: 'Settings',
+              titleText: 'Settings',
               shape: const CircleBorder(),
               bodyText:
                   'Click here to access settings such as dark mode, daily limit, etc',
@@ -199,7 +199,7 @@ class _AppState extends State<App> {
             ),
             OnboardingStep(
               focusNode: focusNodes[6],
-              title: 'Counter Value',
+              titleText: 'Counter Value',
               bodyText: 'With automatic vertical positioning of the text',
               labelBoxPadding: const EdgeInsets.all(16.0),
               labelBoxDecoration: BoxDecoration(
@@ -218,7 +218,7 @@ class _AppState extends State<App> {
             ),
             OnboardingStep(
               focusNode: focusNodes[7],
-              title: "Or no widget at all! You're all done!",
+              titleText: "Or no widget at all! You're all done!",
               bodyText: "Or no widget at all! You're all done!",
               margin: EdgeInsets.zero,
               labelBoxPadding: const EdgeInsets.all(8.0),
@@ -228,7 +228,7 @@ class _AppState extends State<App> {
             ),
             OnboardingStep(
               focusNode: focusNodes[8],
-              title: 'Icon 1',
+              titleText: 'Icon 1',
               shape: const CircleBorder(),
               bodyText: 'Icon 1Icon 1Icon 1Icon 1Icon 1Icon 1Icon 1Icon 1',
               fullscreen: false,
@@ -237,7 +237,7 @@ class _AppState extends State<App> {
             ),
             OnboardingStep(
               focusNode: focusNodes[9],
-              title: 'Icon 2',
+              titleText: 'Icon 2',
               shape: BeveledRectangleBorder(
                 borderRadius: BorderRadius.circular(15.0),
               ),
@@ -249,7 +249,7 @@ class _AppState extends State<App> {
             ),
             OnboardingStep(
               focusNode: focusNodes[10],
-              title: 'Icon 3',
+              titleText: 'Icon 3',
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16.0),
               ),
@@ -265,7 +265,7 @@ class _AppState extends State<App> {
             ),
             OnboardingStep(
               focusNode: focusNodes[11],
-              title: 'Icon 4',
+              titleText: 'Icon 4',
               shape: ContinuousRectangleBorder(
                 borderRadius: BorderRadius.circular(16.0),
               ),
@@ -281,7 +281,7 @@ class _AppState extends State<App> {
             ),
             OnboardingStep(
               focusNode: focusNodes[12],
-              title: 'Icon 5',
+              titleText: 'Icon 5',
               shape: const CircleBorder(),
               bodyText:
                   'Icon 5Icon 5Icon 5Icon 5Icon 5Icon 5Icon 5Icon 5Icon 5',
@@ -291,7 +291,7 @@ class _AppState extends State<App> {
             ),
             OnboardingStep(
               focusNode: focusNodes[13],
-              title: 'No icon',
+              titleText: 'No icon',
               bodyText: 'No iconNo iconNo iconNo iconNo iconNo iconNo iconNo ',
               fullscreen: true,
               overlayColor: Colors.black.withOpacity(0.8),
@@ -302,7 +302,7 @@ class _AppState extends State<App> {
             ),
             OnboardingStep(
               focusNode: focusNodes[14],
-              title: 'Icon 7',
+              titleText: 'Icon 7',
               shape: const CircleBorder(),
               bodyText: 'Icon 7Icon 7Icon 7Icon 7Icon ',
               fullscreen: false,
@@ -311,7 +311,7 @@ class _AppState extends State<App> {
             ),
             OnboardingStep(
               focusNode: focusNodes[15],
-              title: 'Icon 8',
+              titleText: 'Icon 8',
               shape: const CircleBorder(),
               bodyText: 'Icon 8Icon 8Icon 8Icon 8Icon 8Icon 8Icon ',
               fullscreen: false,
@@ -326,7 +326,7 @@ class _AppState extends State<App> {
             ),
             OnboardingStep(
               focusNode: focusNodes[16],
-              title: 'Icon 9',
+              titleText: 'Icon 9',
               shape: const CircleBorder(),
               bodyText: 'Icon 9Icon 9Icon 9Icon 9Icon ',
               fullscreen: false,
@@ -343,7 +343,7 @@ class _AppState extends State<App> {
             ),
             OnboardingStep(
               focusNode: focusNodes[17],
-              title: 'Icon 10',
+              titleText: 'Icon 10',
               shape: const CircleBorder(),
               bodyText: 'Icon 10Icon 10Icon 10Icon 10Icon 10Icon 10Icon',
               fullscreen: false,
