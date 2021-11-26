@@ -332,15 +332,22 @@ class _OnboardingStepperState extends State<OnboardingStepper>
 
         double boxHeight = 0;
         if (step.fullscreen) {
-          boxHeight = (isTop
-                  ? holeRect.top -
-                      sideGap -
-                      (step.hasArrow ? kArrowHeight + sideGap : sideGap)
-                  : size.height -
-                      holeRect.bottom -
-                      sideGap -
-                      (step.hasArrow ? kArrowHeight + sideGap : sideGap)) -
-              media.padding.top;
+          if (holeRect.height > 0) {
+            boxHeight = (isTop
+                    ? holeRect.top -
+                        sideGap -
+                        (step.hasArrow ? kArrowHeight + sideGap : sideGap)
+                    : size.height -
+                        holeRect.bottom -
+                        sideGap -
+                        (step.hasArrow ? kArrowHeight + sideGap : sideGap)) -
+                media.padding.top;
+          } else {
+            boxHeight = size.height -
+                sideGap -
+                (step.hasArrow ? kArrowHeight + sideGap : sideGap) -
+                2 * media.padding.top;
+          }
         } else {
           boxHeight = size.width * 0.5 -
               kSpace -
