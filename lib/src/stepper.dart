@@ -15,6 +15,7 @@ class OnboardingStepper extends StatefulWidget {
     this.initialIndex = 0,
     required this.steps,
     this.duration = const Duration(milliseconds: 350),
+    this.pulseDuration = const Duration(milliseconds: 1000),
     this.onChanged,
     this.onEnd,
     this.autoSizeTexts = false,
@@ -55,6 +56,9 @@ class OnboardingStepper extends StatefulWidget {
   /// By default, the value is `Duration(milliseconds: 350)`
   final Duration duration;
 
+  /// By default, the value is `Duration(milliseconds: 1000)`
+  final Duration pulseDuration;
+
   /// By default is `false`, turns on to usage of `AutoSizeText` widget and ignore `maxLines`
   final bool autoSizeTexts;
 
@@ -66,11 +70,14 @@ class OnboardingStepper extends StatefulWidget {
 }
 
 class _OnboardingStepperState extends State<OnboardingStepper>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late int stepperIndex;
   late ColorTween overlayColorTween;
   late AnimationController controller;
-  late Animation<double> animation;
+  late AnimationController pulseController;
+  late Animation<double> overlayAnimation;
+  late Animation<double> pulseAnimationInner;
+  late Animation<double> pulseAnimationOuter;
   late List<int> _stepIndexes;
   late RectTween holeTween;
   Offset? holeOffset;
@@ -85,17 +92,23 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     controller = AnimationController(
       vsync: this,
       duration: widget.duration,
-    );
-    animation = const AlwaysStoppedAnimation<double>(0.0);
-    controller.addListener(() => setState(() {}));
+    )..addListener(() => setState(() {}));
+    overlayAnimation = const AlwaysStoppedAnimation<double>(0.0);
+
+    pulseController = AnimationController(
+      vsync: this,
+      duration: widget.pulseDuration,
+    )..addListener(() => setState(() {}));
+    pulseAnimationInner = const AlwaysStoppedAnimation<double>(0.0);
+    pulseAnimationOuter = const AlwaysStoppedAnimation<double>(0.0);
 
     holeTween = RectTween(
       begin: Rect.zero,
       end: Rect.zero,
     );
     overlayColorTween = ColorTween(
-      begin: const Color(0x00000000),
-      end: const Color(0x00000000),
+      begin: null,
+      end: null,
     );
 
     startStepper(fromIndex: widget.initialIndex);
@@ -205,6 +218,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
   @override
   void dispose() {
     controller.dispose();
+    pulseController.dispose();
     super.dispose();
   }
 
@@ -225,13 +239,53 @@ class _OnboardingStepperState extends State<OnboardingStepper>
           );
   }
 
+  bool shouldShowPulse(OnboardingStep step) {
+    return step.overlayBehavior != HitTestBehavior.opaque &&
+        step.showPulseAnimation;
+  }
+
   void setTweensAndAnimate(OnboardingStep step) {
     overlayColorTween = ColorTween(
-      begin: step.overlayColor.withOpacity(animation.value),
+      begin: step.overlayColor.withOpacity(overlayAnimation.value),
       end: step.overlayColor,
     );
 
-    animation = CurvedAnimation(curve: Curves.ease, parent: controller);
+    overlayAnimation = CurvedAnimation(
+      curve: Curves.ease,
+      parent: controller,
+    );
+
+    controller.addStatusListener((AnimationStatus status) {
+      if (shouldShowPulse(step)) {
+        if (status == AnimationStatus.completed) {
+          pulseController.repeat(reverse: true);
+        }
+
+        if (status == AnimationStatus.reverse) {
+          pulseController.stop();
+        }
+      }
+    });
+
+    pulseController.addStatusListener((AnimationStatus status) {
+      print('$status');
+      // if (shouldShowPulse(step) && status == AnimationStatus) {
+      //   pulseController.reset();
+      // }
+    });
+
+    pulseAnimationInner = CurvedAnimation(
+      curve: Curves.ease,
+      parent: pulseController,
+    );
+    pulseAnimationOuter = CurvedAnimation(
+      curve: const Interval(
+        0.0,
+        0.8,
+        curve: Curves.ease,
+      ),
+      parent: pulseController,
+    );
 
     controller.forward(from: 0.0);
   }
@@ -393,8 +447,12 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                         ? size.center(Offset.zero)
                         : null,
                     hole: hole ?? Rect.zero,
-                    animation: animation.value,
-                    overlayColor: overlayColorTween.evaluate(animation),
+                    overlayAnimation: overlayAnimation.value,
+                    pulseInnerColor: step.pulseInnerColor,
+                    pulseOuterColor: step.pulseOuterColor,
+                    pulseAnimationInner: pulseAnimationInner.value,
+                    pulseAnimationOuter: pulseAnimationOuter.value,
+                    overlayColor: overlayColorTween.evaluate(overlayAnimation),
                   ),
                 ),
               ),
@@ -402,7 +460,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                 left: leftPos,
                 top: topPos,
                 child: FadeTransition(
-                  opacity: animation,
+                  opacity: overlayAnimation,
                   child: Container(
                     decoration: widget.debugBoundaries
                         ? BoxDecoration(
@@ -419,7 +477,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                         RepaintBoundary(
                           child: CustomPaint(
                             painter: LabelPainter(
-                              opacity: animation.value,
+                              opacity: overlayAnimation.value,
                               hasLabelBox: step.hasLabelBox,
                               labelBoxPadding: step.labelBoxPadding,
                               labelBoxDecoration: step.labelBoxDecoration,

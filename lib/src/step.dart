@@ -89,6 +89,9 @@ class OnboardingStep {
     this.overlayBehavior = HitTestBehavior.opaque,
     this.stepBuilder,
     this.manualControl = false,
+    this.showPulseAnimation = true,
+    this.pulseInnerColor = const Color(0x0fffffff),
+    this.pulseOuterColor = const Color(0x0fffffff),
   })  : assert(titleTextColor != null || titleTextStyle != null,
             'You should provide at least one of titleTextColor or titleTextStyle'),
         assert(bodyTextColor != null || bodyTextStyle != null,
@@ -221,6 +224,17 @@ class OnboardingStep {
   /// using the nextStep and close callbacks in the `stepBuilder`.
   final bool manualControl;
 
+  /// By default, the value used is false
+  ///
+  /// Enables a pulsing animation around a widget in focus
+  final bool showPulseAnimation;
+
+  /// By default, the value used is white
+  final Color pulseInnerColor;
+
+  /// By default, the value used is white
+  final Color pulseOuterColor;
+
   OnboardingStep copyWith({
     Key? key,
     FocusNode? focusNode,
@@ -244,6 +258,9 @@ class OnboardingStep {
     Duration? delay,
     HitTestBehavior? overlayBehavior,
     StepWidgetBuilder? stepBuilder,
+    bool? showPulseAnimation,
+    Color? pulseInnerColor,
+    Color? pulseOuterColor,
   }) {
     return OnboardingStep(
       key: key ?? this.key,
@@ -268,6 +285,9 @@ class OnboardingStep {
       delay: delay ?? this.delay,
       overlayBehavior: overlayBehavior ?? this.overlayBehavior,
       stepBuilder: stepBuilder ?? this.stepBuilder,
+      showPulseAnimation: showPulseAnimation ?? this.showPulseAnimation,
+      pulseInnerColor: pulseInnerColor ?? this.pulseInnerColor,
+      pulseOuterColor: pulseOuterColor ?? this.pulseOuterColor,
     );
   }
 
@@ -295,7 +315,10 @@ class OnboardingStep {
       fullscreen: $fullscreen, 
       delay: $delay, 
       overlayBehavior: $overlayBehavior, 
-      stepBuilder: $stepBuilder
+      stepBuilder: $stepBuilder, 
+      showPulseAnimation: $showPulseAnimation, 
+      pulseInnerColor: $pulseInnerColor, 
+      pulseOuterColor: $pulseOuterColor
     )''';
   }
 
