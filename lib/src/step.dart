@@ -2,8 +2,24 @@ import 'package:flutter/widgets.dart';
 
 import 'label_painter.dart';
 
-typedef StepWidgetBuilder = Widget Function(BuildContext context, String title,
-    TextStyle titleStyle, String body, TextStyle bodyStyle);
+class OnboardingStepRenderInfo {
+  final String title;
+  final TextStyle titleStyle;
+  final String body;
+  final TextStyle bodyStyle;
+  final Size size;
+
+  OnboardingStepRenderInfo({
+    required this.title,
+    required this.titleStyle,
+    required this.body,
+    required this.bodyStyle,
+    required this.size,
+  });
+}
+
+typedef StepWidgetBuilder = Widget Function(
+    BuildContext context, OnboardingStepRenderInfo renderInfo);
 
 @immutable
 class OnboardingStep {
@@ -222,7 +238,30 @@ class OnboardingStep {
 
   @override
   String toString() {
-    return 'OnboardingStep(key: $key, focusNode: $focusNode, textAlign: $textAlign, titleTextColor: $titleTextColor, title: $title, arrowPosition: $arrowPosition, titleTextStyle: $titleTextStyle, bodyText: $bodyText, bodyTextColor: $bodyTextColor, bodyTextStyle: $bodyTextStyle, labelBoxDecoration: $labelBoxDecoration, shape: $shape, overlayColor: $overlayColor, overlayShape: $overlayShape, margin: $margin, labelBoxPadding: $labelBoxPadding, hasLabelBox: $hasLabelBox, hasArrow: $hasArrow, fullscreen: $fullscreen, delay: $delay, overlayBehavior: $overlayBehavior, stepBuilder: $stepBuilder)';
+    return '''OnboardingStep(
+      key: $key, 
+      focusNode: $focusNode, 
+      textAlign: $textAlign, 
+      titleTextColor: $titleTextColor, 
+      title: $title, 
+      arrowPosition: $arrowPosition, 
+      titleTextStyle: $titleTextStyle, 
+      bodyText: $bodyText, 
+      bodyTextColor: $bodyTextColor, 
+      bodyTextStyle: $bodyTextStyle, 
+      labelBoxDecoration: $labelBoxDecoration, 
+      shape: $shape, 
+      overlayColor: $overlayColor, 
+      overlayShape: $overlayShape, 
+      margin: $margin, 
+      labelBoxPadding: $labelBoxPadding, 
+      hasLabelBox: $hasLabelBox, 
+      hasArrow: $hasArrow, 
+      fullscreen: $fullscreen, 
+      delay: $delay, 
+      overlayBehavior: $overlayBehavior, 
+      stepBuilder: $stepBuilder
+    )''';
   }
 
   @override

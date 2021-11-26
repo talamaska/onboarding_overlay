@@ -227,9 +227,12 @@ class _OnboardingStepperState extends State<OnboardingStepper>
   }
 
   double _getHorizontalPosition(OnboardingStep step, Size size) {
-    final double boxWidth = step.fullscreen
-        ? size.width * kLabelBoxWidthRatioLarge
-        : size.width * kLabelBoxWidthRatio;
+    // final double boxWidth = step.fullscreen
+    //     ? size.width * kLabelBoxWidthRatioLarge
+    //     : size.width * kLabelBoxWidthRatio;
+
+    final double boxWidth =
+        step.fullscreen ? size.width - 10 : size.width * kLabelBoxWidthRatio;
     if (widgetRect != null) {
       if (widgetRect!.center.dx > size.width / 2) {
         return (widgetRect!.center.dx - boxWidth / 2)
@@ -246,19 +249,20 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     }
   }
 
-  double _getVerticalPosition(OnboardingStep step, Size size) {
-    final double boxHeight = size.shortestSide * kLabelBoxHeightRatio;
-    final double bottomSpace = (step.hasArrow ? kArrowHeight + kSpace : kSpace);
-    final double topSpace = (step.hasArrow ? kArrowHeight + kSpace : kSpace);
+  double _getVerticalPosition(
+      OnboardingStep step, Size size, double boxHeight) {
+    // final double boxHeight = size.shortestSide * kLabelBoxHeightRatio;
+
+    final double spacer = (step.hasArrow ? kArrowHeight + kSpace : kSpace);
+
     if (widgetRect != null) {
       final Rect holeRect = step.margin.inflateRect(widgetRect!);
 
       if (widgetRect!.center.dy > size.height / 2) {
-        return (holeRect.top - boxHeight - topSpace)
+        return (holeRect.top - boxHeight - spacer)
             .clamp(0, size.height - boxHeight);
       } else {
-        return (holeRect.bottom + bottomSpace)
-            .clamp(0, size.height - boxHeight);
+        return (holeRect.bottom + spacer).clamp(0, size.height - boxHeight);
       }
     } else {
       return size.height / 2 - boxHeight / 2;
@@ -269,12 +273,11 @@ class _OnboardingStepperState extends State<OnboardingStepper>
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
+        final MediaQueryData media = MediaQuery.of(context);
+        print('media $media');
         final Size size = MediaQuery.of(context).size;
         final OnboardingStep step = widget.steps[stepperIndex];
-        final double boxWidth = step.fullscreen
-            ? size.width * kLabelBoxWidthRatioLarge
-            : size.width * kLabelBoxWidthRatio;
-        final double boxHeight = size.shortestSide * kLabelBoxHeightRatio;
+
         final ThemeData theme = Theme.of(context);
 
         final TextTheme textTheme = theme.textTheme;
@@ -314,8 +317,35 @@ class _OnboardingStepperState extends State<OnboardingStepper>
         }
 
         final bool isTop = holeRect.center.dy > size.height / 2;
+
+        // final double boxWidth = step.fullscreen
+        //             ? size.width * kLabelBoxWidthRatioLarge
+        //                         : size.width * kLabelBoxWidthRatio;
+        final double boxWidth = step.fullscreen
+            ? size.width - 10
+            : size.width * kLabelBoxWidthRatio;
+
+        // final double boxHeight = size.shortestSide * kLabelBoxHeightRatio;
+        double boxHeight = 0;
+        if (step.fullscreen) {
+          boxHeight = (isTop
+                  ? holeRect.top -
+                      kSpace -
+                      (step.hasArrow ? kArrowHeight + kSpace : kSpace)
+                  : size.height -
+                      holeRect.bottom -
+                      kSpace -
+                      (step.hasArrow ? kArrowHeight + kSpace : kSpace)) -
+              media.padding.top;
+        } else {
+          // size.width * kOverlayRatio - holeRect.width / 2
+          boxHeight = size.width * 0.5 -
+              kSpace -
+              (step.hasArrow ? kArrowHeight + kSpace : kSpace);
+        }
+
         final double leftPos = _getHorizontalPosition(step, size);
-        final double topPos = _getVerticalPosition(step, size);
+        final double topPos = _getVerticalPosition(step, size, boxHeight);
         final Rect? hole = holeTween.evaluate(animation);
 
         return GestureDetector(
@@ -362,7 +392,10 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                 top: topPos,
                 child: FadeTransition(
                   opacity: animation,
-                  child: SizedBox(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(),
+                    ),
                     width: boxWidth,
                     height: boxHeight,
                     child: Stack(
@@ -388,11 +421,13 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                                 child: step.stepBuilder != null
                                     ? step.stepBuilder!(
                                         context,
-                                        step.title,
-                                        activeTitleStyle,
-                                        step.bodyText,
-                                        activeBodyStyle,
-                                      )
+                                        OnboardingStepRenderInfo(
+                                          title: step.title,
+                                          titleStyle: activeTitleStyle,
+                                          body: step.bodyText,
+                                          bodyStyle: activeBodyStyle,
+                                          size: Size(boxWidth, boxHeight),
+                                        ))
                                     : widget.autoSizeTexts
                                         ? AutoSizeText.rich(
                                             TextSpan(

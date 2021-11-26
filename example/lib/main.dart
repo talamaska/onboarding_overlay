@@ -61,17 +61,14 @@ class _AppState extends State<App> {
                 fullscreen: true,
                 stepBuilder: (
                   BuildContext context,
-                  String title,
-                  TextStyle titleStyle,
-                  String body,
-                  TextStyle bodyStyle,
+                  OnboardingStepRenderInfo renderInfo,
                 ) {
                   return SingleChildScrollView(
                     child: Column(
                       children: [
                         Text(
-                          title,
-                          style: titleStyle,
+                          renderInfo.title,
+                          style: renderInfo.titleStyle,
                         ),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,13 +77,13 @@ class _AppState extends State<App> {
                               'assets/demo.gif',
                               width: 50,
                             ),
-                            SizedBox(
+                            const SizedBox(
                               width: 10,
                             ),
                             Flexible(
                               child: AutoSizeText(
-                                body,
-                                style: bodyStyle,
+                                renderInfo.body,
+                                style: renderInfo.bodyStyle,
                               ),
                             ),
                           ],
