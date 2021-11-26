@@ -11,7 +11,7 @@ class OnboardingController with ChangeNotifier {
   int get currentIndex => _currentIndex;
   void setCurrentIndex(int index) {
     _currentIndex = index;
-    setCurrentStep(steps[index]);
+    _currentStep = steps[index];
     notifyListeners();
   }
 
@@ -26,5 +26,6 @@ class OnboardingController with ChangeNotifier {
   OnboardingStep? get currentStep => _currentStep;
   void setCurrentStep(OnboardingStep? step) {
     _currentStep = step;
+    notifyListeners();
   }
 }
