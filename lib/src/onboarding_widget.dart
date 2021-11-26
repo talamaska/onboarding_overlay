@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'state.dart';
+import 'onboarding_controller.dart';
 import 'step.dart';
 import 'stepper.dart';
 
