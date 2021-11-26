@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import 'state.dart';
 import 'step.dart';
 import 'stepper.dart';
 
@@ -20,12 +21,16 @@ class Onboarding extends StatefulWidget {
     required this.steps,
     required this.child,
     this.duration = const Duration(milliseconds: 350),
+    this.debugBoundaries = false,
   }) : super(key: key);
 
   final bool autoSizeTexts;
   final int initialIndex;
   final ValueChanged<int>? onChanged;
   final ValueChanged<int>? onEnd;
+
+  /// By default, the value used is `false`
+  final bool debugBoundaries;
 
   /// is required
   final List<OnboardingStep> steps;
@@ -68,6 +73,7 @@ class Onboarding extends StatefulWidget {
 
 class OnboardingState extends State<Onboarding> {
   late OverlayEntry _overlayEntry;
+  OnboardingController controller = OnboardingController();
 
   /// Shows an onboarding session with all steps provided and initial index passed via the widget
   void show() {
@@ -106,10 +112,16 @@ class OnboardingState extends State<Onboarding> {
           stepIndexes: stepIndexes,
           duration: widget.duration,
           autoSizeTexts: widget.autoSizeTexts,
+          debugBoundaries: widget.debugBoundaries,
+          setupIndex: (int index) {
+            controller.setCurrentIndex(index);
+          },
           onChanged: (int index) {
+            controller.setCurrentIndex(index);
             widget.onChanged?.call(index);
           },
           onEnd: (int index) {
+            controller.setCurrentIndex(index);
             widget.onEnd?.call(index);
             hide();
           },

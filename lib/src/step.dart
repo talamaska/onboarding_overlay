@@ -8,6 +8,9 @@ class OnboardingStepRenderInfo {
   final String body;
   final TextStyle bodyStyle;
   final Size size;
+  final VoidCallback nextStep;
+  final VoidCallback close;
+  final bool manualControl;
 
   OnboardingStepRenderInfo({
     required this.title,
@@ -15,6 +18,9 @@ class OnboardingStepRenderInfo {
     required this.body,
     required this.bodyStyle,
     required this.size,
+    required this.nextStep,
+    required this.close,
+    required this.manualControl,
   });
 }
 
@@ -67,6 +73,7 @@ class OnboardingStep {
     this.arrowPosition = ArrowPosition.top,
     this.overlayBehavior = HitTestBehavior.opaque,
     this.stepBuilder,
+    this.manualControl = false,
   })  : assert(titleTextColor != null || titleTextStyle != null,
             'You should provide at least one of titleTextColor or titleTextStyle'),
         assert(bodyTextColor != null || bodyTextStyle != null,
@@ -186,7 +193,15 @@ class OnboardingStep {
   /// `HitTestBehavior.deferToChild` triggers only the onTap on the widget
   final HitTestBehavior overlayBehavior;
 
+  /// [stepBuilder] is a callback funtion that passes the context, the title `String`, the actual title `TextStyle`,
+  /// the bodyText `String` and the actual bodytext `TextStyle`.
+  /// By default it is `null`. If you decide to use it you are on your own - there will be no safety measures.
+  /// If the content is too much you might get overflow error. To mitigate such issues try using `SingleChildScrollView`,
+  /// but remember that you will not be able to actually scroll it, as there is already an `GestureDetector` upper in the tree that will catch the gestures
+  /// The non full-screen overlays provide significantly smaller available space
   final StepWidgetBuilder? stepBuilder;
+
+  final bool manualControl;
 
   OnboardingStep copyWith({
     Key? key,

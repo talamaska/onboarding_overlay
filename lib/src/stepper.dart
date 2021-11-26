@@ -19,6 +19,8 @@ class OnboardingStepper extends StatefulWidget {
     this.onEnd,
     this.autoSizeTexts = false,
     this.stepIndexes = const <int>[],
+    this.debugBoundaries = false,
+    required this.setupIndex,
   })  : assert(() {
           if (stepIndexes.isNotEmpty && !stepIndexes.contains(initialIndex)) {
             final List<DiagnosticsNode> information = <DiagnosticsNode>[
@@ -48,11 +50,16 @@ class OnboardingStepper extends StatefulWidget {
   /// `onEnd` is called when there are no more steps to transition to
   final ValueChanged<int>? onEnd;
 
+  final ValueChanged<int> setupIndex;
+
   /// By default, the value is `Duration(milliseconds: 350)`
   final Duration duration;
 
-  /// By default is false, turns on to usage of AutoSizeText widget and ignore maxLines
+  /// By default is `false`, turns on to usage of `AutoSizeText` widget and ignore `maxLines`
   final bool autoSizeTexts;
+
+  /// By default the value is false
+  final bool debugBoundaries;
 
   @override
   _OnboardingStepperState createState() => _OnboardingStepperState();
@@ -130,12 +137,13 @@ class _OnboardingStepperState extends State<OnboardingStepper>
       _stepIndexes.removeAt(0);
       step = widget.steps[stepperIndex];
     }
+    widget.setupIndex(stepperIndex);
 
     setTweensAndAnimate(step);
     step.focusNode.requestFocus();
   }
 
-  Future<void> nextStep() async {
+  Future<void> _nextStep() async {
     assert(() {
       if (widget.stepIndexes.isNotEmpty &&
           !widget.stepIndexes.contains(widget.initialIndex)) {
@@ -228,13 +236,8 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     controller.forward(from: 0.0);
   }
 
-  double _getHorizontalPosition(OnboardingStep step, Size size) {
-    // final double boxWidth = step.fullscreen
-    //     ? size.width * kLabelBoxWidthRatioLarge
-    //     : size.width * kLabelBoxWidthRatio;
-
-    final double boxWidth =
-        step.fullscreen ? size.width - 10 : size.width * kLabelBoxWidthRatio;
+  double _getHorizontalPosition(
+      OnboardingStep step, Size size, double boxWidth) {
     if (widgetRect != null) {
       if (widgetRect!.center.dx > size.width / 2) {
         return (widgetRect!.center.dx - boxWidth / 2)
@@ -271,13 +274,16 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     }
   }
 
+  void _close() {
+    widget.onEnd?.call(stepperIndex);
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final MediaQueryData media = MediaQuery.of(context);
-        print('media $media');
-        final Size size = MediaQuery.of(context).size;
+        final Size size = media.size;
         final OnboardingStep step = widget.steps[stepperIndex];
 
         final ThemeData theme = Theme.of(context);
@@ -320,33 +326,28 @@ class _OnboardingStepperState extends State<OnboardingStepper>
 
         final bool isTop = holeRect.center.dy > size.height / 2;
 
-        // final double boxWidth = step.fullscreen
-        //             ? size.width * kLabelBoxWidthRatioLarge
-        //                         : size.width * kLabelBoxWidthRatio;
         final double boxWidth = step.fullscreen
-            ? size.width - 10
+            ? size.width - 2 * sideGap
             : size.width * kLabelBoxWidthRatio;
 
-        // final double boxHeight = size.shortestSide * kLabelBoxHeightRatio;
         double boxHeight = 0;
         if (step.fullscreen) {
           boxHeight = (isTop
                   ? holeRect.top -
-                      kSpace -
-                      (step.hasArrow ? kArrowHeight + kSpace : kSpace)
+                      sideGap -
+                      (step.hasArrow ? kArrowHeight + sideGap : sideGap)
                   : size.height -
                       holeRect.bottom -
-                      kSpace -
-                      (step.hasArrow ? kArrowHeight + kSpace : kSpace)) -
+                      sideGap -
+                      (step.hasArrow ? kArrowHeight + sideGap : sideGap)) -
               media.padding.top;
         } else {
-          // size.width * kOverlayRatio - holeRect.width / 2
           boxHeight = size.width * 0.5 -
               kSpace -
-              (step.hasArrow ? kArrowHeight + kSpace : kSpace);
+              (step.hasArrow ? kArrowHeight + sideGap : sideGap);
         }
 
-        final double leftPos = _getHorizontalPosition(step, size);
+        final double leftPos = _getHorizontalPosition(step, size, boxWidth);
         final double topPos = _getVerticalPosition(step, size, boxHeight);
         final Rect? hole = holeTween.evaluate(animation);
 
@@ -360,9 +361,10 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                 overlayBox.globalToLocal(details.globalPosition);
 
             final BoxHitTestResult result = BoxHitTestResult();
-            if (overlayBox.hitTest(result, position: localOverlay) ||
-                step.overlayBehavior != HitTestBehavior.deferToChild) {
-              nextStep();
+            if ((overlayBox.hitTest(result, position: localOverlay) ||
+                    step.overlayBehavior != HitTestBehavior.deferToChild) &&
+                !step.manualControl) {
+              _nextStep();
             }
           },
           child: Stack(
@@ -395,9 +397,11 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                 child: FadeTransition(
                   opacity: animation,
                   child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(),
-                    ),
+                    decoration: widget.debugBoundaries
+                        ? BoxDecoration(
+                            border: Border.all(color: const Color(0xFFFF0000)),
+                          )
+                        : null,
                     width: boxWidth,
                     height: boxHeight,
                     child: Stack(
@@ -430,7 +434,11 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                                           body: step.bodyText,
                                           bodyStyle: activeBodyStyle,
                                           size: Size(boxWidth, boxHeight),
-                                        ))
+                                          nextStep: _nextStep,
+                                          close: _close,
+                                          manualControl: step.manualControl,
+                                        ),
+                                      )
                                     : widget.autoSizeTexts
                                         ? AutoSizeText.rich(
                                             TextSpan(

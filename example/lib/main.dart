@@ -38,6 +38,7 @@ class _AppState extends State<App> {
         home: Onboarding(
           key: widget.onboardingKey,
           autoSizeTexts: true,
+          debugBoundaries: true,
           steps: <OnboardingStep>[
             OnboardingStep(
                 focusNode: focusNodes[0],
@@ -55,10 +56,11 @@ class _AppState extends State<App> {
                     style: BorderStyle.solid,
                   ),
                 ),
-                arrowPosition: ArrowPosition.bottom,
+                arrowPosition: ArrowPosition.autoVertical,
                 hasArrow: true,
                 hasLabelBox: true,
                 fullscreen: true,
+                manualControl: true,
                 stepBuilder: (
                   BuildContext context,
                   OnboardingStepRenderInfo renderInfo,
@@ -85,6 +87,18 @@ class _AppState extends State<App> {
                                 renderInfo.body,
                                 style: renderInfo.bodyStyle,
                               ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            TextButton(
+                              onPressed: renderInfo.nextStep,
+                              child: Text('Next'),
+                            ),
+                            TextButton(
+                              onPressed: renderInfo.close,
+                              child: Text('close'),
                             ),
                           ],
                         ),
@@ -149,7 +163,7 @@ class _AppState extends State<App> {
                   style: BorderStyle.solid,
                 ),
               ),
-              arrowPosition: ArrowPosition.top,
+              arrowPosition: ArrowPosition.autoVertical,
               hasArrow: true,
               hasLabelBox: true,
               textAlign: TextAlign.center,
@@ -198,7 +212,7 @@ class _AppState extends State<App> {
                   style: BorderStyle.solid,
                 ),
               ),
-              arrowPosition: ArrowPosition.bottom,
+              arrowPosition: ArrowPosition.autoVertical,
               hasArrow: true,
               hasLabelBox: true,
             ),
@@ -247,7 +261,7 @@ class _AppState extends State<App> {
               hasArrow: true,
               hasLabelBox: true,
               labelBoxDecoration: BoxDecoration(color: Colors.orange.shade900),
-              arrowPosition: ArrowPosition.top,
+              arrowPosition: ArrowPosition.autoVertical,
             ),
             OnboardingStep(
               focusNode: focusNodes[11],
@@ -263,7 +277,7 @@ class _AppState extends State<App> {
               hasArrow: true,
               hasLabelBox: true,
               labelBoxDecoration: const BoxDecoration(color: Colors.green),
-              arrowPosition: ArrowPosition.top,
+              arrowPosition: ArrowPosition.autoVertical,
             ),
             OnboardingStep(
               focusNode: focusNodes[12],
@@ -284,7 +298,7 @@ class _AppState extends State<App> {
               hasArrow: true,
               hasLabelBox: true,
               labelBoxDecoration: const BoxDecoration(color: Colors.purple),
-              arrowPosition: ArrowPosition.bottom,
+              arrowPosition: ArrowPosition.autoVertical,
             ),
             OnboardingStep(
               focusNode: focusNodes[14],
@@ -308,7 +322,7 @@ class _AppState extends State<App> {
               hasArrow: true,
               hasLabelBox: true,
               labelBoxDecoration: BoxDecoration(color: Colors.cyan.shade900),
-              arrowPosition: ArrowPosition.bottom,
+              arrowPosition: ArrowPosition.autoVertical,
             ),
             OnboardingStep(
               focusNode: focusNodes[16],
@@ -325,7 +339,7 @@ class _AppState extends State<App> {
               labelBoxDecoration: BoxDecoration(
                 color: Colors.pink.shade900,
               ),
-              arrowPosition: ArrowPosition.bottom,
+              arrowPosition: ArrowPosition.autoVertical,
             ),
             OnboardingStep(
               focusNode: focusNodes[17],
@@ -348,6 +362,10 @@ class _AppState extends State<App> {
               // interrupt onboarding on specific step
               // widget.onboardingKey.currentState.hide();
             }
+            final int? currentIndex =
+                widget.onboardingKey.currentState?.controller.currentIndex;
+
+            print('currentIndex $currentIndex');
           },
           child: Home(
             focusNodes: focusNodes,
