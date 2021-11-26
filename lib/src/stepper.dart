@@ -7,6 +7,8 @@ import 'label_painter.dart';
 import 'overlay_painter.dart';
 import 'step.dart';
 
+const double sideGap = 5;
+
 class OnboardingStepper extends StatefulWidget {
   OnboardingStepper({
     Key? key,
@@ -233,13 +235,13 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     if (widgetRect != null) {
       if (widgetRect!.center.dx > size.width / 2) {
         return (widgetRect!.center.dx - boxWidth / 2)
-            .clamp(0, size.width - boxWidth);
+            .clamp(sideGap, size.width - boxWidth - sideGap);
       } else if (widgetRect!.center.dx == size.width / 2) {
         return (widgetRect!.center.dx - boxWidth / 2)
-            .clamp(0, size.width - boxWidth);
+            .clamp(sideGap, size.width - boxWidth - sideGap);
       } else {
         return (widgetRect!.center.dx - boxWidth / 2)
-            .clamp(0, size.width - boxWidth);
+            .clamp(sideGap, size.width - boxWidth - sideGap);
       }
     } else {
       return size.width / 2 - boxWidth / 2;
