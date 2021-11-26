@@ -17,8 +17,8 @@ class OverlayPainter extends CustomPainter {
     required this.pulseAnimationOuter,
     this.fullscreen = true,
     this.overlayColor = const Color(0xaa000000),
-    this.pulseInnerColor = const Color(0xFFFFFFFF),
-    this.pulseOuterColor = const Color(0xFFFFFFFF),
+    this.pulseInnerColor = defaultInnerPulseColor,
+    this.pulseOuterColor = defaultOuterPulseColor,
   });
 
   /// By default, the value is
@@ -88,29 +88,31 @@ class OverlayPainter extends CustomPainter {
         ..style = PaintingStyle.fill,
     );
 
-    final Rect pulseInnerRect = hole.inflate(20 * pulseAnimationInner);
-    final Path pulseInnerPath = shape.getOuterPath(pulseInnerRect);
-    final Path pulseInnerPathHole = Path.combine(
-      PathOperation.difference,
-      pulseInnerPath,
-      holePath,
-    );
-    final Paint pulseInnerPaint = Paint()
-      ..color = pulseInnerColor.withOpacity(0.5)
-      ..style = PaintingStyle.fill;
-    canvas.drawPath(pulseInnerPathHole, pulseInnerPaint);
+    if (hole.width != 0 && hole.height != 0) {
+      final Rect pulseInnerRect = hole.inflate(20 * pulseAnimationInner);
+      final Path pulseInnerPath = shape.getOuterPath(pulseInnerRect);
+      final Path pulseInnerPathHole = Path.combine(
+        PathOperation.difference,
+        pulseInnerPath,
+        holePath,
+      );
+      final Paint pulseInnerPaint = Paint()
+        ..color = pulseInnerColor.withOpacity(0.5)
+        ..style = PaintingStyle.fill;
+      canvas.drawPath(pulseInnerPathHole, pulseInnerPaint);
 
-    final Rect pulseOuterRect = hole.inflate(35 * pulseAnimationOuter);
-    final Path pulseOuterPath = shape.getOuterPath(pulseOuterRect);
-    final Path pulseOuterPathHole = Path.combine(
-      PathOperation.difference,
-      pulseOuterPath,
-      pulseInnerPath,
-    );
-    final Paint pulseOuterPaint = Paint()
-      ..color = pulseOuterColor.withOpacity(0.2)
-      ..style = PaintingStyle.fill;
-    canvas.drawPath(pulseOuterPathHole, pulseOuterPaint);
+      final Rect pulseOuterRect = hole.inflate(35 * pulseAnimationOuter);
+      final Path pulseOuterPath = shape.getOuterPath(pulseOuterRect);
+      final Path pulseOuterPathHole = Path.combine(
+        PathOperation.difference,
+        pulseOuterPath,
+        pulseInnerPath,
+      );
+      final Paint pulseOuterPaint = Paint()
+        ..color = pulseOuterColor.withOpacity(0.2)
+        ..style = PaintingStyle.fill;
+      canvas.drawPath(pulseOuterPathHole, pulseOuterPaint);
+    }
   }
 
   @override

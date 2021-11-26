@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import 'constants.dart';
 import 'label_painter.dart';
 
 class OnboardingStepRenderInfo {
@@ -65,17 +66,17 @@ class OnboardingStep {
     this.key,
     required this.focusNode,
     required this.titleText,
-    this.titleTextColor = const Color(0xFFFFFFFF),
+    this.titleTextColor = defaultTextColor,
     this.titleTextStyle,
     this.bodyText = '',
     this.bodyTextStyle,
-    this.bodyTextColor = const Color(0xFFFFFFFF),
+    this.bodyTextColor = defaultTextColor,
     this.textAlign = TextAlign.start,
     this.shape = const RoundedRectangleBorder(
       borderRadius: BorderRadius.all(Radius.circular(8.0)),
     ),
     this.margin = const EdgeInsets.all(8.0),
-    this.overlayColor = const Color(0xC4000000),
+    this.overlayColor = defaultOverlayColor,
     this.overlayShape = const RoundedRectangleBorder(
       borderRadius: BorderRadius.all(Radius.circular(8.0)),
     ),
@@ -90,8 +91,8 @@ class OnboardingStep {
     this.stepBuilder,
     this.manualControl = false,
     this.showPulseAnimation = true,
-    this.pulseInnerColor = const Color(0x0fffffff),
-    this.pulseOuterColor = const Color(0x0fffffff),
+    this.pulseInnerColor = defaultInnerPulseColor,
+    this.pulseOuterColor = defaultOuterPulseColor,
   })  : assert(titleTextColor != null || titleTextStyle != null,
             'You should provide at least one of titleTextColor or titleTextStyle'),
         assert(bodyTextColor != null || bodyTextStyle != null,
@@ -240,7 +241,7 @@ class OnboardingStep {
     FocusNode? focusNode,
     TextAlign? textAlign,
     Color? titleTextColor,
-    String? title,
+    String? titleText,
     ArrowPosition? arrowPosition,
     TextStyle? titleTextStyle,
     String? bodyText,
@@ -267,7 +268,7 @@ class OnboardingStep {
       focusNode: focusNode ?? this.focusNode,
       textAlign: textAlign ?? this.textAlign,
       titleTextColor: titleTextColor ?? this.titleTextColor,
-      titleText: title ?? titleText,
+      titleText: titleText ?? this.titleText,
       arrowPosition: arrowPosition ?? this.arrowPosition,
       titleTextStyle: titleTextStyle ?? this.titleTextStyle,
       bodyText: bodyText ?? this.bodyText,
@@ -348,7 +349,10 @@ class OnboardingStep {
         other.fullscreen == fullscreen &&
         other.delay == delay &&
         other.overlayBehavior == overlayBehavior &&
-        other.stepBuilder == stepBuilder;
+        other.stepBuilder == stepBuilder &&
+        other.showPulseAnimation == showPulseAnimation &&
+        other.pulseInnerColor == pulseInnerColor &&
+        other.pulseOuterColor == pulseOuterColor;
   }
 
   @override
@@ -374,6 +378,9 @@ class OnboardingStep {
         fullscreen.hashCode ^
         delay.hashCode ^
         overlayBehavior.hashCode ^
-        stepBuilder.hashCode;
+        stepBuilder.hashCode ^
+        showPulseAnimation.hashCode ^
+        pulseInnerColor.hashCode ^
+        pulseOuterColor.hashCode;
   }
 }

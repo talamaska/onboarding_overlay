@@ -8,6 +8,7 @@ import 'overlay_painter.dart';
 import 'step.dart';
 
 const double sideGap = 5;
+const Color debugBorderColor = Color(0xFFFF0000);
 
 class OnboardingStepper extends StatefulWidget {
   OnboardingStepper({
@@ -73,7 +74,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     with TickerProviderStateMixin {
   late int stepperIndex;
   late ColorTween overlayColorTween;
-  late AnimationController controller;
+  late AnimationController overlayController;
   late AnimationController pulseController;
   late Animation<double> overlayAnimation;
   late Animation<double> pulseAnimationInner;
@@ -89,7 +90,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     super.initState();
     stepperIndex = widget.initialIndex;
     _stepIndexes = List<int>.from(widget.stepIndexes);
-    controller = AnimationController(
+    overlayController = AnimationController(
       vsync: this,
       duration: widget.duration,
     )..addListener(() => setState(() {}));
@@ -137,6 +138,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
       }
       return true;
     }());
+
     OnboardingStep step;
 
     if (widget.stepIndexes.isEmpty) {
@@ -170,7 +172,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     }());
 
     if (widget.stepIndexes.isEmpty) {
-      await controller.reverse();
+      await overlayController.reverse();
       widget.onChanged?.call(stepperIndex);
 
       if (stepperIndex < widget.steps.length - 1) {
@@ -190,7 +192,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
 
       step.focusNode.requestFocus();
     } else {
-      await controller.reverse();
+      await overlayController.reverse();
 
       widget.onChanged?.call(stepperIndex);
 
@@ -217,7 +219,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
 
   @override
   void dispose() {
-    controller.dispose();
+    overlayController.dispose();
     pulseController.dispose();
     super.dispose();
   }
@@ -252,32 +254,14 @@ class _OnboardingStepperState extends State<OnboardingStepper>
 
     overlayAnimation = CurvedAnimation(
       curve: Curves.ease,
-      parent: controller,
+      parent: overlayController,
     );
-
-    controller.addStatusListener((AnimationStatus status) {
-      if (shouldShowPulse(step)) {
-        if (status == AnimationStatus.completed) {
-          pulseController.repeat(reverse: true);
-        }
-
-        if (status == AnimationStatus.reverse) {
-          pulseController.stop();
-        }
-      }
-    });
-
-    pulseController.addStatusListener((AnimationStatus status) {
-      print('$status');
-      // if (shouldShowPulse(step) && status == AnimationStatus) {
-      //   pulseController.reset();
-      // }
-    });
 
     pulseAnimationInner = CurvedAnimation(
       curve: Curves.ease,
       parent: pulseController,
     );
+
     pulseAnimationOuter = CurvedAnimation(
       curve: const Interval(
         0.0,
@@ -287,11 +271,40 @@ class _OnboardingStepperState extends State<OnboardingStepper>
       parent: pulseController,
     );
 
-    controller.forward(from: 0.0);
+    overlayController.removeStatusListener((AnimationStatus status) {
+      if (shouldShowPulse(step)) {
+        if (status == AnimationStatus.completed) {
+          pulseController.forward(from: 0.0);
+        }
+
+        if (status == AnimationStatus.reverse) {
+          pulseController.stop(canceled: false);
+        }
+      }
+    });
+
+    overlayController.addStatusListener((AnimationStatus status) {
+      if (shouldShowPulse(step)) {
+        if (status == AnimationStatus.completed) {
+          pulseController
+            ..forward(from: 0.0)
+            ..repeat(reverse: true);
+        }
+
+        if (status == AnimationStatus.reverse) {
+          pulseController.reset();
+        }
+      }
+    });
+
+    overlayController.forward(from: 0.0);
   }
 
   double _getHorizontalPosition(
-      OnboardingStep step, Size size, double boxWidth) {
+    OnboardingStep step,
+    Size size,
+    double boxWidth,
+  ) {
     if (widgetRect != null) {
       if (widgetRect!.center.dx > size.width / 2) {
         return (widgetRect!.center.dx - boxWidth / 2)
@@ -309,9 +322,10 @@ class _OnboardingStepperState extends State<OnboardingStepper>
   }
 
   double _getVerticalPosition(
-      OnboardingStep step, Size size, double boxHeight) {
-    // final double boxHeight = size.shortestSide * kLabelBoxHeightRatio;
-
+    OnboardingStep step,
+    Size size,
+    double boxHeight,
+  ) {
     final double spacer = (step.hasArrow ? kArrowHeight + kSpace : kSpace);
 
     if (widgetRect != null) {
@@ -336,11 +350,10 @@ class _OnboardingStepperState extends State<OnboardingStepper>
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
+        final ThemeData theme = Theme.of(context);
         final MediaQueryData media = MediaQuery.of(context);
         final Size size = media.size;
         final OnboardingStep step = widget.steps[stepperIndex];
-
-        final ThemeData theme = Theme.of(context);
 
         final TextTheme textTheme = theme.textTheme;
         final TextStyle localTitleTextStyle =
@@ -382,20 +395,25 @@ class _OnboardingStepperState extends State<OnboardingStepper>
 
         final double boxWidth = step.fullscreen
             ? size.width - 2 * sideGap
-            : size.width * kLabelBoxWidthRatio;
+            : widgetRect != null
+                ? size.width * kLabelBoxWidthRatio
+                : size.width * kOverlayRatio;
 
         double boxHeight = 0;
         if (step.fullscreen) {
           if (holeRect.height > 0) {
-            boxHeight = (isTop
-                    ? holeRect.top -
-                        sideGap -
-                        (step.hasArrow ? kArrowHeight + sideGap : sideGap)
-                    : size.height -
-                        holeRect.bottom -
-                        sideGap -
-                        (step.hasArrow ? kArrowHeight + sideGap : sideGap)) -
-                media.padding.top;
+            if (isTop) {
+              boxHeight = holeRect.top -
+                  sideGap -
+                  (step.hasArrow ? kArrowHeight + sideGap : sideGap) -
+                  media.padding.top;
+            } else {
+              boxHeight = size.height -
+                  holeRect.bottom -
+                  sideGap -
+                  (step.hasArrow ? kArrowHeight + sideGap : sideGap) -
+                  media.padding.top;
+            }
           } else {
             boxHeight = size.height -
                 sideGap -
@@ -403,14 +421,20 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                 2 * media.padding.top;
           }
         } else {
-          boxHeight = size.width * 0.5 -
-              kSpace -
-              (step.hasArrow ? kArrowHeight + sideGap : sideGap);
+          if (widgetRect != null) {
+            boxHeight = size.width * kLabelBoxWidthRatio -
+                kSpace -
+                (step.hasArrow ? kArrowHeight + sideGap : sideGap);
+          } else {
+            boxHeight = size.height * kLabelBoxWidthRatio -
+                kSpace -
+                (step.hasArrow ? kArrowHeight + sideGap : sideGap);
+          }
         }
 
         final double leftPos = _getHorizontalPosition(step, size, boxWidth);
         final double topPos = _getVerticalPosition(step, size, boxHeight);
-        final Rect? hole = holeTween.evaluate(animation);
+        final Rect? holeAnimatedValue = holeTween.evaluate(overlayAnimation);
 
         return GestureDetector(
           behavior: step.overlayBehavior,
@@ -446,7 +470,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                     center: step.focusNode.context == null
                         ? size.center(Offset.zero)
                         : null,
-                    hole: hole ?? Rect.zero,
+                    hole: holeAnimatedValue ?? Rect.zero,
                     overlayAnimation: overlayAnimation.value,
                     pulseInnerColor: step.pulseInnerColor,
                     pulseOuterColor: step.pulseOuterColor,
@@ -464,7 +488,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                   child: Container(
                     decoration: widget.debugBoundaries
                         ? BoxDecoration(
-                            border: Border.all(color: const Color(0xFFFF0000)),
+                            border: Border.all(color: debugBorderColor),
                           )
                         : null,
                     width: boxWidth,
@@ -483,7 +507,8 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                               labelBoxDecoration: step.labelBoxDecoration,
                               hasArrow: step.hasArrow,
                               arrowPosition: step.arrowPosition,
-                              hole: hole!.shift(Offset(-leftPos, -topPos)),
+                              hole: holeAnimatedValue!
+                                  .shift(Offset(-leftPos, -topPos)),
                               isTop: isTop,
                             ),
                             child: SizedBox(
