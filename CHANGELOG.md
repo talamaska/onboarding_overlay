@@ -1,10 +1,20 @@
+## [3.0.0-pre.2]
+  - add: a OverlayController (ChangeNotifier) attached to the OverlayState that provides the currentIndex, currentStep and isVisible - [#20](https://github.com/talamaska/onboarding_overlay/issues/20)
+  - add: possibility to build your own step layout with stepBuilder - [#21](https://github.com/talamaska/onboarding_overlay/issues/21)
+  - add: pulse animation on the focused widget if the overlayBehavior is HitTestBehavior.deferToChild or HitTestBehavior.translucent (Thanks to the author [Gautier](https://github.com/g-apparence) of the [pal](http://pub.dev/packages/pal) package for the inspiration)
+  - add: debugBoundaries boolean to show red border around the max size of the label box
+  - add: ArrowPosition.autoVertical and ArrowPosition.autoVerticalCenter. This setting will automatically position the label box arrow, if enabled, above or below the label box, depending on its position relative to the widget of interest.
+  - change: make label box use more space available
+  - change: **[Breaking Change]** rename title to titleText
+  - remove: **[Breaking Change]** ArrowPosition.centerLeft and ArrowPosition.centerRight
+
 ## [2.3.5]
   - add: more docs around the titleTextStyle and bodyTextStyle
   - fix: make sure that if a color is not set in the titleTextStyle and bodyTextStyle properties they will fallback to titleTextColor or bodyTextColor accordingly
 
 ## [2.3.4]
-  - fix: position of the overlay when no focus node is attached and the setting of the overlay is fullscreen: false - issue #16
-  - fix: merging text styles was done incorrectly - issue #14
+  - fix: position of the overlay when no focus node is attached and the setting of the overlay is fullscreen: false - issue [#16](https://github.com/talamaska/onboarding_overlay/issues/16)
+  - fix: merging text styles was done incorrectly - issue [#14](https://github.com/talamaska/onboarding_overlay/issues/14)
 
 
 ## [2.3.3]

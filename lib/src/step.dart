@@ -90,7 +90,7 @@ class OnboardingStep {
     this.overlayBehavior = HitTestBehavior.opaque,
     this.stepBuilder,
     this.manualControl = false,
-    this.showPulseAnimation = true,
+    this.showPulseAnimation = false,
     this.pulseInnerColor = defaultInnerPulseColor,
     this.pulseOuterColor = defaultOuterPulseColor,
   })  : assert(titleTextColor != null || titleTextStyle != null,
@@ -228,6 +228,7 @@ class OnboardingStep {
   /// By default, the value used is false
   ///
   /// Enables a pulsing animation around a widget in focus
+  /// when overlBehaviour is different from HitTestBehavior.opaque
   final bool showPulseAnimation;
 
   /// By default, the value used is white
