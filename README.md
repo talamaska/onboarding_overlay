@@ -248,6 +248,8 @@ OnboardingStep(
 ),
 ```
 
+<img src="https://github.com/talamaska/onboarding_overlay/blob/master/screenshots/demo3.png?raw=true" width="320"/>
+
 13. **From v.3.0.0** if you want to have your own button for closing the onboarding, you need to define a `GlobalKey`, pass it to the closeKey property of the `OnboardingStep` and set the key to the button you defined in your `stepBuilder`.
 
 ```dart
@@ -330,4 +332,8 @@ if( onboarding?.controller.isVisible ?? false) {
 
 15. **From v.3.0.0** you can also add a pulsing animation around the focused widget. Pulse animation will be displayed if the `overlayBehavior` is `HitTestBehavior.deferToChild` or `HitTestBehavior.translucent` and `showPulseAnimation` on an `OnboardingStep` is set to `true`. In addition you can change the inner and outer colors of the pulse animation. Thanks to the author [Gautier](https://github.com/g-apparence) of the [pal](http://pub.dev/packages/pal) package for the inspiration.
 
+<img src="https://github.com/talamaska/onboarding_overlay/blob/master/screenshots/demo4.gif?raw=true" width="320"/>
+
 16. **From v.3.0.0** you can show a red border around the label box for debugging purposes by using an `Onboarding` parameter `debugBoundaries` which is `false` by default.
+
+<img src="https://github.com/talamaska/onboarding_overlay/blob/master/screenshots/demo2.png?raw=true" width="320"/>

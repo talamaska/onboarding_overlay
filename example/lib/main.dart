@@ -45,7 +45,7 @@ class _AppState extends State<App> {
         home: Onboarding(
           key: widget.onboardingKey,
           autoSizeTexts: true,
-          debugBoundaries: true,
+          // debugBoundaries: true,
           steps: <OnboardingStep>[
             OnboardingStep(
               focusNode: focusNodes[0],
@@ -94,7 +94,7 @@ class _AppState extends State<App> {
                             Flexible(
                               child: AutoSizeText(
                                 renderInfo.bodyText,
-                                style: renderInfo.bodyStyle,
+                                // style: renderInfo.bodyStyle,
                               ),
                             ),
                           ],
