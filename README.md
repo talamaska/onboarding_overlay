@@ -176,7 +176,7 @@ void initState() {
 ```
 
 12. From v.3.0.0 if you want to show something else, different from just title and explanation text, then `stepBuilder` 
-is for you. With `stepBuilder`, you can change the layout, add images or something else. With the combination of `manualNextControl` you can even add you own buttons to proceed to next step. If you want to have your own button for closing the onboarding, you need to define a `GlobalKey`, pass it to the closeKey property of the `OnboardingStep` and set the key to the button you defined in your `stepBuilder`.
+is for you. With `stepBuilder`, you can change the layout, add images or something else. With the combination of `manualNextControl` you can even add you own button to proceed to next step. 
 
 ```dart
 final GlobalKey closeKey = GlobalKey();
@@ -201,8 +201,7 @@ OnboardingStep(
   hasArrow: true,
   hasLabelBox: true,
   fullscreen: true,
-  manualControl: true,
-  closeKey: closeKey,
+  manualNextControl: true,
   stepBuilder: (
     BuildContext context,
     OnboardingStepRenderInfo renderInfo,
@@ -238,6 +237,72 @@ OnboardingStep(
                 onPressed: renderInfo.nextStep,
                 child: Text('Next'),
               ),
+            ],
+          ),
+        ],
+      ),
+    );
+  },
+),
+```
+
+13. From v.3.0.0 if you want to have your own button for closing the onboarding, you need to define a `GlobalKey`, pass it to the closeKey property of the `OnboardingStep` and set the key to the button you defined in your `stepBuilder`.
+
+```dart
+final GlobalKey closeKey = GlobalKey();
+
+OnboardingStep(
+  focusNode: focusNodes[0],
+  titleText: 'Tap anywhere to continue ',
+  titleTextColor: Colors.black,
+  bodyText: 'Tap anywhere to continue Tap anywhere to continue',
+  labelBoxPadding: const EdgeInsets.all(16.0),
+  labelBoxDecoration: BoxDecoration(
+    shape: BoxShape.rectangle,
+    borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+    color: const Color(0xFF00E1FF),
+    border: Border.all(
+      color: const Color(0xFF1E05FB),
+      width: 1.0,
+      style: BorderStyle.solid,
+    ),
+  ),
+  arrowPosition: ArrowPosition.autoVertical,
+  hasArrow: true,
+  hasLabelBox: true,
+  fullscreen: true,
+  closeKey: closeKey,
+  stepBuilder: (
+    BuildContext context,
+    OnboardingStepRenderInfo renderInfo,
+  ) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Text(
+            renderInfo.titleText,
+            style: renderInfo.titleStyle,
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Image.asset(
+                'assets/demo.gif',
+                width: 50,
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              Flexible(
+                child: AutoSizeText(
+                  renderInfo.bodyText,
+                  style: renderInfo.bodyStyle,
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
               TextButton(
                 key: closeKey
                 onPressed: renderInfo.close,
@@ -252,7 +317,7 @@ OnboardingStep(
 ),
 ```
 
-13. From v3.0.0 there is an additional `OverlayController` (ChangeNotifier) attached to the OverlayState that provides the `currentIndex`, `currentStep` and `isVisible`.
+14. From v3.0.0 there is an additional `OverlayController` (ChangeNotifier) attached to the OverlayState that provides the `currentIndex`, `currentStep` and `isVisible`.
 
 ```dart
 final OnboardingState? onboarding = Onboarding.of(context);
@@ -261,6 +326,6 @@ if( onboarding?.controller.isVisible ?? false) {
 }
 ```
 
-14. From v.3.0.0 you can also add a pulsing animation around the focused widget. Pulse animation will be displayed if the `overlayBehavior` is `HitTestBehavior.deferToChild` or `HitTestBehavior.translucent` and `showPulseAnimation` on an `OnboardingStep` is set to `true`. In addition you can change the inner and outer colors of the pulse animation. Thanks to the author [Gautier](https://github.com/g-apparence) of the [pal](http://pub.dev/packages/pal) package for the inspiration.
+15. From v.3.0.0 you can also add a pulsing animation around the focused widget. Pulse animation will be displayed if the `overlayBehavior` is `HitTestBehavior.deferToChild` or `HitTestBehavior.translucent` and `showPulseAnimation` on an `OnboardingStep` is set to `true`. In addition you can change the inner and outer colors of the pulse animation. Thanks to the author [Gautier](https://github.com/g-apparence) of the [pal](http://pub.dev/packages/pal) package for the inspiration.
 
-15. From v.3.0.0 you can show a red border around the label box for debugging purposes by using an `Onboarding` parameter `debugBoundaries` which is `false` by default.
+16. From v.3.0.0 you can show a red border around the label box for debugging purposes by using an `Onboarding` parameter `debugBoundaries` which is `false` by default.
