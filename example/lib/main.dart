@@ -20,6 +20,7 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
+  final GlobalKey closeKey = GlobalKey();
   late List<FocusNode> focusNodes;
 
   @override
@@ -35,6 +36,12 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
+        theme: ThemeData.from(
+          colorScheme: ColorScheme.fromSwatch(
+            primarySwatch: Colors.blue,
+            backgroundColor: Colors.white,
+          ),
+        ),
         home: Onboarding(
           key: widget.onboardingKey,
           autoSizeTexts: true,
@@ -60,49 +67,53 @@ class _AppState extends State<App> {
               hasArrow: true,
               hasLabelBox: true,
               fullscreen: true,
-              manualControl: true,
+              manualNextControl: true,
+              closeKey: closeKey,
               stepBuilder: (
                 BuildContext context,
                 OnboardingStepRenderInfo renderInfo,
               ) {
-                return SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Text(
-                        renderInfo.titleText,
-                        style: renderInfo.titleStyle,
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Image.asset(
-                            'assets/demo.gif',
-                            width: 50,
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Flexible(
-                            child: AutoSizeText(
-                              renderInfo.bodyText,
-                              style: renderInfo.bodyStyle,
+                return Material(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Text(
+                          renderInfo.titleText,
+                          // style: renderInfo.titleStyle,
+                        ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Image.asset(
+                              'assets/demo.gif',
+                              width: 50,
                             ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          TextButton(
-                            onPressed: renderInfo.nextStep,
-                            child: Text('Next'),
-                          ),
-                          TextButton(
-                            onPressed: renderInfo.close,
-                            child: Text('close'),
-                          ),
-                        ],
-                      ),
-                    ],
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Flexible(
+                              child: AutoSizeText(
+                                renderInfo.bodyText,
+                                style: renderInfo.bodyStyle,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            TextButton(
+                              onPressed: renderInfo.nextStep,
+                              child: Text('Next'),
+                            ),
+                            TextButton(
+                              key: closeKey,
+                              onPressed: renderInfo.close,
+                              child: Text('close'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
@@ -136,6 +147,7 @@ class _AppState extends State<App> {
               overlayColor: Colors.blue.withOpacity(0.9),
               overlayShape: const CircleBorder(),
               overlayBehavior: HitTestBehavior.deferToChild,
+              showPulseAnimation: true,
             ),
             OnboardingStep(
               focusNode: focusNodes[3],

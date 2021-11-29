@@ -1,3 +1,10 @@
+## [3.0.0-pre.5]
+- add: a closeKey to control if we have a close button and ignore taps for next step if there is such widget and we tap within it's boundaries
+- change: rename manualControl to manualNextControl
+- fix: showPulseAnimation
+- add: demo add default theme textStyles
+
+
 ## [3.0.0-pre.4]
 
 - add: a OverlayController (ChangeNotifier) attached to the OverlayState that provides the currentIndex, currentStep and isVisible - [#20](https://github.com/talamaska/onboarding_overlay/issues/20)

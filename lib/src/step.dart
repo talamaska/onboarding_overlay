@@ -89,10 +89,11 @@ class OnboardingStep {
     this.arrowPosition = ArrowPosition.autoVertical,
     this.overlayBehavior = HitTestBehavior.opaque,
     this.stepBuilder,
-    this.manualControl = false,
+    this.manualNextControl = false,
     this.showPulseAnimation = false,
     this.pulseInnerColor = defaultInnerPulseColor,
     this.pulseOuterColor = defaultOuterPulseColor,
+    this.closeKey,
   })  : assert(titleTextColor != null || titleTextStyle != null,
             'You should provide at least one of titleTextColor or titleTextStyle'),
         assert(bodyTextColor != null || bodyTextStyle != null,
@@ -220,10 +221,10 @@ class OnboardingStep {
   /// The non full-screen overlays provide significantly smaller available space
   final StepWidgetBuilder? stepBuilder;
 
-  /// [manualControl] is by default `false`. If you change it to `true` the global `GestureDetector` is disabled
+  /// [manualNextControl] is by default `false`. If you change it to `true` the global `GestureDetector` is disabled
   /// and you will be able to navigate to next step or to close the Onboarding
   /// using the nextStep and close callbacks in the `stepBuilder`.
-  final bool manualControl;
+  final bool manualNextControl;
 
   /// By default, the value used is false
   ///
@@ -236,6 +237,8 @@ class OnboardingStep {
 
   /// By default, the value used is white
   final Color pulseOuterColor;
+
+  final GlobalKey? closeKey;
 
   OnboardingStep copyWith({
     Key? key,
@@ -263,6 +266,7 @@ class OnboardingStep {
     bool? showPulseAnimation,
     Color? pulseInnerColor,
     Color? pulseOuterColor,
+    GlobalKey? closeKey,
   }) {
     return OnboardingStep(
       key: key ?? this.key,
@@ -290,6 +294,7 @@ class OnboardingStep {
       showPulseAnimation: showPulseAnimation ?? this.showPulseAnimation,
       pulseInnerColor: pulseInnerColor ?? this.pulseInnerColor,
       pulseOuterColor: pulseOuterColor ?? this.pulseOuterColor,
+      closeKey: closeKey ?? this.closeKey,
     );
   }
 
@@ -320,7 +325,8 @@ class OnboardingStep {
       stepBuilder: $stepBuilder, 
       showPulseAnimation: $showPulseAnimation, 
       pulseInnerColor: $pulseInnerColor, 
-      pulseOuterColor: $pulseOuterColor
+      pulseOuterColor: $pulseOuterColor,
+      closeKey: $closeKey,
     )''';
   }
 
@@ -353,7 +359,8 @@ class OnboardingStep {
         other.stepBuilder == stepBuilder &&
         other.showPulseAnimation == showPulseAnimation &&
         other.pulseInnerColor == pulseInnerColor &&
-        other.pulseOuterColor == pulseOuterColor;
+        other.pulseOuterColor == pulseOuterColor &&
+        other.closeKey == closeKey;
   }
 
   @override
@@ -382,6 +389,7 @@ class OnboardingStep {
         stepBuilder.hashCode ^
         showPulseAnimation.hashCode ^
         pulseInnerColor.hashCode ^
-        pulseOuterColor.hashCode;
+        pulseOuterColor.hashCode ^
+        closeKey.hashCode;
   }
 }

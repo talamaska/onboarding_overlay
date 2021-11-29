@@ -175,9 +175,12 @@ void initState() {
 
 ```
 
-12. From v.3.0.0 if you want to show something else, different from just title and explanation text, then `stepBuilder` is for you. With `stepBuilder`, you can change the layout, add images or something else. With the combination of `manualControl` you can even add you own buttons to proceed to next step and interrupt the onboarding.
+12. From v.3.0.0 if you want to show something else, different from just title and explanation text, then `stepBuilder` 
+is for you. With `stepBuilder`, you can change the layout, add images or something else. With the combination of `manualNextControl` you can even add you own buttons to proceed to next step. If you want to have your own button for closing the onboarding, you need to define a `GlobalKey`, pass it to the closeKey property of the `OnboardingStep` and set the key to the button you defined in your `stepBuilder`.
 
 ```dart
+final GlobalKey closeKey = GlobalKey();
+
 OnboardingStep(
   focusNode: focusNodes[0],
   titleText: 'Tap anywhere to continue ',
@@ -199,6 +202,7 @@ OnboardingStep(
   hasLabelBox: true,
   fullscreen: true,
   manualControl: true,
+  closeKey: closeKey,
   stepBuilder: (
     BuildContext context,
     OnboardingStepRenderInfo renderInfo,
@@ -235,6 +239,7 @@ OnboardingStep(
                 child: Text('Next'),
               ),
               TextButton(
+                key: closeKey
                 onPressed: renderInfo.close,
                 child: Text('close'),
               ),

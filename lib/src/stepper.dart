@@ -158,6 +158,12 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     step.focusNode.requestFocus();
   }
 
+  Future<void> _nextStepCallback(OnboardingStep step) async {
+    if (step.manualNextControl) {
+      await _nextStep();
+    }
+  }
+
   Future<void> _nextStep() async {
     assert(() {
       if (widget.stepIndexes.isNotEmpty &&
@@ -346,6 +352,12 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     widget.onEnd?.call(stepperIndex);
   }
 
+  void _closeCallback(OnboardingStep step) {
+    if (step.manualNextControl) {
+      _close();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -439,16 +451,41 @@ class _OnboardingStepperState extends State<OnboardingStepper>
         return GestureDetector(
           behavior: step.overlayBehavior,
           onTapDown: (TapDownDetails details) {
+            final BoxHitTestResult result = BoxHitTestResult();
             final RenderBox overlayBox =
                 overlayKey.currentContext?.findRenderObject() as RenderBox;
+            if (step.closeKey != null) {
+              assert(() {
+                if (step.closeKey!.currentContext == null) {
+                  final List<DiagnosticsNode> information = <DiagnosticsNode>[
+                    ErrorSummary('The closeKey is not attached to any widget'),
+                  ];
+
+                  throw FlutterError.fromParts(information);
+                }
+                return true;
+              }());
+              if (step.closeKey!.currentContext != null) {
+                final RenderBox buttonBox = step.closeKey!.currentContext
+                    ?.findRenderObject() as RenderBox;
+                Offset localButton =
+                    buttonBox.globalToLocal(details.globalPosition);
+
+                final bool hitCloseButton =
+                    buttonBox.hitTest(result, position: localButton);
+
+                if (hitCloseButton) {
+                  return;
+                }
+              }
+            }
 
             Offset localOverlay =
                 overlayBox.globalToLocal(details.globalPosition);
 
-            final BoxHitTestResult result = BoxHitTestResult();
             if ((overlayBox.hitTest(result, position: localOverlay) ||
                     step.overlayBehavior != HitTestBehavior.deferToChild) &&
-                !step.manualControl) {
+                !step.manualNextControl) {
               _nextStep();
             }
           },
@@ -477,6 +514,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                     pulseAnimationInner: pulseAnimationInner.value,
                     pulseAnimationOuter: pulseAnimationOuter.value,
                     overlayColor: overlayColorTween.evaluate(overlayAnimation),
+                    showPulseAnimation: step.showPulseAnimation,
                   ),
                 ),
               ),
@@ -524,9 +562,13 @@ class _OnboardingStepperState extends State<OnboardingStepper>
                                           bodyText: step.bodyText,
                                           bodyStyle: activeBodyStyle,
                                           size: Size(boxWidth, boxHeight),
-                                          nextStep: _nextStep,
-                                          close: _close,
-                                          manualControl: step.manualControl,
+                                          nextStep: () {
+                                            _nextStepCallback(step);
+                                          },
+                                          close: () {
+                                            _closeCallback(step);
+                                          },
+                                          manualControl: step.manualNextControl,
                                         ),
                                       )
                                     : widget.autoSizeTexts
