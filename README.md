@@ -175,7 +175,7 @@ void initState() {
 
 ```
 
-12. From v.3.0.0 if you want to show something else, different from just title and explanation text, then `stepBuilder` is for you. With stepBuilder, you can change the layout, add images or something else. With the combination of `manualControl` you can even add you own buttons to proceed to next step and interrupt the onboarding.
+12. From v.3.0.0 if you want to show something else, different from just title and explanation text, then `stepBuilder` is for you. With `stepBuilder`, you can change the layout, add images or something else. With the combination of `manualControl` you can even add you own buttons to proceed to next step and interrupt the onboarding.
 
 ```dart
 OnboardingStep(
@@ -247,7 +247,7 @@ OnboardingStep(
 ),
 ```
 
-13. From v3.0.0 there is an additional OverlayController (ChangeNotifier) attached to the OverlayState that provides the currentIndex, currentStep and isVisible.
+13. From v3.0.0 there is an additional `OverlayController` (ChangeNotifier) attached to the OverlayState that provides the `currentIndex`, `currentStep` and `isVisible`.
 
 ```dart
 final OnboardingState? onboarding = Onboarding.of(context);
@@ -255,3 +255,7 @@ if( onboarding?.controller.isVisible ?? false) {
   // do some logic here
 }
 ```
+
+14. From v.3.0.0 you can also add a pulsing animation around the focused widget. Pulse animation will be displayed if the `overlayBehavior` is `HitTestBehavior.deferToChild` or `HitTestBehavior.translucent` and `showPulseAnimation` on an `OnboardingStep` is set to `true`. In addition you can change the inner and outer colors of the pulse animation. Thanks to the author [Gautier](https://github.com/g-apparence) of the [pal](http://pub.dev/packages/pal) package for the inspiration.
+
+15. From v.3.0.0 you can show a red border around the label box for debugging purposes by using an `Onboarding` parameter `debugBoundaries` which is `false` by default.

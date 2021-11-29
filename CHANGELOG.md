@@ -1,4 +1,4 @@
-## [3.0.0-pre.3]
+## [3.0.0-pre.4]
 
 - add: a OverlayController (ChangeNotifier) attached to the OverlayState that provides the currentIndex, currentStep and isVisible - [#20](https://github.com/talamaska/onboarding_overlay/issues/20)
 - add: possibility to build your own step layout with stepBuilder - [#21](https://github.com/talamaska/onboarding_overlay/issues/21)
