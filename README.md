@@ -177,6 +177,7 @@ void initState() {
 
 12. From v.3.0.0 if you want to show something else, different from just title and explanation text, then `stepBuilder` 
 is for you. With `stepBuilder`, you can change the layout, add images or something else. With the combination of `manualNextControl` you can even add you own button to proceed to next step. 
+**Important** If you want to inherit your App `Theme` from your app instead of using the style properties. You need to wrap your `stepBuilder` code with a Scaffold or Material widgets.
 
 ```dart
 final GlobalKey closeKey = GlobalKey();
