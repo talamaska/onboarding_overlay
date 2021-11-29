@@ -41,71 +41,72 @@ class _AppState extends State<App> {
           debugBoundaries: true,
           steps: <OnboardingStep>[
             OnboardingStep(
-                focusNode: focusNodes[0],
-                titleText: 'Tap anywhere to continue ',
-                titleTextColor: Colors.black,
-                bodyText: 'Tap anywhere to continue Tap anywhere to continue',
-                labelBoxPadding: const EdgeInsets.all(16.0),
-                labelBoxDecoration: BoxDecoration(
-                  shape: BoxShape.rectangle,
-                  borderRadius: const BorderRadius.all(Radius.circular(8.0)),
-                  color: const Color(0xFF00E1FF),
-                  border: Border.all(
-                    color: const Color(0xFF1E05FB),
-                    width: 1.0,
-                    style: BorderStyle.solid,
-                  ),
+              focusNode: focusNodes[0],
+              titleText: 'Tap anywhere to continue ',
+              titleTextColor: Colors.black,
+              bodyText: 'Tap anywhere to continue Tap anywhere to continue',
+              labelBoxPadding: const EdgeInsets.all(16.0),
+              labelBoxDecoration: BoxDecoration(
+                shape: BoxShape.rectangle,
+                borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+                color: const Color(0xFF00E1FF),
+                border: Border.all(
+                  color: const Color(0xFF1E05FB),
+                  width: 1.0,
+                  style: BorderStyle.solid,
                 ),
-                arrowPosition: ArrowPosition.autoVertical,
-                hasArrow: true,
-                hasLabelBox: true,
-                fullscreen: true,
-                manualControl: true,
-                stepBuilder: (
-                  BuildContext context,
-                  OnboardingStepRenderInfo renderInfo,
-                ) {
-                  return SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Text(
-                          renderInfo.titleText,
-                          style: renderInfo.titleStyle,
-                        ),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Image.asset(
-                              'assets/demo.gif',
-                              width: 50,
+              ),
+              arrowPosition: ArrowPosition.autoVertical,
+              hasArrow: true,
+              hasLabelBox: true,
+              fullscreen: true,
+              manualControl: true,
+              stepBuilder: (
+                BuildContext context,
+                OnboardingStepRenderInfo renderInfo,
+              ) {
+                return SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Text(
+                        renderInfo.titleText,
+                        style: renderInfo.titleStyle,
+                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Image.asset(
+                            'assets/demo.gif',
+                            width: 50,
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Flexible(
+                            child: AutoSizeText(
+                              renderInfo.bodyText,
+                              style: renderInfo.bodyStyle,
                             ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Flexible(
-                              child: AutoSizeText(
-                                renderInfo.bodyText,
-                                style: renderInfo.bodyStyle,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            TextButton(
-                              onPressed: renderInfo.nextStep,
-                              child: Text('Next'),
-                            ),
-                            TextButton(
-                              onPressed: renderInfo.close,
-                              child: Text('close'),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  );
-                }),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          TextButton(
+                            onPressed: renderInfo.nextStep,
+                            child: Text('Next'),
+                          ),
+                          TextButton(
+                            onPressed: renderInfo.close,
+                            child: Text('close'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
             OnboardingStep(
               focusNode: focusNodes[1],
               titleText: 'left fab',

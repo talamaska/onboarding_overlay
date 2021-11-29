@@ -1,80 +1,86 @@
-## [3.0.0-pre.2]
-  - add: a OverlayController (ChangeNotifier) attached to the OverlayState that provides the currentIndex, currentStep and isVisible - [#20](https://github.com/talamaska/onboarding_overlay/issues/20)
-  - add: possibility to build your own step layout with stepBuilder - [#21](https://github.com/talamaska/onboarding_overlay/issues/21)
-  - add: pulse animation on the focused widget if the overlayBehavior is HitTestBehavior.deferToChild or HitTestBehavior.translucent (Thanks to the author [Gautier](https://github.com/g-apparence) of the [pal](http://pub.dev/packages/pal) package for the inspiration)
-  - add: debugBoundaries boolean to show red border around the max size of the label box
-  - add: ArrowPosition.autoVertical and ArrowPosition.autoVerticalCenter. This setting will automatically position the label box arrow, if enabled, above or below the label box, depending on its position relative to the widget of interest.
-  - change: make label box use more space available
-  - change: **[Breaking Change]** rename title to titleText
-  - remove: **[Breaking Change]** ArrowPosition.centerLeft and ArrowPosition.centerRight
+## [3.0.0-pre.3]
+
+- add: a OverlayController (ChangeNotifier) attached to the OverlayState that provides the currentIndex, currentStep and isVisible - [#20](https://github.com/talamaska/onboarding_overlay/issues/20)
+- add: possibility to build your own step layout with stepBuilder - [#21](https://github.com/talamaska/onboarding_overlay/issues/21)
+- add: pulse animation on the focused widget if the overlayBehavior is HitTestBehavior.deferToChild or HitTestBehavior.translucent (Thanks to the author [Gautier](https://github.com/g-apparence) of the [pal](http://pub.dev/packages/pal) package for the inspiration)
+- add: debugBoundaries boolean to show red border around the max size of the label box
+- add: ArrowPosition.autoVertical and ArrowPosition.autoVerticalCenter. This setting will automatically position the label box arrow, if enabled, above or below the label box, depending on its position relative to the widget of interest.
+- change: make label box use more space available
+- change: **[Breaking Change]** rename title to titleText
+- remove: **[Breaking Change]** ArrowPosition.centerLeft and ArrowPosition.centerRight
+- add: docs
 
 ## [2.3.5]
-  - add: more docs around the titleTextStyle and bodyTextStyle
-  - fix: make sure that if a color is not set in the titleTextStyle and bodyTextStyle properties they will fallback to titleTextColor or bodyTextColor accordingly
+
+- add: more docs around the titleTextStyle and bodyTextStyle
+- fix: make sure that if a color is not set in the titleTextStyle and bodyTextStyle properties they will fallback to titleTextColor or bodyTextColor accordingly
 
 ## [2.3.4]
-  - fix: position of the overlay when no focus node is attached and the setting of the overlay is fullscreen: false - issue [#16](https://github.com/talamaska/onboarding_overlay/issues/16)
-  - fix: merging text styles was done incorrectly - issue [#14](https://github.com/talamaska/onboarding_overlay/issues/14)
 
+- fix: position of the overlay when no focus node is attached and the setting of the overlay is fullscreen: false - issue [#16](https://github.com/talamaska/onboarding_overlay/issues/16)
+- fix: merging text styles was done incorrectly - issue [#14](https://github.com/talamaska/onboarding_overlay/issues/14)
 
 ## [2.3.3]
-  - fix: formatting
+
+- fix: formatting
 
 ## [2.3.2]
-  - change: use aut_size_text library again because a stable null-safe version was published
-  - fix: remove a repeated text for debugging purposes reported in #14
+
+- change: use aut_size_text library again because a stable null-safe version was published
+- fix: remove a repeated text for debugging purposes reported in #14
 
 ## [2.3.1]
-  - update demo gif
-  - add: more clear docs
-  - add: more documentation in the readme
-  - add: expand the examples
-  - add: auto size text via AutoSizeText widget in which case if turned on will ignore maxLines
-  - add: hard limit maxLines for the title to be 2 lines
-  - add: hard limit maxLines for the body to be 5 lines
-  - add: overlayBehavior that accepts HitTestBehavior
-  - add: logic to forward pointer events to the widget of interest.
-  - change: text is rendered by RichText or AutoSizeText.rich not CustomPaint
-  - change: vertical position of the text is handled by a Column mainAxisAlignment
-  - change: not exposing constants anymore, nobody from outside needs them anyways
-  - fix: docs
-  - fix: docs for the arrowPosition
-  - fix: imports
-  - fix: multiplication of the bodyText
-  - fix: issue with change orientation (thanks to [IgorKhramtsov](https://github.com/IgorKhramtsov))
-  - fix: landscape positions and sizes
-  - fix: badge to include pre-release versions
+
+- update demo gif
+- add: more clear docs
+- add: more documentation in the readme
+- add: expand the examples
+- add: auto size text via AutoSizeText widget in which case if turned on will ignore maxLines
+- add: hard limit maxLines for the title to be 2 lines
+- add: hard limit maxLines for the body to be 5 lines
+- add: overlayBehavior that accepts HitTestBehavior
+- add: logic to forward pointer events to the widget of interest.
+- change: text is rendered by RichText or AutoSizeText.rich not CustomPaint
+- change: vertical position of the text is handled by a Column mainAxisAlignment
+- change: not exposing constants anymore, nobody from outside needs them anyways
+- fix: docs
+- fix: docs for the arrowPosition
+- fix: imports
+- fix: multiplication of the bodyText
+- fix: issue with change orientation (thanks to [IgorKhramtsov](https://github.com/IgorKhramtsov))
+- fix: landscape positions and sizes
+- fix: badge to include pre-release versions
 
 ## [2.2.1]
-  - add: some small optimizations
-  - add: more steps in the example app
-  - add: isTop property to the LabelPainter for better positioning of the text
-  - change: move some hard-coded numbers as constants
-  - change: text positioning algorithm
-  - change: make some props public
-  - change: separate some logic
-  - fix: some imports
-  - fix: typos
 
+- add: some small optimizations
+- add: more steps in the example app
+- add: isTop property to the LabelPainter for better positioning of the text
+- change: move some hard-coded numbers as constants
+- change: text positioning algorithm
+- change: make some props public
+- change: separate some logic
+- fix: some imports
+- fix: typos
 
 ## [2.1.1]
-  - add: shield with the pub version
-  - fix: assert condition in the Onboarding widget when calling .of
-  - fix: update readme to demo the null-safety.
-  - fix: check for null in the example instead of '!'
+
+- add: shield with the pub version
+- fix: assert condition in the Onboarding widget when calling .of
+- fix: update readme to demo the null-safety.
+- fix: check for null in the example instead of '!'
 
 ## [2.1.0]
 
-  - add: handling arrows on the label box
-  - add: default arrow height
-  - add: exports for the LabelPainter and the ArrowPosition enum
-  - add: docs
-  - change: the label box styling it is now a custom painter
-  - change: use flutter_lints from now on
-  - change: replace Container with SizeBox where possible
-  - change: the position of the Label when the overlay is not full screen
-  - change: update example app to demo the label box arrows
-
+- add: handling arrows on the label box
+- add: default arrow height
+- add: exports for the LabelPainter and the ArrowPosition enum
+- add: docs
+- change: the label box styling it is now a custom painter
+- change: use flutter_lints from now on
+- change: replace Container with SizeBox where possible
+- change: the position of the Label when the overlay is not full screen
+- change: update example app to demo the label box arrows
 
 ## [2.0.1+1] - add visual demo (gif).
 

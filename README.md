@@ -6,6 +6,7 @@ A flexible onboarding widget that can start and stop with an arbitrary number of
 and arbitrary starting point
 
 ## Demo
+
 <img src="https://github.com/talamaska/onboarding_overlay/blob/master/screenshots/demo.gif?raw=true" width="320"/>
 
 ## Usage
@@ -101,9 +102,9 @@ class _AppState extends State<App> {
 }
 ```
 
-5. Showing the onboarding 
+5. Showing the onboarding
 
-  - On some activity somewhere down the widget tree in another widget with a new BuildContext
+- On some activity somewhere down the widget tree in another widget with a new BuildContext
 
 ```dart
 final OnboardingState? onboarding = Onboarding.of(context);
@@ -112,47 +113,48 @@ if (onboarding != null) {
   onboarding.show();
 }
 ```
- - Or immediately in initState somewhere down the widget tree in another widget with a new BuildContext
 
+- Or immediately in initState somewhere down the widget tree in another widget with a new BuildContext
 
 ```dart
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((Duration timeStamp) {
-      final OnboardingState? onboarding = Onboarding.of(context);
-      if (onboarding != null) {
-        onboarding.show();
-      }
-    });
-  }
+@override
+void initState() {
+  super.initState();
+  WidgetsBinding.instance.addPostFrameCallback((Duration timeStamp) {
+    final OnboardingState? onboarding = Onboarding.of(context);
+    if (onboarding != null) {
+      onboarding.show();
+    }
+  });
+}
 
 ```
 
 6. The text can be wrapped in a box, than support all kind of decorations and only shape: BoxShape.rectangle
-For this to happen, you have to set `hasLabelBox` equal to `true`, `labelBoxDecoration`, which supports only `BoxDecoration`
+   For this to happen, you have to set `hasLabelBox` equal to `true`, `labelBoxDecoration`, which supports only `BoxDecoration`
 
-7. The Label box also supports having an arrow. This is controlled by `hasArrow`. The position is not calculated automatically. The default position is top. You will have to specify the position via arrowPosition by using the enum `ArrowPosition`. The `ArrowPosition.top` and `ArrowPosition.bottom` calculates the horizontal position automatically according to the widget of interest (the focused one which is visible through the overlay), the other arrow positions are centered in the label box e.g. topCenter, bottomCenter, leftCenter and rightCenter.
+7. The Label box also supports having an arrow. This is controlled by `hasArrow`. The position is not calculated automatically. The default position is top. You will have to specify the position via arrowPosition by using the enum `ArrowPosition`. The `ArrowPosition.top` and `ArrowPosition.bottom` calculates the horizontal position automatically according to the widget of interest (the focused one which is visible through the overlay), the other arrow positions are centered in the label box e.g. `ArrowPosition.topCenter`, `ArrowPosition.bottomCenter`. In addition there are 2 new settings from v3.0.0 - `ArrowPosition.autoVertical` and `ArrowPosition.autoVerticalCenter`, which will take care of positioning the arrow automatically relative to the label box and widget position.
 
 8. The onboarding also supports forwarding the onTap event to the widget of interest. You can control the behavior for each step using the overlayBehavior. It accepts the Flutter enum HitTestBehavior. By default, the value used is `HitTestBehavior.opaque`.
-  - `HitTestBehavior.opaque` blocks the onTap on the widget and will trigger the onTap only on the overlay
-  - `HitTestBehavior.translucent` triggers onTap callbacks on the widget and on the overlay
-  - `HitTestBehavior.deferToChild` triggers only the onTap on the widget
 
-9. Sometimes the title and the bodyText might not fit well in the constrained label box, because of the long texts, longer translations or smaller screens. There are 2 behaviors for this scenario. The default one will limit the title to 2 lines and the bodyText to 5 lines and will overflow both with ellipsis, the second one is to automatically resize the texts. This is controlled by the Onboarding property `autoSizeTexts`, which default value is `false`. 
+- `HitTestBehavior.opaque` blocks the onTap on the widget and will trigger the onTap only on the overlay
+- `HitTestBehavior.translucent` triggers onTap callbacks on the widget and on the overlay
+- `HitTestBehavior.deferToChild` triggers only the onTap on the widget
+
+9. Sometimes the title and the bodyText might not fit well in the constrained label box, because of the long texts, longer translations or smaller screens. There are 2 behaviors for this scenario. The default one will limit the title to 2 lines and the bodyText to 5 lines and will overflow both with ellipsis, the second one is to automatically resize the texts. This is controlled by the Onboarding property `autoSizeTexts`, which default value is `false`.
 
 10. The onboarding can show only a portion of the defined steps with a specific start index. Use `showWithSteps` method. Remember that the steps indexes are 0-based (starting from zero)
 
 ```dart
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((Duration timeStamp) {
-      final OnboardingState? onboarding = Onboarding.of(context);
-      if (onboarding != null) {
-        onboarding.showWithSteps(3, <int>[3,4,5,6]);
-      }
-    });
+@override
+void initState() {
+  super.initState();
+  WidgetsBinding.instance.addPostFrameCallback((Duration timeStamp) {
+    final OnboardingState? onboarding = Onboarding.of(context);
+    if (onboarding != null) {
+      onboarding.showWithSteps(3, <int>[3,4,5,6]);
+    }
+  });
   }
 
 ```
@@ -173,4 +175,83 @@ For this to happen, you have to set `hasLabelBox` equal to `true`, `labelBoxDeco
 
 ```
 
+12. From v.3.0.0 if you want to show something else, different from just title and explanation text, then `stepBuilder` is for you. With stepBuilder, you can change the layout, add images or something else. With the combination of `manualControl` you can even add you own buttons to proceed to next step and interrupt the onboarding.
 
+```dart
+OnboardingStep(
+  focusNode: focusNodes[0],
+  titleText: 'Tap anywhere to continue ',
+  titleTextColor: Colors.black,
+  bodyText: 'Tap anywhere to continue Tap anywhere to continue',
+  labelBoxPadding: const EdgeInsets.all(16.0),
+  labelBoxDecoration: BoxDecoration(
+    shape: BoxShape.rectangle,
+    borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+    color: const Color(0xFF00E1FF),
+    border: Border.all(
+      color: const Color(0xFF1E05FB),
+      width: 1.0,
+      style: BorderStyle.solid,
+    ),
+  ),
+  arrowPosition: ArrowPosition.autoVertical,
+  hasArrow: true,
+  hasLabelBox: true,
+  fullscreen: true,
+  manualControl: true,
+  stepBuilder: (
+    BuildContext context,
+    OnboardingStepRenderInfo renderInfo,
+  ) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Text(
+            renderInfo.titleText,
+            style: renderInfo.titleStyle,
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Image.asset(
+                'assets/demo.gif',
+                width: 50,
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              Flexible(
+                child: AutoSizeText(
+                  renderInfo.bodyText,
+                  style: renderInfo.bodyStyle,
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              TextButton(
+                onPressed: renderInfo.nextStep,
+                child: Text('Next'),
+              ),
+              TextButton(
+                onPressed: renderInfo.close,
+                child: Text('close'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  },
+),
+```
+
+13. From v3.0.0 there is an additional OverlayController (ChangeNotifier) attached to the OverlayState that provides the currentIndex, currentStep and isVisible.
+
+```dart
+final OnboardingState? onboarding = Onboarding.of(context);
+if( onboarding?.controller.isVisible ?? false) {
+  // do some logic here
+}
+```
