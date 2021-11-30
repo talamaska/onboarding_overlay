@@ -116,26 +116,30 @@ class OnboardingState extends State<Onboarding> {
     return OverlayEntry(
       opaque: false,
       builder: (BuildContext context) {
-        return OnboardingStepper(
-          initialIndex: initialIndex,
-          steps: widget.steps,
-          stepIndexes: stepIndexes,
-          duration: widget.duration,
-          autoSizeTexts: widget.autoSizeTexts,
-          debugBoundaries: widget.debugBoundaries,
-          setupIndex: (int index) {
-            controller.setCurrentIndex(index);
-          },
-          onChanged: (int index) {
-            controller.setCurrentIndex(index);
-            widget.onChanged?.call(index);
-          },
-          onEnd: (int index) {
-            controller.setCurrentIndex(index);
-            widget.onEnd?.call(index);
-            hide();
-          },
-        );
+        return LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+          return OnboardingStepper(
+            constraints: constraints,
+            initialIndex: initialIndex,
+            steps: widget.steps,
+            stepIndexes: stepIndexes,
+            duration: widget.duration,
+            autoSizeTexts: widget.autoSizeTexts,
+            debugBoundaries: widget.debugBoundaries,
+            setupIndex: (int index) {
+              controller.setCurrentIndex(index);
+            },
+            onChanged: (int index) {
+              controller.setCurrentIndex(index);
+              widget.onChanged?.call(index);
+            },
+            onEnd: (int index) {
+              controller.setCurrentIndex(index);
+              widget.onEnd?.call(index);
+              hide();
+            },
+          );
+        });
       },
     );
   }

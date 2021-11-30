@@ -135,11 +135,11 @@ void initState() {
 
 7. The Label box also supports having an arrow. This is controlled by `hasArrow`. The position is not calculated automatically. The default position is top. You will have to specify the position via arrowPosition by using the enum `ArrowPosition`. The `ArrowPosition.top` and `ArrowPosition.bottom` calculates the horizontal position automatically according to the widget of interest (the focused one which is visible through the overlay), the other arrow positions are centered in the label box e.g. `ArrowPosition.topCenter`, `ArrowPosition.bottomCenter`. In addition there are 2 new settings **from v3.0.0** - `ArrowPosition.autoVertical` and `ArrowPosition.autoVerticalCenter`, which will take care of positioning the arrow automatically relative to the label box and widget position.
 
-8. The onboarding also supports forwarding the onTap event to the widget of interest. You can control the behavior for each step using the overlayBehavior. It accepts the Flutter enum HitTestBehavior. By default, the value used is `HitTestBehavior.opaque`.
+8. The onboarding also supports forwarding the onTap event to the widget of interest. You can control the behavior for each step using the overlayBehavior. It accepts an enum OverlayBehavior. By default, the value used is `OverlayBehavior.defetToOverlay`.
 
-- `HitTestBehavior.opaque` blocks the onTap on the widget and will trigger the onTap only on the overlay
-- `HitTestBehavior.translucent` triggers onTap callbacks on the widget and on the overlay
-- `HitTestBehavior.deferToChild` triggers only the onTap on the widget
+- `OverlayBehavior.defetToOverlay` blocks the onTap on the widget and will trigger the onTap only on the overlay
+
+- `OverlayBehavior.deferToChild` triggers only the onTap on the widget
 
 9. Sometimes the title and the bodyText might not fit well in the constrained label box, because of the long texts, longer translations or smaller screens. There are 2 behaviors for this scenario. The default one will limit the title to 2 lines and the bodyText to 5 lines and will overflow both with ellipsis, the second one is to automatically resize the texts. This is controlled by the Onboarding property `autoSizeTexts`, which default value is `false`.
 
@@ -176,13 +176,11 @@ void initState() {
 ```
 
 12. **From v.3.0.0** if you want to show something else, different from just title and explanation text, then `stepBuilder` 
-is for you. With `stepBuilder`, you can change the layout, add images or something else. With the combination of `manualNextControl` you can even add you own button to proceed to next step. 
+is for you. With `stepBuilder`, you can change the layout, add images or something else.
 
-**Important:** If you want to inherit your App `Theme` from your app instead of using the style properties. You need to wrap your `stepBuilder` code with a Scaffold or Material widgets.
+**Important:** If you want to inherit your App `Theme` from your app instead of using the style properties. You need to wrap your `stepBuilder` code with a `Scaffold` or `Material` widgets.
 
 ```dart
-final GlobalKey closeKey = GlobalKey();
-
 OnboardingStep(
   focusNode: focusNodes[0],
   titleText: 'Tap anywhere to continue ',
@@ -203,7 +201,6 @@ OnboardingStep(
   hasArrow: true,
   hasLabelBox: true,
   fullscreen: true,
-  manualNextControl: true,
   stepBuilder: (
     BuildContext context,
     OnboardingStepRenderInfo renderInfo,
@@ -239,6 +236,13 @@ OnboardingStep(
                 onPressed: renderInfo.nextStep,
                 child: Text('Next'),
               ),
+              const SizedBox(
+                width: 10,
+              ),
+              TextButton(
+                onPressed: renderInfo.close,
+                child: Text('close'),
+              ),
             ],
           ),
         ],
@@ -250,73 +254,20 @@ OnboardingStep(
 
 <img src="https://github.com/talamaska/onboarding_overlay/blob/master/screenshots/demo3.png?raw=true" width="320"/>
 
-13. **From v.3.0.0** if you want to have your own button for closing the onboarding, you need to define a `GlobalKey`, pass it to the closeKey property of the `OnboardingStep` and set the key to the button you defined in your `stepBuilder`.
+13. **From v.3.0.0** If you want to navigate to the next step but at the same time trigger some other event, or call some other function, you could use onTapCallback.
 
 ```dart
-final GlobalKey closeKey = GlobalKey();
-
 OnboardingStep(
-  focusNode: focusNodes[0],
-  titleText: 'Tap anywhere to continue ',
-  titleTextColor: Colors.black,
-  bodyText: 'Tap anywhere to continue Tap anywhere to continue',
-  labelBoxPadding: const EdgeInsets.all(16.0),
-  labelBoxDecoration: BoxDecoration(
-    shape: BoxShape.rectangle,
-    borderRadius: const BorderRadius.all(Radius.circular(8.0)),
-    color: const Color(0xFF00E1FF),
-    border: Border.all(
-      color: const Color(0xFF1E05FB),
-      width: 1.0,
-      style: BorderStyle.solid,
-    ),
-  ),
-  arrowPosition: ArrowPosition.autoVertical,
-  hasArrow: true,
-  hasLabelBox: true,
-  fullscreen: true,
-  closeKey: closeKey,
-  stepBuilder: (
-    BuildContext context,
-    OnboardingStepRenderInfo renderInfo,
-  ) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          Text(
-            renderInfo.titleText,
-            style: renderInfo.titleStyle,
-          ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Image.asset(
-                'assets/demo.gif',
-                width: 50,
-              ),
-              const SizedBox(
-                width: 10,
-              ),
-              Flexible(
-                child: AutoSizeText(
-                  renderInfo.bodyText,
-                  style: renderInfo.bodyStyle,
-                ),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              TextButton(
-                key: closeKey
-                onPressed: renderInfo.close,
-                child: Text('close'),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
+  focusNode: focusNodes[4],
+  titleText: 'Menu',
+  bodyText: 'You can open menu from here',
+  overlayColor: Colors.green.withOpacity(0.9),
+  shape: const CircleBorder(),
+  overlayBehavior: OverlayBehavior.deferToOverlay,
+  onTapCallback:
+      (TapArea area, VoidCallback next, VoidCallback close) {
+    scaffoldKey.currentState?.openDrawer();
+    next();
   },
 ),
 ```

@@ -3,6 +3,10 @@ import 'package:flutter/widgets.dart';
 import 'constants.dart';
 import 'label_painter.dart';
 
+enum TapArea { hole, overlay }
+
+enum OverlayBehavior { deferToChild, deferToOverlay }
+
 class OnboardingStepRenderInfo {
   /// The `title` for the current step
   final String titleText;
@@ -25,9 +29,6 @@ class OnboardingStepRenderInfo {
   /// Callback for closing the Onboarding. Won't work if `manualControl` is `false`
   final VoidCallback close;
 
-  /// the `manualControl` for the current step
-  final bool manualControl;
-
   OnboardingStepRenderInfo({
     required this.titleText,
     required this.titleStyle,
@@ -36,12 +37,14 @@ class OnboardingStepRenderInfo {
     required this.size,
     required this.nextStep,
     required this.close,
-    required this.manualControl,
   });
 }
 
 typedef StepWidgetBuilder = Widget Function(
     BuildContext context, OnboardingStepRenderInfo renderInfo);
+
+typedef TapCallback = void Function(
+    TapArea area, VoidCallback next, VoidCallback close);
 
 @immutable
 class OnboardingStep {
@@ -87,13 +90,12 @@ class OnboardingStep {
     this.fullscreen = true,
     this.delay = Duration.zero,
     this.arrowPosition = ArrowPosition.autoVertical,
-    this.overlayBehavior = HitTestBehavior.opaque,
+    this.overlayBehavior = OverlayBehavior.deferToOverlay,
     this.stepBuilder,
-    this.manualNextControl = false,
     this.showPulseAnimation = false,
     this.pulseInnerColor = defaultInnerPulseColor,
     this.pulseOuterColor = defaultOuterPulseColor,
-    this.closeKey,
+    this.onTapCallback,
   })  : assert(titleTextColor != null || titleTextStyle != null,
             'You should provide at least one of titleTextColor or titleTextStyle'),
         assert(bodyTextColor != null || bodyTextStyle != null,
@@ -204,14 +206,12 @@ class OnboardingStep {
   /// By default, the value used is `Duration.zero`
   final Duration delay;
 
-  /// By default, the value used is `HitTestBehavior.opaque`
+  /// By default, the value used is `OverlayBehavior.opaque`
   ///
-  /// `HitTestBehavior.opaque` blocks the onTap on the widget and will trigger the onTap only on the overlay
+  /// `OverlayBehavior.deferToOverlay` blocks the onTap on the widget and will trigger the onTap only on the overlay
   ///
-  /// `HitTestBehavior.translucent` triggers onTap callbacks on the widget and on the overlay
-  ///
-  /// `HitTestBehavior.deferToChild` triggers only the onTap on the widget
-  final HitTestBehavior overlayBehavior;
+  /// `OverlayBehavior.deferToChild` triggers only the onTap on the widget
+  final OverlayBehavior overlayBehavior;
 
   /// [stepBuilder] is a callback funtion that passes the context, the title `String`, the actual title `TextStyle`,
   /// the bodyText `String` and the actual bodytext `TextStyle`.
@@ -220,11 +220,6 @@ class OnboardingStep {
   /// but remember that you will not be able to actually scroll it, as there is already an `GestureDetector` upper in the tree that will catch the gestures
   /// The non full-screen overlays provide significantly smaller available space
   final StepWidgetBuilder? stepBuilder;
-
-  /// [manualNextControl] is by default `false`. If you change it to `true` the global `GestureDetector` is disabled
-  /// and you will be able to navigate to next step or to close the Onboarding
-  /// using the nextStep and close callbacks in the `stepBuilder`.
-  final bool manualNextControl;
 
   /// By default, the value used is false
   ///
@@ -238,7 +233,7 @@ class OnboardingStep {
   /// By default, the value used is white
   final Color pulseOuterColor;
 
-  final GlobalKey? closeKey;
+  final TapCallback? onTapCallback;
 
   OnboardingStep copyWith({
     Key? key,
@@ -261,12 +256,12 @@ class OnboardingStep {
     bool? hasArrow,
     bool? fullscreen,
     Duration? delay,
-    HitTestBehavior? overlayBehavior,
+    OverlayBehavior? overlayBehavior,
     StepWidgetBuilder? stepBuilder,
     bool? showPulseAnimation,
     Color? pulseInnerColor,
     Color? pulseOuterColor,
-    GlobalKey? closeKey,
+    TapCallback? onTapCallback,
   }) {
     return OnboardingStep(
       key: key ?? this.key,
@@ -294,7 +289,7 @@ class OnboardingStep {
       showPulseAnimation: showPulseAnimation ?? this.showPulseAnimation,
       pulseInnerColor: pulseInnerColor ?? this.pulseInnerColor,
       pulseOuterColor: pulseOuterColor ?? this.pulseOuterColor,
-      closeKey: closeKey ?? this.closeKey,
+      onTapCallback: onTapCallback ?? this.onTapCallback,
     );
   }
 
@@ -326,7 +321,7 @@ class OnboardingStep {
       showPulseAnimation: $showPulseAnimation, 
       pulseInnerColor: $pulseInnerColor, 
       pulseOuterColor: $pulseOuterColor,
-      closeKey: $closeKey,
+      onTapCallback: $onTapCallback,
     )''';
   }
 
@@ -360,7 +355,7 @@ class OnboardingStep {
         other.showPulseAnimation == showPulseAnimation &&
         other.pulseInnerColor == pulseInnerColor &&
         other.pulseOuterColor == pulseOuterColor &&
-        other.closeKey == closeKey;
+        other.onTapCallback == onTapCallback;
   }
 
   @override
@@ -390,6 +385,6 @@ class OnboardingStep {
         showPulseAnimation.hashCode ^
         pulseInnerColor.hashCode ^
         pulseOuterColor.hashCode ^
-        closeKey.hashCode;
+        onTapCallback.hashCode;
   }
 }
