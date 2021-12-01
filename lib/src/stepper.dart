@@ -438,16 +438,15 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     final Color? colorAnimatedValue =
         overlayColorTween.evaluate(overlayAnimation);
 
-    return GestureDetector(
-      behavior: step.overlayBehavior == OverlayBehavior.deferToChild
-          ? HitTestBehavior.deferToChild
-          : HitTestBehavior.opaque,
-      onTapDown: (TapDownDetails details) {
+    return Listener(
+      behavior: step.overlayBehavior,
+      onPointerDown: (PointerDownEvent details) {
+        // print('global listener');
         final BoxHitTestResult result = BoxHitTestResult();
         final RenderBox overlayBox =
             overlayKey.currentContext?.findRenderObject() as RenderBox;
 
-        Offset localOverlay = overlayBox.globalToLocal(details.globalPosition);
+        Offset localOverlay = overlayBox.globalToLocal(details.position);
 
         if (step.onTapCallback != null) {
           final TapArea area =
@@ -457,9 +456,8 @@ class _OnboardingStepperState extends State<OnboardingStepper>
           step.onTapCallback?.call(area, _nextStep, _close);
           return;
         }
-
         if ((overlayBox.hitTest(result, position: localOverlay) ||
-                step.overlayBehavior != OverlayBehavior.deferToChild) &&
+                step.overlayBehavior != HitTestBehavior.deferToChild) &&
             step.stepBuilder == null &&
             step.onTapCallback == null) {
           _nextStep();

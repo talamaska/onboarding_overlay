@@ -1,13 +1,13 @@
-## [3.0.0-pre.6]
+## [3.0.0-pre.7]
 
 - add: demo add default theme textStyles
-- add: onTapCallback
+- add: onTapCallback which id set will ignore the internal next step method call
 - add: a OverlayController (ChangeNotifier) attached to the OverlayState that provides the currentIndex, currentStep and isVisible - [#20](https://github.com/talamaska/onboarding_overlay/issues/20)
 - add: possibility to build your own step layout with stepBuilder - [#21](https://github.com/talamaska/onboarding_overlay/issues/21)
-- add: pulse animation on the focused widget if the overlayBehavior is HitTestBehavior.deferToChild or HitTestBehavior.translucent (Thanks to the author [Gautier](https://github.com/g-apparence) of the [pal](http://pub.dev/packages/pal) package for the inspiration)
+- add: pulse animation on the focused widget (Thanks to the author [Gautier](https://github.com/g-apparence) of the [pal](http://pub.dev/packages/pal) package for the inspiration)
 - add: debugBoundaries boolean to show red border around the max size of the label box
 - add: ArrowPosition.autoVertical and ArrowPosition.autoVerticalCenter. This setting will automatically position the label box arrow, if enabled, above or below the label box, depending on its position relative to the widget of interest.
-- change: replace HitTestBehavior with OverlayBehavior
+- fix: HitTestBehavior.translucent
 - change: make label box use more space available
 - change: **[Breaking Change]** rename title to titleText
 - remove: **[Breaking Change]** ArrowPosition.centerLeft and ArrowPosition.centerRight

@@ -143,7 +143,7 @@ class _AppState extends State<App> {
               fullscreen: false,
               overlayColor: Colors.blue.withOpacity(0.9),
               overlayShape: const CircleBorder(),
-              overlayBehavior: OverlayBehavior.deferToChild,
+              overlayBehavior: HitTestBehavior.deferToChild,
               showPulseAnimation: true,
             ),
             OnboardingStep(
@@ -184,11 +184,16 @@ class _AppState extends State<App> {
               bodyText: 'You can open menu from here',
               overlayColor: Colors.green.withOpacity(0.9),
               shape: const CircleBorder(),
-              overlayBehavior: OverlayBehavior.deferToOverlay,
-              onTapCallback:
-                  (TapArea area, VoidCallback next, VoidCallback close) {
-                scaffoldKey.currentState?.openDrawer();
-                next();
+              overlayBehavior: HitTestBehavior.translucent,
+              onTapCallback: (
+                TapArea area,
+                VoidCallback next,
+                VoidCallback close,
+              ) {
+                print('tap callback $area');
+                if (area == TapArea.hole) {
+                  next();
+                }
               },
             ),
             OnboardingStep(
@@ -210,11 +215,17 @@ class _AppState extends State<App> {
               ),
               hasLabelBox: true,
               hasArrow: true,
+              overlayBehavior: HitTestBehavior.translucent,
               margin: EdgeInsets.all(0),
-              onTapCallback:
-                  (TapArea area, VoidCallback next, VoidCallback close) {
-                scaffoldKey.currentState?.openEndDrawer();
-                next();
+              onTapCallback: (
+                TapArea area,
+                VoidCallback next,
+                VoidCallback close,
+              ) {
+                print('tap callback $area');
+                if (area == TapArea.hole) {
+                  next();
+                }
               },
             ),
             OnboardingStep(

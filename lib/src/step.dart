@@ -5,8 +5,6 @@ import 'label_painter.dart';
 
 enum TapArea { hole, overlay }
 
-enum OverlayBehavior { deferToChild, deferToOverlay }
-
 class OnboardingStepRenderInfo {
   /// The `title` for the current step
   final String titleText;
@@ -65,7 +63,7 @@ class OnboardingStep {
   /// but remember that you will not be able to actually scroll it, as there is already an `GestureDetector` upper in the tree that will catch the gestures
   /// The non full-screen overlays provide significantly smaller available space
 
-  const OnboardingStep({
+  OnboardingStep({
     this.key,
     required this.focusNode,
     required this.titleText,
@@ -90,21 +88,44 @@ class OnboardingStep {
     this.fullscreen = true,
     this.delay = Duration.zero,
     this.arrowPosition = ArrowPosition.autoVertical,
-    this.overlayBehavior = OverlayBehavior.deferToOverlay,
+    this.overlayBehavior = HitTestBehavior.opaque,
     this.stepBuilder,
     this.showPulseAnimation = false,
     this.pulseInnerColor = defaultInnerPulseColor,
     this.pulseOuterColor = defaultOuterPulseColor,
     this.onTapCallback,
-  })  : assert(titleTextColor != null || titleTextStyle != null,
-            'You should provide at least one of titleTextColor or titleTextStyle'),
-        assert(bodyTextColor != null || bodyTextStyle != null,
-            'You should provide at least one of bodyTextColor or bodyTextStyle'),
-        assert(
-            (hasArrow && hasLabelBox) ||
-                (!hasArrow && !hasLabelBox) ||
-                !hasArrow && hasLabelBox,
-            'hasArrow $hasArrow cannot be true if hasLabelBox $hasLabelBox is false');
+  })  : assert(() {
+          if (titleTextColor == null && titleTextStyle == null) {
+            final List<DiagnosticsNode> information = <DiagnosticsNode>[
+              ErrorSummary(
+                  'You should provide at least one of titleTextColor or titleTextStyle'),
+            ];
+
+            throw FlutterError.fromParts(information);
+          }
+          return true;
+        }()),
+        assert(() {
+          if (bodyTextColor == null && bodyTextStyle == null) {
+            final List<DiagnosticsNode> information = <DiagnosticsNode>[
+              ErrorSummary(
+                  'You should provide at least one of bodyTextColor or bodyTextStyle'),
+            ];
+
+            throw FlutterError.fromParts(information);
+          }
+          return true;
+        }()),
+        assert(() {
+          if (hasArrow && !hasLabelBox) {
+            final List<DiagnosticsNode> information = <DiagnosticsNode>[
+              ErrorSummary('hasArrow cannot be true if hasLabelBox is false'),
+            ];
+
+            throw FlutterError.fromParts(information);
+          }
+          return true;
+        }());
 
   final Key? key;
 
@@ -211,7 +232,7 @@ class OnboardingStep {
   /// `OverlayBehavior.deferToOverlay` blocks the onTap on the widget and will trigger the onTap only on the overlay
   ///
   /// `OverlayBehavior.deferToChild` triggers only the onTap on the widget
-  final OverlayBehavior overlayBehavior;
+  final HitTestBehavior overlayBehavior;
 
   /// [stepBuilder] is a callback funtion that passes the context, the title `String`, the actual title `TextStyle`,
   /// the bodyText `String` and the actual bodytext `TextStyle`.
@@ -256,7 +277,7 @@ class OnboardingStep {
     bool? hasArrow,
     bool? fullscreen,
     Duration? delay,
-    OverlayBehavior? overlayBehavior,
+    HitTestBehavior? overlayBehavior,
     StepWidgetBuilder? stepBuilder,
     bool? showPulseAnimation,
     Color? pulseInnerColor,

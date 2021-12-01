@@ -135,10 +135,10 @@ void initState() {
 
 7. The Label box also supports having an arrow. This is controlled by `hasArrow`. The position is not calculated automatically. The default position is top. You will have to specify the position via arrowPosition by using the enum `ArrowPosition`. The `ArrowPosition.top` and `ArrowPosition.bottom` calculates the horizontal position automatically according to the widget of interest (the focused one which is visible through the overlay), the other arrow positions are centered in the label box e.g. `ArrowPosition.topCenter`, `ArrowPosition.bottomCenter`. In addition there are 2 new settings **from v3.0.0** - `ArrowPosition.autoVertical` and `ArrowPosition.autoVerticalCenter`, which will take care of positioning the arrow automatically relative to the label box and widget position.
 
-8. The onboarding also supports forwarding the onTap event to the widget of interest. You can control the behavior for each step using the overlayBehavior. It accepts an enum OverlayBehavior. By default, the value used is `OverlayBehavior.deferToOverlay`.
-
-- `OverlayBehavior.deferToOverlay` blocks the onTap on the widget and will trigger the onTap only on the overlay
-- `OverlayBehavior.deferToChild` triggers only the onTap on the widget
+8. 8. The onboarding also supports forwarding the onTap event to the widget of interest. You can control the behavior for each step using the overlayBehavior. It accepts the Flutter enum HitTestBehavior. By default, the value used is `HitTestBehavior.opaque`.
+- `HitTestBehavior.opaque` blocks the onTap on the widget and will trigger the onTap only on the overlay
+- `HitTestBehavior.translucent` triggers onTap callbacks on the widget and on the overlay
+- `HitTestBehavior.deferToChild` triggers only the onTap on the widget
 
 9. Sometimes the title and the bodyText might not fit well in the constrained label box, because of the long texts, longer translations or smaller screens. There are 2 behaviors for this scenario. The default one will limit the title to 2 lines and the bodyText to 5 lines and will overflow both with ellipsis, the second one is to automatically resize the texts. This is controlled by the Onboarding property `autoSizeTexts`, which default value is `false`.
 
@@ -280,7 +280,7 @@ if( onboarding?.controller.isVisible ?? false) {
 }
 ```
 
-15. **From v.3.0.0** you can also add a pulsing animation around the focused widget. Pulse animation will be displayed if the `overlayBehavior` is `HitTestBehavior.deferToChild` or `HitTestBehavior.translucent` and `showPulseAnimation` on an `OnboardingStep` is set to `true`. In addition you can change the inner and outer colors of the pulse animation. Thanks to the author [Gautier](https://github.com/g-apparence) of the [pal](http://pub.dev/packages/pal) package for the inspiration.
+15. **From v.3.0.0** you can also add a pulsing animation around the focused widget. Pulse animation will be displayed `showPulseAnimation` on an `OnboardingStep` is set to `true`. In addition you can change the inner and outer colors of the pulse animation. Thanks to the author [Gautier](https://github.com/g-apparence) of the [pal](http://pub.dev/packages/pal) package for the inspiration.
 
 <img src="https://github.com/talamaska/onboarding_overlay/blob/master/screenshots/demo4.gif?raw=true" width="320"/>
 
