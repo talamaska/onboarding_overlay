@@ -19,6 +19,7 @@ class OverlayPainter extends CustomPainter {
     this.overlayColor = const Color(0xaa000000),
     this.pulseInnerColor = defaultInnerPulseColor,
     this.pulseOuterColor = defaultOuterPulseColor,
+    this.showPulseAnimation = false,
   });
 
   /// By default, the value is
@@ -54,6 +55,9 @@ class OverlayPainter extends CustomPainter {
   /// By default value is `true`
   final bool fullscreen;
 
+  /// By default value is `false`
+  final bool showPulseAnimation;
+
   @override
   void paint(Canvas canvas, Size size) {
     final Path canvasPath = Path()
@@ -88,7 +92,7 @@ class OverlayPainter extends CustomPainter {
         ..style = PaintingStyle.fill,
     );
 
-    if (hole.width != 0 && hole.height != 0) {
+    if (hole.width != 0 && hole.height != 0 && showPulseAnimation) {
       final Rect pulseInnerRect = hole.inflate(20 * pulseAnimationInner);
       final Path pulseInnerPath = shape.getOuterPath(pulseInnerRect);
       final Path pulseInnerPathHole = Path.combine(
@@ -126,6 +130,7 @@ class OverlayPainter extends CustomPainter {
   @override
   bool hitTest(Offset position) {
     final bool hit = !(hole.contains(position));
+    // print('overlay hit $hit');
     return hit;
   }
 }

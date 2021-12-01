@@ -20,6 +20,7 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
+  final GlobalKey closeKey = GlobalKey();
   late List<FocusNode> focusNodes;
 
   @override
@@ -35,10 +36,16 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
+        theme: ThemeData.from(
+          colorScheme: ColorScheme.fromSwatch(
+            primarySwatch: Colors.blue,
+            backgroundColor: Colors.white,
+          ),
+        ),
         home: Onboarding(
           key: widget.onboardingKey,
           autoSizeTexts: true,
-          debugBoundaries: true,
+          // debugBoundaries: true,
           steps: <OnboardingStep>[
             OnboardingStep(
               focusNode: focusNodes[0],
@@ -60,49 +67,50 @@ class _AppState extends State<App> {
               hasArrow: true,
               hasLabelBox: true,
               fullscreen: true,
-              manualControl: true,
               stepBuilder: (
                 BuildContext context,
                 OnboardingStepRenderInfo renderInfo,
               ) {
-                return SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Text(
-                        renderInfo.titleText,
-                        style: renderInfo.titleStyle,
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Image.asset(
-                            'assets/demo.gif',
-                            width: 50,
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Flexible(
-                            child: AutoSizeText(
-                              renderInfo.bodyText,
-                              style: renderInfo.bodyStyle,
+                return Material(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Text(
+                          renderInfo.titleText,
+                          // style: renderInfo.titleStyle,
+                        ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Image.asset(
+                              'assets/demo.gif',
+                              width: 50,
                             ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          TextButton(
-                            onPressed: renderInfo.nextStep,
-                            child: Text('Next'),
-                          ),
-                          TextButton(
-                            onPressed: renderInfo.close,
-                            child: Text('close'),
-                          ),
-                        ],
-                      ),
-                    ],
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Flexible(
+                              child: AutoSizeText(
+                                renderInfo.bodyText,
+                                // style: renderInfo.bodyStyle,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            TextButton(
+                              onPressed: renderInfo.nextStep,
+                              child: Text('Next'),
+                            ),
+                            TextButton(
+                              onPressed: renderInfo.close,
+                              child: Text('close'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
@@ -135,7 +143,8 @@ class _AppState extends State<App> {
               fullscreen: false,
               overlayColor: Colors.blue.withOpacity(0.9),
               overlayShape: const CircleBorder(),
-              overlayBehavior: HitTestBehavior.deferToChild,
+              overlayBehavior: OverlayBehavior.deferToChild,
+              showPulseAnimation: true,
             ),
             OnboardingStep(
               focusNode: focusNodes[3],
@@ -175,14 +184,17 @@ class _AppState extends State<App> {
               bodyText: 'You can open menu from here',
               overlayColor: Colors.green.withOpacity(0.9),
               shape: const CircleBorder(),
-              overlayBehavior: HitTestBehavior.translucent,
+              overlayBehavior: OverlayBehavior.deferToOverlay,
+              onTapCallback:
+                  (TapArea area, VoidCallback next, VoidCallback close) {
+                scaffoldKey.currentState?.openDrawer();
+                next();
+              },
             ),
             OnboardingStep(
               focusNode: focusNodes[5],
-              titleText: 'Settings',
-              shape: const CircleBorder(),
-              bodyText:
-                  'Click here to access settings such as dark mode, daily limit, etc',
+              titleText: 'Close menu',
+              bodyText: 'Click here to close the drawer',
               fullscreen: false,
               overlayColor: Colors.black.withOpacity(0.8),
               overlayShape: const CircleBorder(),
@@ -197,6 +209,13 @@ class _AppState extends State<App> {
                 ),
               ),
               hasLabelBox: true,
+              hasArrow: true,
+              margin: EdgeInsets.all(0),
+              onTapCallback:
+                  (TapArea area, VoidCallback next, VoidCallback close) {
+                scaffoldKey.currentState?.openEndDrawer();
+                next();
+              },
             ),
             OnboardingStep(
               focusNode: focusNodes[6],
@@ -357,9 +376,9 @@ class _AppState extends State<App> {
           onChanged: (int index) {
             if (index == 4) {
               // close the drawer
-              if (scaffoldKey.currentState?.isDrawerOpen ?? false) {
-                scaffoldKey.currentState?.openEndDrawer();
-              }
+              // if (scaffoldKey.currentState?.isDrawerOpen ?? false) {
+              //   scaffoldKey.currentState?.openEndDrawer();
+              // }
               // interrupt onboarding on specific step
               // widget.onboardingKey.currentState.hide();
             }
@@ -425,7 +444,7 @@ class _HomeState extends State<Home> {
         ),
         actions: [
           IconButton(
-            focusNode: widget.focusNodes[5],
+            // focusNode: widget.focusNodes[5],
             icon: const Icon(Icons.mic),
             onPressed: () {},
           ),
@@ -441,9 +460,20 @@ class _HomeState extends State<Home> {
           )
         ],
       ),
-      drawer: const Drawer(
-        child: Center(
-          child: Text('Menu'),
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            const DrawerHeader(
+              child: Text('Menu'),
+            ),
+            ListTile(
+              focusNode: widget.focusNodes[5],
+              title: const Text('Close menu'),
+              onTap: () {
+                Navigator.of(context).pop();
+              },
+            )
+          ],
         ),
       ),
       body: ListView.builder(

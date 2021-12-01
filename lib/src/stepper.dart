@@ -23,6 +23,7 @@ class OnboardingStepper extends StatefulWidget {
     this.stepIndexes = const <int>[],
     this.debugBoundaries = false,
     required this.setupIndex,
+    required this.constraints,
   })  : assert(() {
           if (stepIndexes.isNotEmpty && !stepIndexes.contains(initialIndex)) {
             final List<DiagnosticsNode> information = <DiagnosticsNode>[
@@ -66,6 +67,8 @@ class OnboardingStepper extends StatefulWidget {
   /// By default the value is false
   final bool debugBoundaries;
 
+  final BoxConstraints constraints;
+
   @override
   _OnboardingStepperState createState() => _OnboardingStepperState();
 }
@@ -88,31 +91,53 @@ class _OnboardingStepperState extends State<OnboardingStepper>
   @override
   void initState() {
     super.initState();
-    stepperIndex = widget.initialIndex;
+    // stepperIndex = widget.initialIndex;
     _stepIndexes = List<int>.from(widget.stepIndexes);
     overlayController = AnimationController(
       vsync: this,
       duration: widget.duration,
-    )..addListener(() => setState(() {}));
-    overlayAnimation = const AlwaysStoppedAnimation<double>(0.0);
+    )..addListener(() {
+        setState(() {});
+      });
 
     pulseController = AnimationController(
       vsync: this,
       duration: widget.pulseDuration,
-    )..addListener(() => setState(() {}));
-    pulseAnimationInner = const AlwaysStoppedAnimation<double>(0.0);
-    pulseAnimationOuter = const AlwaysStoppedAnimation<double>(0.0);
+    )..addListener(() {
+        setState(() {});
+      });
+
+    overlayAnimation = CurvedAnimation(
+      curve: Curves.ease,
+      parent: overlayController,
+    );
+
+    pulseAnimationInner = CurvedAnimation(
+      curve: Curves.ease,
+      parent: pulseController,
+    );
+
+    pulseAnimationOuter = CurvedAnimation(
+      curve: const Interval(
+        0.0,
+        0.8,
+        curve: Curves.ease,
+      ),
+      parent: pulseController,
+    );
 
     holeTween = RectTween(
       begin: Rect.zero,
       end: Rect.zero,
     );
+
     overlayColorTween = ColorTween(
       begin: null,
       end: null,
     );
 
     startStepper(fromIndex: widget.initialIndex);
+    calcWidgetRect(widget.steps[stepperIndex]);
   }
 
   Future<void> startStepper({int fromIndex = 0}) async {
@@ -174,9 +199,11 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     if (widget.stepIndexes.isEmpty) {
       await overlayController.reverse();
       widget.onChanged?.call(stepperIndex);
-
+      // await Future<void>.delayed(Duration(milliseconds: 1000));
       if (stepperIndex < widget.steps.length - 1) {
-        stepperIndex++;
+        setState(() {
+          stepperIndex++;
+        });
       } else {
         widget.onEnd?.call(stepperIndex);
         return;
@@ -188,9 +215,8 @@ class _OnboardingStepperState extends State<OnboardingStepper>
       }
       if (stepperIndex < widget.steps.length && stepperIndex >= 0) {
         setTweensAndAnimate(step);
+        step.focusNode.requestFocus();
       }
-
-      step.focusNode.requestFocus();
     } else {
       await overlayController.reverse();
 
@@ -202,7 +228,9 @@ class _OnboardingStepperState extends State<OnboardingStepper>
       }
 
       if (_stepIndexes.isNotEmpty) {
-        stepperIndex = _stepIndexes.first;
+        setState(() {
+          stepperIndex = _stepIndexes.first;
+        });
         _stepIndexes.removeAt(0);
       }
 
@@ -211,9 +239,21 @@ class _OnboardingStepperState extends State<OnboardingStepper>
 
       if (widget.stepIndexes.indexWhere((int el) => el == stepperIndex) != -1) {
         setTweensAndAnimate(step);
+        step.focusNode.requestFocus();
       }
+    }
+    setState(() {
+      calcWidgetRect(widget.steps[stepperIndex]);
+    });
+  }
 
-      step.focusNode.requestFocus();
+  @override
+  void didUpdateWidget(OnboardingStepper oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.constraints != widget.constraints) {
+      setState(() {
+        calcWidgetRect(widget.steps[stepperIndex]);
+      });
     }
   }
 
@@ -241,63 +281,31 @@ class _OnboardingStepperState extends State<OnboardingStepper>
           );
   }
 
-  bool shouldShowPulse(OnboardingStep step) {
-    return step.overlayBehavior != HitTestBehavior.opaque &&
-        step.showPulseAnimation;
+  void overlayStatusCallback(AnimationStatus status) {
+    if (status == AnimationStatus.completed) {
+      pulseController
+        ..forward(from: 0.0)
+        ..repeat(reverse: true);
+    }
+
+    if (status == AnimationStatus.reverse) {
+      pulseController.reset();
+    }
   }
 
-  void setTweensAndAnimate(OnboardingStep step) {
+  void setTweensAndAnimate(OnboardingStep step) async {
     overlayColorTween = ColorTween(
       begin: step.overlayColor.withOpacity(overlayAnimation.value),
       end: step.overlayColor,
     );
 
-    overlayAnimation = CurvedAnimation(
-      curve: Curves.ease,
-      parent: overlayController,
-    );
+    overlayController.removeStatusListener(overlayStatusCallback);
 
-    pulseAnimationInner = CurvedAnimation(
-      curve: Curves.ease,
-      parent: pulseController,
-    );
+    if (step.showPulseAnimation) {
+      overlayController.addStatusListener(overlayStatusCallback);
+    }
 
-    pulseAnimationOuter = CurvedAnimation(
-      curve: const Interval(
-        0.0,
-        0.8,
-        curve: Curves.ease,
-      ),
-      parent: pulseController,
-    );
-
-    overlayController.removeStatusListener((AnimationStatus status) {
-      if (shouldShowPulse(step)) {
-        if (status == AnimationStatus.completed) {
-          pulseController.forward(from: 0.0);
-        }
-
-        if (status == AnimationStatus.reverse) {
-          pulseController.stop(canceled: false);
-        }
-      }
-    });
-
-    overlayController.addStatusListener((AnimationStatus status) {
-      if (shouldShowPulse(step)) {
-        if (status == AnimationStatus.completed) {
-          pulseController
-            ..forward(from: 0.0)
-            ..repeat(reverse: true);
-        }
-
-        if (status == AnimationStatus.reverse) {
-          pulseController.reset();
-        }
-      }
-    });
-
-    overlayController.forward(from: 0.0);
+    await overlayController.forward(from: 0.0);
   }
 
   double _getHorizontalPosition(
@@ -348,246 +356,333 @@ class _OnboardingStepperState extends State<OnboardingStepper>
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        final ThemeData theme = Theme.of(context);
-        final MediaQueryData media = MediaQuery.of(context);
-        final Size size = media.size;
-        final OnboardingStep step = widget.steps[stepperIndex];
+    final ThemeData theme = Theme.of(context);
+    final MediaQueryData media = MediaQuery.of(context);
+    final Size mediaSize = media.size;
+    final OnboardingStep step = widget.steps[stepperIndex];
 
-        final TextTheme textTheme = theme.textTheme;
-        final TextStyle localTitleTextStyle =
-            textTheme.headline5!.copyWith(color: step.titleTextColor);
-        final TextStyle localBodyTextStyle =
-            textTheme.bodyText1!.copyWith(color: step.bodyTextColor);
+    final TextTheme textTheme = theme.textTheme;
+    final TextStyle localTitleTextStyle =
+        textTheme.headline5!.copyWith(color: step.titleTextColor);
+    final TextStyle localBodyTextStyle =
+        textTheme.bodyText1!.copyWith(color: step.bodyTextColor);
 
-        final TextStyle stepTitleTextStyle = textTheme.headline5!.copyWith(
-          color: step.titleTextStyle?.color ?? step.titleTextColor,
-        );
+    final TextStyle stepTitleTextStyle = textTheme.headline5!.copyWith(
+      color: step.titleTextStyle?.color ?? step.titleTextColor,
+    );
 
-        final TextStyle stepBodyTextStyle = textTheme.bodyText1!.copyWith(
-          color: step.bodyTextStyle?.color ?? step.bodyTextColor,
-        );
+    final TextStyle stepBodyTextStyle = textTheme.bodyText1!.copyWith(
+      color: step.bodyTextStyle?.color ?? step.bodyTextColor,
+    );
 
-        final TextStyle activeTitleStyle = textTheme.headline5!.merge(
-            step.titleTextStyle != null
-                ? stepTitleTextStyle
-                : localTitleTextStyle);
+    final TextStyle activeTitleStyle = textTheme.headline5!.merge(
+        step.titleTextStyle != null ? stepTitleTextStyle : localTitleTextStyle);
 
-        final TextStyle activeBodyStyle = textTheme.bodyText1!.merge(
-            step.bodyTextStyle != null
-                ? stepBodyTextStyle
-                : localBodyTextStyle);
+    final TextStyle activeBodyStyle = textTheme.bodyText1!.merge(
+        step.bodyTextStyle != null ? stepBodyTextStyle : localBodyTextStyle);
 
-        Rect holeRect = Rect.fromCenter(
-          center: Offset(size.shortestSide / 2, size.longestSide / 2),
-          width: 0,
-          height: 0,
-        );
+    Rect holeRect = Rect.fromCenter(
+      center: Offset(mediaSize.shortestSide / 2, mediaSize.longestSide / 2),
+      width: 0,
+      height: 0,
+    );
 
-        calcWidgetRect(step);
+    if (widgetRect != null) {
+      holeRect = step.margin.inflateRect(widgetRect!);
+    }
 
-        if (widgetRect != null) {
-          holeRect = step.margin.inflateRect(widgetRect!);
-        }
+    final bool isTop = holeRect.center.dy > mediaSize.height / 2;
 
-        final bool isTop = holeRect.center.dy > size.height / 2;
+    final double boxWidth = step.fullscreen
+        ? mediaSize.width - 2 * sideGap
+        : widgetRect != null
+            ? mediaSize.width * kLabelBoxWidthRatio
+            : mediaSize.width * kOverlayRatio;
 
-        final double boxWidth = step.fullscreen
-            ? size.width - 2 * sideGap
-            : widgetRect != null
-                ? size.width * kLabelBoxWidthRatio
-                : size.width * kOverlayRatio;
-
-        double boxHeight = 0;
-        if (step.fullscreen) {
-          if (holeRect.height > 0) {
-            if (isTop) {
-              boxHeight = holeRect.top -
-                  sideGap -
-                  (step.hasArrow ? kArrowHeight + sideGap : sideGap) -
-                  media.padding.top;
-            } else {
-              boxHeight = size.height -
-                  holeRect.bottom -
-                  sideGap -
-                  (step.hasArrow ? kArrowHeight + sideGap : sideGap) -
-                  media.padding.top;
-            }
-          } else {
-            boxHeight = size.height -
-                sideGap -
-                (step.hasArrow ? kArrowHeight + sideGap : sideGap) -
-                2 * media.padding.top;
-          }
+    double boxHeight = 0;
+    if (step.fullscreen) {
+      if (holeRect.height > 0) {
+        if (isTop) {
+          boxHeight = holeRect.top -
+              sideGap -
+              (step.hasArrow ? kArrowHeight + sideGap : sideGap) -
+              media.padding.top;
         } else {
-          if (widgetRect != null) {
-            boxHeight = size.width * kLabelBoxWidthRatio -
-                kSpace -
-                (step.hasArrow ? kArrowHeight + sideGap : sideGap);
-          } else {
-            boxHeight = size.height * kLabelBoxWidthRatio -
-                kSpace -
-                (step.hasArrow ? kArrowHeight + sideGap : sideGap);
-          }
+          boxHeight = mediaSize.height -
+              holeRect.bottom -
+              sideGap -
+              (step.hasArrow ? kArrowHeight + sideGap : sideGap) -
+              media.padding.top;
+        }
+      } else {
+        boxHeight = mediaSize.height -
+            sideGap -
+            (step.hasArrow ? kArrowHeight + sideGap : sideGap) -
+            2 * media.padding.top;
+      }
+    } else {
+      if (widgetRect != null) {
+        boxHeight = mediaSize.width * kLabelBoxWidthRatio -
+            kSpace -
+            (step.hasArrow ? kArrowHeight + sideGap : sideGap);
+      } else {
+        boxHeight = mediaSize.height * kLabelBoxWidthRatio -
+            kSpace -
+            (step.hasArrow ? kArrowHeight + sideGap : sideGap);
+      }
+    }
+
+    final double leftPos = _getHorizontalPosition(step, mediaSize, boxWidth);
+    final double topPos = _getVerticalPosition(step, mediaSize, boxHeight);
+    final Rect? holeAnimatedValue = holeTween.evaluate(overlayAnimation);
+    final Color? colorAnimatedValue =
+        overlayColorTween.evaluate(overlayAnimation);
+
+    return GestureDetector(
+      behavior: step.overlayBehavior == OverlayBehavior.deferToChild
+          ? HitTestBehavior.deferToChild
+          : HitTestBehavior.opaque,
+      onTapDown: (TapDownDetails details) {
+        final BoxHitTestResult result = BoxHitTestResult();
+        final RenderBox overlayBox =
+            overlayKey.currentContext?.findRenderObject() as RenderBox;
+
+        Offset localOverlay = overlayBox.globalToLocal(details.globalPosition);
+
+        if (step.onTapCallback != null) {
+          final TapArea area =
+              overlayBox.hitTest(result, position: localOverlay)
+                  ? TapArea.overlay
+                  : TapArea.hole;
+          step.onTapCallback?.call(area, _nextStep, _close);
+          return;
         }
 
-        final double leftPos = _getHorizontalPosition(step, size, boxWidth);
-        final double topPos = _getVerticalPosition(step, size, boxHeight);
-        final Rect? holeAnimatedValue = holeTween.evaluate(overlayAnimation);
-
-        return GestureDetector(
-          behavior: step.overlayBehavior,
-          onTapDown: (TapDownDetails details) {
-            final RenderBox overlayBox =
-                overlayKey.currentContext?.findRenderObject() as RenderBox;
-
-            Offset localOverlay =
-                overlayBox.globalToLocal(details.globalPosition);
-
-            final BoxHitTestResult result = BoxHitTestResult();
-            if ((overlayBox.hitTest(result, position: localOverlay) ||
-                    step.overlayBehavior != HitTestBehavior.deferToChild) &&
-                !step.manualControl) {
-              _nextStep();
-            }
-          },
-          child: Stack(
-            key: step.key,
-            clipBehavior: Clip.antiAlias,
-            children: <Widget>[
-              RepaintBoundary(
-                child: CustomPaint(
-                  key: overlayKey,
-                  size: Size(
-                    size.width,
-                    size.height,
-                  ),
-                  painter: OverlayPainter(
-                    fullscreen: step.fullscreen,
-                    shape: step.shape,
-                    overlayShape: step.overlayShape,
-                    center: step.focusNode.context == null
-                        ? size.center(Offset.zero)
-                        : null,
-                    hole: holeAnimatedValue ?? Rect.zero,
-                    overlayAnimation: overlayAnimation.value,
-                    pulseInnerColor: step.pulseInnerColor,
-                    pulseOuterColor: step.pulseOuterColor,
-                    pulseAnimationInner: pulseAnimationInner.value,
-                    pulseAnimationOuter: pulseAnimationOuter.value,
-                    overlayColor: overlayColorTween.evaluate(overlayAnimation),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: leftPos,
-                top: topPos,
-                child: FadeTransition(
-                  opacity: overlayAnimation,
-                  child: Container(
-                    decoration: widget.debugBoundaries
-                        ? BoxDecoration(
-                            border: Border.all(color: debugBorderColor),
-                          )
-                        : null,
-                    width: boxWidth,
-                    height: boxHeight,
-                    child: Stack(
-                      clipBehavior: Clip.antiAlias,
-                      alignment:
-                          isTop ? Alignment.bottomCenter : Alignment.topCenter,
-                      children: [
-                        RepaintBoundary(
-                          child: CustomPaint(
-                            painter: LabelPainter(
-                              opacity: overlayAnimation.value,
-                              hasLabelBox: step.hasLabelBox,
-                              labelBoxPadding: step.labelBoxPadding,
-                              labelBoxDecoration: step.labelBoxDecoration,
-                              hasArrow: step.hasArrow,
-                              arrowPosition: step.arrowPosition,
-                              hole: holeAnimatedValue!
-                                  .shift(Offset(-leftPos, -topPos)),
-                              isTop: isTop,
-                            ),
-                            child: SizedBox(
-                              width: boxWidth,
-                              child: Padding(
-                                padding: step.labelBoxPadding,
-                                child: step.stepBuilder != null
-                                    ? step.stepBuilder!(
-                                        context,
-                                        OnboardingStepRenderInfo(
-                                          titleText: step.titleText,
-                                          titleStyle: activeTitleStyle,
-                                          bodyText: step.bodyText,
-                                          bodyStyle: activeBodyStyle,
-                                          size: Size(boxWidth, boxHeight),
-                                          nextStep: _nextStep,
-                                          close: _close,
-                                          manualControl: step.manualControl,
-                                        ),
-                                      )
-                                    : widget.autoSizeTexts
-                                        ? AutoSizeText.rich(
-                                            TextSpan(
-                                              text: step.titleText,
-                                              style: activeTitleStyle,
-                                              children: <InlineSpan>[
-                                                const TextSpan(text: '\n'),
-                                                TextSpan(
-                                                  text: step.bodyText,
-                                                  style: activeBodyStyle,
-                                                )
-                                              ],
-                                            ),
-                                            textDirection:
-                                                Directionality.of(context),
-                                            textAlign: step.textAlign,
-                                            minFontSize: 12,
-                                          )
-                                        : Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.stretch,
-                                            mainAxisAlignment: isTop
-                                                ? MainAxisAlignment.end
-                                                : MainAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                step.titleText,
-                                                style: activeTitleStyle,
-                                                maxLines: 2,
-                                                overflow: TextOverflow.ellipsis,
-                                                textAlign: step.textAlign,
-                                                textDirection:
-                                                    Directionality.of(context),
-                                              ),
-                                              Text(
-                                                step.bodyText,
-                                                style: activeBodyStyle,
-                                                maxLines: 5,
-                                                overflow: TextOverflow.ellipsis,
-                                                textAlign: step.textAlign,
-                                                textDirection:
-                                                    Directionality.of(context),
-                                              )
-                                            ],
-                                          ),
-                              ),
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
+        if ((overlayBox.hitTest(result, position: localOverlay) ||
+                step.overlayBehavior != OverlayBehavior.deferToChild) &&
+            step.stepBuilder == null &&
+            step.onTapCallback == null) {
+          _nextStep();
+        }
       },
+      child: Stack(
+        key: step.key,
+        clipBehavior: Clip.antiAlias,
+        children: <Widget>[
+          AnimatedOverlay(
+            overlayKey: overlayKey,
+            size: mediaSize,
+            step: step,
+            holeAnimatedValue: holeAnimatedValue,
+            overlayAnimation: overlayAnimation.value,
+            pulseAnimationInner: pulseAnimationInner.value,
+            pulseAnimationOuter: pulseAnimationOuter.value,
+            colorAnimatedValue: colorAnimatedValue,
+          ),
+          Positioned(
+            left: leftPos,
+            top: topPos,
+            child: AnimatedLabel(
+              overlayAnimation: overlayAnimation,
+              debugBoundaries: widget.debugBoundaries,
+              size: Size(boxWidth, boxHeight),
+              isTop: isTop,
+              step: step,
+              holeAnimatedValue:
+                  holeAnimatedValue?.shift(Offset(-leftPos, -topPos)) ??
+                      Rect.zero,
+              leftPos: leftPos,
+              topPos: topPos,
+              autoSizeTexts: widget.autoSizeTexts,
+              activeTitleStyle: activeTitleStyle,
+              activeBodyStyle: activeBodyStyle,
+              next: _nextStep,
+              close: _close,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class AnimatedLabel extends StatelessWidget {
+  const AnimatedLabel({
+    Key? key,
+    required this.overlayAnimation,
+    required this.debugBoundaries,
+    required this.size,
+    required this.isTop,
+    required this.step,
+    required this.holeAnimatedValue,
+    required this.leftPos,
+    required this.topPos,
+    required this.autoSizeTexts,
+    required this.activeTitleStyle,
+    required this.activeBodyStyle,
+    required this.close,
+    required this.next,
+  }) : super(key: key);
+
+  final Animation<double> overlayAnimation;
+  final Size size;
+  final bool isTop;
+  final OnboardingStep step;
+  final Rect holeAnimatedValue;
+  final double leftPos;
+  final double topPos;
+  final bool autoSizeTexts;
+  final bool debugBoundaries;
+  final TextStyle activeTitleStyle;
+  final TextStyle activeBodyStyle;
+  final VoidCallback close;
+  final VoidCallback next;
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: overlayAnimation,
+      child: Container(
+        decoration: debugBoundaries
+            ? BoxDecoration(
+                border: Border.all(color: debugBorderColor),
+              )
+            : null,
+        width: size.width,
+        height: size.height,
+        child: Stack(
+          clipBehavior: Clip.antiAlias,
+          alignment: isTop ? Alignment.bottomCenter : Alignment.topCenter,
+          children: [
+            RepaintBoundary(
+              child: CustomPaint(
+                painter: LabelPainter(
+                  opacity: 1,
+                  hasLabelBox: step.hasLabelBox,
+                  labelBoxPadding: step.labelBoxPadding,
+                  labelBoxDecoration: step.labelBoxDecoration,
+                  hasArrow: step.hasArrow,
+                  arrowPosition: step.arrowPosition,
+                  hole: holeAnimatedValue,
+                  isTop: isTop,
+                ),
+                child: SizedBox(
+                  width: size.width,
+                  child: Padding(
+                    padding: step.labelBoxPadding,
+                    child: step.stepBuilder != null
+                        ? step.stepBuilder!(
+                            context,
+                            OnboardingStepRenderInfo(
+                              titleText: step.titleText,
+                              titleStyle: activeTitleStyle,
+                              bodyText: step.bodyText,
+                              bodyStyle: activeBodyStyle,
+                              size: size,
+                              nextStep: next,
+                              close: close,
+                            ),
+                          )
+                        : autoSizeTexts
+                            ? AutoSizeText.rich(
+                                TextSpan(
+                                  text: step.titleText,
+                                  style: activeTitleStyle,
+                                  children: <InlineSpan>[
+                                    const TextSpan(text: '\n'),
+                                    TextSpan(
+                                      text: step.bodyText,
+                                      style: activeBodyStyle,
+                                    )
+                                  ],
+                                ),
+                                textDirection: Directionality.of(context),
+                                textAlign: step.textAlign,
+                                minFontSize: 12,
+                              )
+                            : Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                mainAxisAlignment: isTop
+                                    ? MainAxisAlignment.end
+                                    : MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    step.titleText,
+                                    style: activeTitleStyle,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    textAlign: step.textAlign,
+                                    textDirection: Directionality.of(context),
+                                  ),
+                                  Text(
+                                    step.bodyText,
+                                    style: activeBodyStyle,
+                                    maxLines: 5,
+                                    overflow: TextOverflow.ellipsis,
+                                    textAlign: step.textAlign,
+                                    textDirection: Directionality.of(context),
+                                  )
+                                ],
+                              ),
+                  ),
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class AnimatedOverlay extends StatelessWidget {
+  const AnimatedOverlay({
+    Key? key,
+    required this.overlayKey,
+    required this.size,
+    required this.step,
+    this.holeAnimatedValue,
+    this.colorAnimatedValue,
+    required this.overlayAnimation,
+    required this.pulseAnimationInner,
+    required this.pulseAnimationOuter,
+  }) : super(key: key);
+
+  final GlobalKey<State<StatefulWidget>> overlayKey;
+  final Size size;
+  final OnboardingStep step;
+  final Rect? holeAnimatedValue;
+  final double overlayAnimation;
+  final double pulseAnimationInner;
+  final double pulseAnimationOuter;
+  final Color? colorAnimatedValue;
+
+  @override
+  Widget build(BuildContext context) {
+    return RepaintBoundary(
+      child: CustomPaint(
+        key: overlayKey,
+        size: Size(
+          size.width,
+          size.height,
+        ),
+        painter: OverlayPainter(
+          fullscreen: step.fullscreen,
+          shape: step.shape,
+          overlayShape: step.overlayShape,
+          center:
+              step.focusNode.context == null ? size.center(Offset.zero) : null,
+          hole: holeAnimatedValue ?? Rect.zero,
+          overlayAnimation: overlayAnimation,
+          pulseInnerColor: step.pulseInnerColor,
+          pulseOuterColor: step.pulseOuterColor,
+          pulseAnimationInner: pulseAnimationInner,
+          pulseAnimationOuter: pulseAnimationOuter,
+          overlayColor: colorAnimatedValue ?? const Color(0xaa000000),
+          showPulseAnimation: step.showPulseAnimation,
+        ),
+      ),
     );
   }
 }
