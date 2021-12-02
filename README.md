@@ -7,7 +7,7 @@ and arbitrary starting point
 
 ## Demo
 
-<img src="https://github.com/talamaska/onboarding_overlay/blob/master/screenshots/demo.gif?raw=true" width="320"/>
+<img src="./screenshots/demo.gif?raw=true" width="320"/>
 
 ## Usage
 
@@ -255,14 +255,14 @@ OnboardingStep(
 ),
 ```
 
-<img src="https://github.com/talamaska/onboarding_overlay/blob/master/screenshots/demo3.png?raw=true" width="320"/>
+<img src="./screenshots/demo3.png" width="320"/>
 
 13. **From v.3.0.0** Combining `onTapCallback` with the `overlayBehavior` gives more control.
 - If you want to capture any clicks and decide what to do depending on the area that was clicked - use `HitTestBehavior.opaque`
 - if you want to be able to click on the focused widget and control when to go to next step or close - use `HitTestBehavior.translucent`
 - If you want to capture clicks only on the overlay, the clicks on the hole will not be controled by the callback - use `HitTestBehavior.deferToChild`
 
-Using the TapArea you can specify what happens when the user clicked on certain area. 
+Using the `TapArea` you can specify what happens when the user clicked on certain area. 
 The possible options are `hole`, `label` and `overlay`
 
 ```dart
@@ -287,7 +287,7 @@ It is possible to combine `onTapCallback` and `stepBuilder`. No navigation will 
 except if you call `next()` method from `onTapCallback` or the `stepBuilder`. You can customize the behavior using the `TapArea` enum to get the area where the user clicked. By using the `HitTestBehavior` you can again customize if the clicks on the hole are ignored or forwarded to the focused widget. Again if you define the `overlayBehavior` with `HitTestBehavior.deferToChild` the click on the hole or the widget in focus will not be controlled by the `onTapCallback`
 
 
-15. **From v3.0.0** there is an additional `OverlayController` (ChangeNotifier) attached to the OverlayState that provides the `currentIndex`, `currentStep` and `isVisible`.
+15. **From v3.0.0** there is an additional `OverlayController` (ChangeNotifier) attached to the `OverlayState` that provides the `currentIndex`, `currentStep` and `isVisible`.
 
 ```dart
 final OnboardingState? onboarding = Onboarding.of(context);
@@ -298,8 +298,8 @@ if( onboarding?.controller.isVisible ?? false) {
 
 16. **From v.3.0.0** you can also add a pulsing animation around the focused widget. Pulse animation will be displayed `showPulseAnimation` on an `OnboardingStep` is set to `true`. In addition you can change the inner and outer colors of the pulse animation. Thanks to the author [Gautier](https://github.com/g-apparence) of the [pal](https://pub.dev/packages/pal) package for the inspiration.
 
-<img src="https://github.com/talamaska/onboarding_overlay/blob/master/screenshots/demo4.gif?raw=true" width="320"/>
+<img src="./screenshots/demo4.gif" width="320"/>
 
 17. **From v.3.0.0** you can show a red border around the label box for debugging purposes by using an `Onboarding` parameter `debugBoundaries` which is `false` by default.
 
-<img src="https://github.com/talamaska/onboarding_overlay/blob/master/screenshots/demo2.png?raw=true" width="320"/>
+<img src="./screenshots/demo2.png" width="320"/>
