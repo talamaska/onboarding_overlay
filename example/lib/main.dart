@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:onboarding_overlay/onboarding_overlay.dart';
@@ -67,6 +69,8 @@ class _AppState extends State<App> {
               hasArrow: true,
               hasLabelBox: true,
               fullscreen: true,
+              overlayBehavior: HitTestBehavior.translucent,
+              onTapCallback: (area, next, close) {},
               stepBuilder: (
                 BuildContext context,
                 OnboardingStepRenderInfo renderInfo,
@@ -184,13 +188,13 @@ class _AppState extends State<App> {
               bodyText: 'You can open menu from here',
               overlayColor: Colors.green.withOpacity(0.9),
               shape: const CircleBorder(),
-              overlayBehavior: HitTestBehavior.translucent,
+              overlayBehavior: HitTestBehavior.deferToChild,
               onTapCallback: (
                 TapArea area,
                 VoidCallback next,
                 VoidCallback close,
               ) {
-                print('tap callback $area');
+                log('tap callback $area');
                 if (area == TapArea.hole) {
                   next();
                 }
@@ -222,7 +226,7 @@ class _AppState extends State<App> {
                 VoidCallback next,
                 VoidCallback close,
               ) {
-                print('tap callback $area');
+                log('tap callback $area');
                 if (area == TapArea.hole) {
                   next();
                 }
@@ -501,8 +505,13 @@ class _HomeState extends State<Home> {
                         children: <Widget>[
                           Focus(
                             focusNode: widget.focusNodes[0],
-                            child: const Text(
-                                'You have pushed the button this many times:'),
+                            child: TextButton(
+                              child: const Text(
+                                  'You have pushed the button this many times:'),
+                              onPressed: () {
+                                print('do something');
+                              },
+                            ),
                           ),
                           Focus(
                             focusNode: widget.focusNodes[6],

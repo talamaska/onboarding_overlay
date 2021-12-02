@@ -135,12 +135,12 @@ void initState() {
 
 7. The Label box also supports having an arrow. This is controlled by `hasArrow`. The position is not calculated automatically. The default position is top. You will have to specify the position via arrowPosition by using the enum `ArrowPosition`. The `ArrowPosition.top` and `ArrowPosition.bottom` calculates the horizontal position automatically according to the widget of interest (the focused one which is visible through the overlay), the other arrow positions are centered in the label box e.g. `ArrowPosition.topCenter`, `ArrowPosition.bottomCenter`. In addition there are 2 new settings **from v3.0.0** - `ArrowPosition.autoVertical` and `ArrowPosition.autoVerticalCenter`, which will take care of positioning the arrow automatically relative to the label box and widget position.
 
-8. 8. The onboarding also supports forwarding the onTap event to the widget of interest. You can control the behavior for each step using the overlayBehavior. It accepts the Flutter enum HitTestBehavior. By default, the value used is `HitTestBehavior.opaque`.
-- `HitTestBehavior.opaque` blocks the onTap on the widget and will trigger the onTap only on the overlay
-- `HitTestBehavior.translucent` triggers onTap callbacks on the widget and on the overlay
-- `HitTestBehavior.deferToChild` triggers only the onTap on the widget
+8. The onboarding also supports forwarding the onTap event to the widget of interest. You can control the behavior for each step using the overlayBehavior. It accepts the Flutter enum HitTestBehavior. By default, the value used is `HitTestBehavior.opaque`.
+- `HitTestBehavior.opaque` ignores the clicks on the focused widget and always will navigate to next step
+- `HitTestBehavior.translucent` forwards clicks on the focused widget and on the overlay in the same time
+- `HitTestBehavior.deferToChild` the clicks on the hole are forwarded to the focused widget, clicks on the overlay navigates to next step.
 
-9. Sometimes the title and the bodyText might not fit well in the constrained label box, because of the long texts, longer translations or smaller screens. There are 2 behaviors for this scenario. The default one will limit the title to 2 lines and the bodyText to 5 lines and will overflow both with ellipsis, the second one is to automatically resize the texts. This is controlled by the Onboarding property `autoSizeTexts`, which default value is `false`.
+9. Sometimes the `titleText` and the `bodyText` might not fit well in the constrained label box, because of the long texts, longer translations or smaller screens. There are 2 behaviors for this scenario. The default one will limit the title to 2 lines and the bodyText to 5 lines and will overflow both with ellipsis, the second one is to automatically resize the texts. This is controlled by the Onboarding property `autoSizeTexts`, which default value is `false`.
 
 10. The onboarding can show only a portion of the defined steps with a specific start index. Use `showWithSteps` method. Remember that the steps indexes are 0-based (starting from zero)
 
@@ -178,6 +178,10 @@ void initState() {
 is for you. With `stepBuilder`, you can change the layout, add images or something else.
 
 **Important:** If you want to inherit your App `Theme` from your app instead of using the style properties. You need to wrap your `stepBuilder` code with a `Scaffold` or `Material` widgets.
+
+**Important:** Clicks on the overlay are ignored if `stepBuilder` is set. Clicks on the hole or on the widget depend on the HitTestBehavior.
+- using `HitTestBehavior.translucent` and `HitTestBehavior.deferToChild` will forward clicks on the hole to the focused widget
+- using `HitTestBehavior.opaque` ignores clicks on the hole and on the overlay are ignored. Call callbacks provided by the `stepBuilder`
 
 ```dart
 OnboardingStep(
@@ -253,7 +257,13 @@ OnboardingStep(
 
 <img src="https://github.com/talamaska/onboarding_overlay/blob/master/screenshots/demo3.png?raw=true" width="320"/>
 
-13. **From v.3.0.0** If you want to navigate to the next step but at the same time trigger some other event, or call some other function, you could use onTapCallback.
+13. **From v.3.0.0** Combining `onTapCallback` with the `overlayBehavior` gives more control.
+- If you want to capture any clicks and decide what to do depending on the area that was clicked - use `HitTestBehavior.opaque`
+- if you want to be able to click on the focused widget and control when to go to next step or close - use `HitTestBehavior.translucent`
+- If you want to capture clicks only on the overlay, the clicks on the hole will not be controled by the callback - use `HitTestBehavior.deferToChild`
+
+Using the TapArea you can specify what happens when the user clicked on certain area. 
+The possible options are `hole`, `label` and `overlay`
 
 ```dart
 OnboardingStep(
@@ -262,16 +272,22 @@ OnboardingStep(
   bodyText: 'You can open menu from here',
   overlayColor: Colors.green.withOpacity(0.9),
   shape: const CircleBorder(),
-  overlayBehavior: OverlayBehavior.deferToOverlay,
+  overlayBehavior: HitTestBehavior.translucent,
   onTapCallback:
       (TapArea area, VoidCallback next, VoidCallback close) {
-    scaffoldKey.currentState?.openDrawer();
-    next();
+    if (area == TapArea.hole) {
+      next();
+    }
   },
 ),
 ```
 
-14. **From v3.0.0** there is an additional `OverlayController` (ChangeNotifier) attached to the OverlayState that provides the `currentIndex`, `currentStep` and `isVisible`.
+14. **From v.3.0.0**
+It is possible to combine `onTapCallback` and `stepBuilder`. No navigation will be executed 
+except if you call `next()` method from `onTapCallback` or the `stepBuilder`. You can customize the behavior using the `TapArea` enum to get the area where the user clicked. By using the `HitTestBehavior` you can again customize if the clicks on the hole are ignored or forwarded to the focused widget. Again if you define the `overlayBehavior` with `HitTestBehavior.deferToChild` the click on the hole or the widget in focus will not be controlled by the `onTapCallback`
+
+
+15. **From v3.0.0** there is an additional `OverlayController` (ChangeNotifier) attached to the OverlayState that provides the `currentIndex`, `currentStep` and `isVisible`.
 
 ```dart
 final OnboardingState? onboarding = Onboarding.of(context);
@@ -280,10 +296,10 @@ if( onboarding?.controller.isVisible ?? false) {
 }
 ```
 
-15. **From v.3.0.0** you can also add a pulsing animation around the focused widget. Pulse animation will be displayed `showPulseAnimation` on an `OnboardingStep` is set to `true`. In addition you can change the inner and outer colors of the pulse animation. Thanks to the author [Gautier](https://github.com/g-apparence) of the [pal](http://pub.dev/packages/pal) package for the inspiration.
+16. **From v.3.0.0** you can also add a pulsing animation around the focused widget. Pulse animation will be displayed `showPulseAnimation` on an `OnboardingStep` is set to `true`. In addition you can change the inner and outer colors of the pulse animation. Thanks to the author [Gautier](https://github.com/g-apparence) of the [pal](https://pub.dev/packages/pal) package for the inspiration.
 
 <img src="https://github.com/talamaska/onboarding_overlay/blob/master/screenshots/demo4.gif?raw=true" width="320"/>
 
-16. **From v.3.0.0** you can show a red border around the label box for debugging purposes by using an `Onboarding` parameter `debugBoundaries` which is `false` by default.
+17. **From v.3.0.0** you can show a red border around the label box for debugging purposes by using an `Onboarding` parameter `debugBoundaries` which is `false` by default.
 
 <img src="https://github.com/talamaska/onboarding_overlay/blob/master/screenshots/demo2.png?raw=true" width="320"/>

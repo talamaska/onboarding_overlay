@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'constants.dart';
 import 'label_painter.dart';
 
-enum TapArea { hole, overlay }
+enum TapArea { hole, overlay, label }
 
 class OnboardingStepRenderInfo {
   /// The `title` for the current step

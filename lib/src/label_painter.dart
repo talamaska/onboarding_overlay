@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:math' as math;
 import 'dart:ui';
 
@@ -158,6 +159,13 @@ class LabelPainter extends CustomPainter {
       canvas.drawPath(labelBoxPath, paintBorder);
       canvas.drawPath(labelBoxPath, paintBody);
     }
+  }
+
+  @override
+  bool hitTest(Offset position) {
+    // final bool hit = !(hole.contains(position));
+    log('label hit');
+    return true;
   }
 
   Path drawCenterRightArrow(Rect paddingBox, double a, double b) {

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/widgets.dart';
 
 import 'constants.dart';
@@ -130,7 +132,7 @@ class OverlayPainter extends CustomPainter {
   @override
   bool hitTest(Offset position) {
     final bool hit = !(hole.contains(position));
-    // print('overlay hit $hit');
+    log('overlay hit $hit');
     return hit;
   }
 }

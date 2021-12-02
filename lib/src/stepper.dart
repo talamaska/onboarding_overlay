@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -87,6 +89,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
   Offset? holeOffset;
   Rect? widgetRect;
   final GlobalKey overlayKey = GlobalKey();
+  final GlobalKey labelKey = GlobalKey();
 
   @override
   void initState() {
@@ -441,25 +444,37 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     return Listener(
       behavior: step.overlayBehavior,
       onPointerDown: (PointerDownEvent details) {
-        // print('global listener');
+        // log('global listener');
         final BoxHitTestResult result = BoxHitTestResult();
         final RenderBox overlayBox =
             overlayKey.currentContext?.findRenderObject() as RenderBox;
-
-        Offset localOverlay = overlayBox.globalToLocal(details.position);
+        final Offset localOverlay = overlayBox.globalToLocal(details.position);
 
         if (step.onTapCallback != null) {
-          final TapArea area =
-              overlayBox.hitTest(result, position: localOverlay)
-                  ? TapArea.overlay
+          final RenderBox labelBox =
+              labelKey.currentContext?.findRenderObject() as RenderBox;
+          final Offset localLabel = labelBox.globalToLocal(details.position);
+
+          final bool isLabelClicked =
+              labelBox.hitTest(result, position: localLabel);
+          final bool isOverlayClicked =
+              overlayBox.hitTest(result, position: localOverlay);
+          final TapArea area = isOverlayClicked && !isLabelClicked
+              ? TapArea.overlay
+              : isOverlayClicked && isLabelClicked
+                  ? TapArea.label
                   : TapArea.hole;
+          log('onTapCallback $area');
           step.onTapCallback?.call(area, _nextStep, _close);
           return;
         }
-        if ((overlayBox.hitTest(result, position: localOverlay) ||
-                step.overlayBehavior != HitTestBehavior.deferToChild) &&
-            step.stepBuilder == null &&
-            step.onTapCallback == null) {
+
+        if (step.stepBuilder != null) {
+          return;
+        }
+
+        if (overlayBox.hitTest(result, position: localOverlay) ||
+            step.overlayBehavior != HitTestBehavior.deferToChild) {
           _nextStep();
         }
       },
@@ -481,6 +496,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
             left: leftPos,
             top: topPos,
             child: AnimatedLabel(
+              labelKey: labelKey,
               overlayAnimation: overlayAnimation,
               debugBoundaries: widget.debugBoundaries,
               size: Size(boxWidth, boxHeight),
@@ -507,6 +523,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
 class AnimatedLabel extends StatelessWidget {
   const AnimatedLabel({
     Key? key,
+    required this.labelKey,
     required this.overlayAnimation,
     required this.debugBoundaries,
     required this.size,
@@ -523,6 +540,7 @@ class AnimatedLabel extends StatelessWidget {
   }) : super(key: key);
 
   final Animation<double> overlayAnimation;
+  final GlobalKey labelKey;
   final Size size;
   final bool isTop;
   final OnboardingStep step;
@@ -554,6 +572,7 @@ class AnimatedLabel extends StatelessWidget {
           children: [
             RepaintBoundary(
               child: CustomPaint(
+                key: labelKey,
                 painter: LabelPainter(
                   opacity: 1,
                   hasLabelBox: step.hasLabelBox,
