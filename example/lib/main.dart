@@ -47,7 +47,7 @@ class _AppState extends State<App> {
         home: Onboarding(
           key: widget.onboardingKey,
           autoSizeTexts: true,
-          // debugBoundaries: true,
+          debugBoundaries: true,
           steps: <OnboardingStep>[
             OnboardingStep(
               focusNode: focusNodes[0],
@@ -188,7 +188,7 @@ class _AppState extends State<App> {
               bodyText: 'You can open menu from here',
               overlayColor: Colors.green.withOpacity(0.9),
               shape: const CircleBorder(),
-              overlayBehavior: HitTestBehavior.deferToChild,
+              overlayBehavior: HitTestBehavior.translucent,
               onTapCallback: (
                 TapArea area,
                 VoidCallback next,
@@ -254,6 +254,7 @@ class _AppState extends State<App> {
             OnboardingStep(
               focusNode: focusNodes[7],
               titleText: "Or no widget at all! You're all done!",
+              textAlign: TextAlign.center,
               bodyText: "Or no widget at all! You're all done!",
               margin: EdgeInsets.zero,
               labelBoxPadding: const EdgeInsets.all(8.0),

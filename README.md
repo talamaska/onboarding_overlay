@@ -7,7 +7,7 @@ and arbitrary starting point
 
 ## Demo
 
-<img src="./screenshots/demo.gif?raw=true" width="320"/>
+<img src="https://github.com/talamaska/onboarding_overlay/blob/master/screenshots/demo.gif?raw=true" width="320"/>
 
 ## Usage
 
@@ -255,7 +255,7 @@ OnboardingStep(
 ),
 ```
 
-<img src="./screenshots/demo3.png" width="320"/>
+<img src="https://github.com/talamaska/onboarding_overlay/blob/master/screenshots/demo3.png?raw=true" width="320"/>
 
 13. **From v.3.0.0** Combining `onTapCallback` with the `overlayBehavior` gives more control.
 - If you want to capture any clicks and decide what to do depending on the area that was clicked - use `HitTestBehavior.opaque`
@@ -298,8 +298,8 @@ if( onboarding?.controller.isVisible ?? false) {
 
 16. **From v.3.0.0** you can also add a pulsing animation around the focused widget. Pulse animation will be displayed `showPulseAnimation` on an `OnboardingStep` is set to `true`. In addition you can change the inner and outer colors of the pulse animation. Thanks to the author [Gautier](https://github.com/g-apparence) of the [pal](https://pub.dev/packages/pal) package for the inspiration.
 
-<img src="./screenshots/demo4.gif" width="320"/>
+<img src="https://github.com/talamaska/onboarding_overlay/blob/master/screenshots/demo4.gif?raw=true" width="320"/>
 
 17. **From v.3.0.0** you can show a red border around the label box for debugging purposes by using an `Onboarding` parameter `debugBoundaries` which is `false` by default.
 
-<img src="./screenshots/demo2.png" width="320"/>
+<img src="https://github.com/talamaska/onboarding_overlay/blob/master/screenshots/demo2.png?raw=true" width="320"/>

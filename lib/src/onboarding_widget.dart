@@ -21,13 +21,27 @@ class Onboarding extends StatefulWidget {
     required this.steps,
     required this.child,
     this.duration = const Duration(milliseconds: 350),
+    this.globalOnboarding = false,
     this.debugBoundaries = false,
   }) : super(key: key);
 
-  final bool autoSizeTexts;
+  /// The first index of the Onboarding, by default it is 0
   final int initialIndex;
+
+  /// A callback that signal when the `Onboarding` changes step
   final ValueChanged<int>? onChanged;
+
+  /// A callback that signal when the `Onboarding` is finished or stopped
   final ValueChanged<int>? onEnd;
+
+  /// By default, the value used is false
+  /// Sometimes the `titleText` and the `bodyText` might not fit well in the constrained label box,
+  /// because of the long texts, longer translations or smaller screens.
+  /// There are 2 behaviors for this scenario.
+  /// The default one will limit the title to 2 lines and the bodyText to 5 lines
+  /// and will overflow both with ellipsis, the second one is to automatically resize the texts.
+  /// This is controlled by the Onboarding property `autoSizeTexts`, which default value is `false`.
+  final bool autoSizeTexts;
 
   /// By default, the value used is `false`
   final bool debugBoundaries;
@@ -40,6 +54,14 @@ class Onboarding extends StatefulWidget {
 
   /// By default, the value used is `Duration(milliseconds: 350)`
   final Duration duration;
+
+  /// By default, the value used is `false`
+  /// If your app has 2 or more top level contexts and the Onboarding is set in the widget tree of one of them
+  /// Because the `Onboarding` is using `Overlay` from the closest context,
+  /// you might end up with not covering the whole app with the `Overlay` and have wrong positions of the hole for the focused widget
+  /// Change to `true` if you have one or both of the above mentiond problems.
+  /// This will make the Onboarding to use the root level `Overlay`
+  final bool globalOnboarding;
 
   /// or
   /// context.findAncestorStateOfType\<OnboardingState\>();
@@ -84,14 +106,16 @@ class OnboardingState extends State<Onboarding> {
   /// Shows an onboarding session with all steps provided and initial index passed via the widget
   void show() {
     _overlayEntry = _createOverlayEntry(initialIndex: widget.initialIndex);
-    Overlay.of(context)!.insert(_overlayEntry);
+    Overlay.of(context, rootOverlay: widget.globalOnboarding)!
+        .insert(_overlayEntry);
     controller.setIsVisible(true);
   }
 
   /// Shows an onboarding session from a specific step index
   void showFromIndex(int index) {
     _overlayEntry = _createOverlayEntry(initialIndex: index);
-    Overlay.of(context)!.insert(_overlayEntry);
+    Overlay.of(context, rootOverlay: widget.globalOnboarding)!
+        .insert(_overlayEntry);
     controller.setIsVisible(true);
   }
 
@@ -99,7 +123,8 @@ class OnboardingState extends State<Onboarding> {
   void showWithSteps(int index, List<int> stepIndexes) {
     _overlayEntry =
         _createOverlayEntry(initialIndex: index, stepIndexes: stepIndexes);
-    Overlay.of(context)!.insert(_overlayEntry);
+    Overlay.of(context, rootOverlay: widget.globalOnboarding)!
+        .insert(_overlayEntry);
     controller.setIsVisible(true);
   }
 
@@ -113,6 +138,7 @@ class OnboardingState extends State<Onboarding> {
     required int initialIndex,
     List<int> stepIndexes = const <int>[],
   }) {
+    controller.setCurrentIndex(initialIndex);
     return OverlayEntry(
       opaque: false,
       builder: (BuildContext context) {
@@ -126,9 +152,6 @@ class OnboardingState extends State<Onboarding> {
             duration: widget.duration,
             autoSizeTexts: widget.autoSizeTexts,
             debugBoundaries: widget.debugBoundaries,
-            setupIndex: (int index) {
-              controller.setCurrentIndex(index);
-            },
             onChanged: (int index) {
               controller.setCurrentIndex(index);
               widget.onChanged?.call(index);
