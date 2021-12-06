@@ -146,8 +146,10 @@ class _OnboardingStepperState extends State<OnboardingStepper>
       end: null,
     );
 
-    startStepper(fromIndex: widget.initialIndex);
-    calcWidgetRect(widget.steps[stepperIndex]);
+    if (widget.steps.isNotEmpty) {
+      startStepper(fromIndex: widget.initialIndex);
+      calcWidgetRect(widget.steps[stepperIndex]);
+    }
   }
 
   Future<void> startStepper({int fromIndex = 0}) async {
@@ -183,7 +185,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
 
     final OnboardingStep step = widget.steps[stepperIndex];
 
-    if (stepperIndex > 0) {
+    if (stepperIndex > 0 && step.delay != Duration.zero) {
       await Future<void>.delayed(step.delay);
     }
 

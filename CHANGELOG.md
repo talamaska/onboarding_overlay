@@ -1,4 +1,4 @@
-## [3.0.0-pre.10]
+## [3.0.0-pre.11]
 
 - add: demo add default theme textStyles
 - add: onTapCallback which id set will ignore the internal next step method call
@@ -8,6 +8,8 @@
 - add: globalOnboarding setting that force the use of rootOverlay
 - add: debugBoundaries boolean to show red border around the max size of the label box
 - add: ArrowPosition.autoVertical and ArrowPosition.autoVerticalCenter. This setting will automatically position the label box arrow, if enabled, above or below the label box, depending on its position relative to the widget of interest.
+- fix: when empty list is passed to steps the onboarding should not start and not throw [#25](https://github.com/talamaska/onboarding_overlay/issues/25)
+- fix: when an empty list of indexes is passed to showWithSteps the onboarding should not start and not throw [#25](https://github.com/talamaska/onboarding_overlay/issues/25)
 - fix: HitTestBehavior.translucent
 - change: make label box use more space available
 - change: **[Breaking Change]** rename title to titleText

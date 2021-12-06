@@ -105,27 +105,33 @@ class OnboardingState extends State<Onboarding> {
 
   /// Shows an onboarding session with all steps provided and initial index passed via the widget
   void show() {
-    _overlayEntry = _createOverlayEntry(initialIndex: widget.initialIndex);
-    Overlay.of(context, rootOverlay: widget.globalOnboarding)!
-        .insert(_overlayEntry);
-    controller.setIsVisible(true);
+    if (widget.steps.isNotEmpty) {
+      _overlayEntry = _createOverlayEntry(initialIndex: widget.initialIndex);
+      Overlay.of(context, rootOverlay: widget.globalOnboarding)!
+          .insert(_overlayEntry);
+      controller.setIsVisible(true);
+    }
   }
 
   /// Shows an onboarding session from a specific step index
   void showFromIndex(int index) {
-    _overlayEntry = _createOverlayEntry(initialIndex: index);
-    Overlay.of(context, rootOverlay: widget.globalOnboarding)!
-        .insert(_overlayEntry);
-    controller.setIsVisible(true);
+    if (widget.steps.isNotEmpty) {
+      _overlayEntry = _createOverlayEntry(initialIndex: index);
+      Overlay.of(context, rootOverlay: widget.globalOnboarding)!
+          .insert(_overlayEntry);
+      controller.setIsVisible(true);
+    }
   }
 
   /// Shows an onboarding session from a specific step index and a specific order and set of step indexes
   void showWithSteps(int index, List<int> stepIndexes) {
-    _overlayEntry =
-        _createOverlayEntry(initialIndex: index, stepIndexes: stepIndexes);
-    Overlay.of(context, rootOverlay: widget.globalOnboarding)!
-        .insert(_overlayEntry);
-    controller.setIsVisible(true);
+    if (widget.steps.isNotEmpty && stepIndexes.isNotEmpty) {
+      _overlayEntry =
+          _createOverlayEntry(initialIndex: index, stepIndexes: stepIndexes);
+      Overlay.of(context, rootOverlay: widget.globalOnboarding)!
+          .insert(_overlayEntry);
+      controller.setIsVisible(true);
+    }
   }
 
   /// Hides the onboarding session overlay
