@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:math' as math;
 import 'dart:ui';
 
@@ -83,9 +82,11 @@ class LabelPainter extends CustomPainter {
 
   final bool isTop;
 
+  static Rect paragraphRect = Rect.zero;
+
   @override
   void paint(Canvas canvas, Size size) {
-    Rect paragraphRect = Rect.fromLTWH(
+    paragraphRect = Rect.fromLTWH(
       0,
       0,
       size.width,
@@ -163,9 +164,8 @@ class LabelPainter extends CustomPainter {
 
   @override
   bool hitTest(Offset position) {
-    // final bool hit = !(hole.contains(position));
-    log('label hit');
-    return true;
+    final bool hit = (paragraphRect.contains(position));
+    return hit;
   }
 
   Path drawCenterRightArrow(Rect paddingBox, double a, double b) {
