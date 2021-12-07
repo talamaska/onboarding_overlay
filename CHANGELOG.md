@@ -1,7 +1,7 @@
 ## [3.0.0-pre.11]
 
 - add: demo add default theme textStyles
-- add: onTapCallback which id set will ignore the internal next step method call
+- add: onTapCallback which if set will ignore the internal next step method call
 - add: a OverlayController (ChangeNotifier) attached to the OverlayState that provides the currentIndex, currentStep and isVisible - [#20](https://github.com/talamaska/onboarding_overlay/issues/20)
 - add: possibility to build your own step layout with stepBuilder - [#21](https://github.com/talamaska/onboarding_overlay/issues/21)
 - add: pulse animation on the focused widget (Thanks to the author [Gautier](https://github.com/g-apparence) of the [pal](https://pub.dev/packages/pal) package for the inspiration)
