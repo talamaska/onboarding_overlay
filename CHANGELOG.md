@@ -1,4 +1,4 @@
-## [3.0.0-pre.11]
+## [3.0.0-pre.12]
 
 - add: demo add default theme textStyles
 - add: onTapCallback which if set will ignore the internal next step method call
