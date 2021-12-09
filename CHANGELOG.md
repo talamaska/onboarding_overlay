@@ -1,4 +1,4 @@
-## [3.0.0-pre.12]
+## [3.0.0-pre.13]
 
 - add: demo add default theme textStyles
 - add: onTapCallback which if set will ignore the internal next step method call
@@ -11,6 +11,7 @@
 - fix: when empty list is passed to steps the onboarding should not start and not throw [#25](https://github.com/talamaska/onboarding_overlay/issues/25)
 - fix: when an empty list of indexes is passed to showWithSteps the onboarding should not start and not throw [#25](https://github.com/talamaska/onboarding_overlay/issues/25)
 - fix: HitTestBehavior.translucent
+- fix: better calculation of the max size of the label box - issue [#26](https://github.com/talamaska/onboarding_overlay/issues/26) 
 - change: make label box use more space available
 - change: **[Breaking Change]** rename title to titleText
 - remove: **[Breaking Change]** ArrowPosition.centerLeft and ArrowPosition.centerRight

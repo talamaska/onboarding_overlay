@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:math' as math;
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
@@ -319,16 +320,21 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     double boxWidth,
   ) {
     if (widgetRect.width != 0 && widgetRect.height != 0) {
-      if (widgetRect.center.dx > size.width / 2) {
-        return (widgetRect.center.dx - boxWidth / 2)
-            .clamp(sideGap, size.width - boxWidth - sideGap);
-      } else if (widgetRect.center.dx == size.width / 2) {
-        return (widgetRect.center.dx - boxWidth / 2)
-            .clamp(sideGap, size.width - boxWidth - sideGap);
-      } else {
-        return (widgetRect.center.dx - boxWidth / 2)
-            .clamp(sideGap, size.width - boxWidth - sideGap);
-      }
+      // if (widgetRect.center.dx > size.width / 2) {
+      //   // log('1. $sideGap - ${size.width - boxWidth - sideGap}');
+      //   return (widgetRect.center.dx - boxWidth / 2).clamp(
+      //       sideGap, (size.width - boxWidth - sideGap).clamp(0, size.width));
+      // } else if (widgetRect.center.dx == size.width / 2) {
+      //   // log('2. $sideGap - ${size.width - boxWidth - sideGap}');
+      //   return (widgetRect.center.dx - boxWidth / 2).clamp(
+      //       sideGap, (size.width - boxWidth - sideGap).clamp(0, size.width));
+      // } else {
+      //   // log('3. $sideGap - ${size.width - boxWidth - sideGap}');
+      //   return (widgetRect.center.dx - boxWidth / 2).clamp(
+      //       sideGap, (size.width - boxWidth - sideGap).clamp(0, size.width));
+      // }
+      return (widgetRect.center.dx - boxWidth / 2).clamp(
+          sideGap, (size.width - boxWidth - sideGap).clamp(0, size.width));
     } else {
       return size.width / 2 - boxWidth / 2;
     }
@@ -345,10 +351,13 @@ class _OnboardingStepperState extends State<OnboardingStepper>
       final Rect holeRect = step.margin.inflateRect(widgetRect);
 
       if (widgetRect.center.dy > size.height / 2) {
+        // log('11. 0 - ${size.height - boxHeight}');
         return (holeRect.top - boxHeight - spacer)
-            .clamp(0, size.height - boxHeight);
+            .clamp(0, (size.height - boxHeight).abs());
       } else {
-        return (holeRect.bottom + spacer).clamp(0, size.height - boxHeight);
+        // log('12. 0 - ${size.height - boxHeight}');
+        return (holeRect.bottom + spacer)
+            .clamp(0, (size.height - boxHeight).abs());
       }
     } else {
       return size.height / 2 - boxHeight / 2;
@@ -361,13 +370,19 @@ class _OnboardingStepperState extends State<OnboardingStepper>
 
   double _calcWidth(
     OnboardingStep step,
+    Rect holeRect,
     Size mediaSize,
   ) {
-    return step.fullscreen
+    final double radius = mediaSize.width * kOverlayRatio;
+    final double a = math.sqrt(math.pow(radius, 2) / 2);
+
+    final double boxWidth = step.fullscreen
         ? (mediaSize.width - 2 * sideGap)
-        : (widgetRect.width != 0 && widgetRect.height != 0)
-            ? mediaSize.width * kLabelBoxWidthRatio
-            : mediaSize.width * kOverlayRatio;
+        : ((widgetRect.width != 0 && widgetRect.height != 0)
+            ? a + holeRect.width / 4
+            : a * 2);
+    // log('boxWidth $boxWidth');
+    return boxWidth;
   }
 
   double _calcHeight(
@@ -378,8 +393,11 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     Size mediaSize,
   ) {
     double boxHeight = 0;
+    final double radius = mediaSize.width * kOverlayRatio;
+    final double a = math.sqrt(math.pow(radius, 2) / 2);
+
     if (step.fullscreen) {
-      if (holeRect.height > 0) {
+      if (widgetRect.width != 0 && widgetRect.height != 0) {
         if (isTop) {
           boxHeight = holeRect.top -
               sideGap -
@@ -396,20 +414,43 @@ class _OnboardingStepperState extends State<OnboardingStepper>
         boxHeight = mediaSize.height -
             sideGap -
             (step.hasArrow ? kArrowHeight + sideGap : sideGap) -
-            2 * media.padding.top;
+            media.padding.top;
       }
     } else {
       if (widgetRect.width != 0 && widgetRect.height != 0) {
-        boxHeight = mediaSize.width * kLabelBoxWidthRatio -
-            kSpace -
-            (step.hasArrow ? kArrowHeight + sideGap : sideGap);
+        if (isTop) {
+          boxHeight = (a -
+                  sideGap -
+                  (step.hasArrow ? kArrowHeight + sideGap : sideGap) +
+                  holeRect.height / 2)
+              .clamp(
+                  0,
+                  holeRect.top -
+                      sideGap -
+                      (step.hasArrow ? kArrowHeight + sideGap : sideGap) -
+                      step.margin.top -
+                      media.padding.top);
+        } else {
+          boxHeight = (a -
+                  sideGap -
+                  (step.hasArrow ? kArrowHeight + sideGap : sideGap) +
+                  holeRect.height / 2)
+              .clamp(
+                  0,
+                  mediaSize.height -
+                      holeRect.bottom -
+                      sideGap -
+                      (step.hasArrow ? kArrowHeight + sideGap : sideGap) -
+                      step.margin.bottom -
+                      media.padding.top);
+        }
       } else {
-        boxHeight = mediaSize.height * kLabelBoxWidthRatio -
-            kSpace -
-            (step.hasArrow ? kArrowHeight + sideGap : sideGap);
+        boxHeight =
+            (a * 2).clamp(0, mediaSize.height - media.padding.top - 2 * kSpace);
       }
     }
-
+    // log('radius ${mediaSize.width * kOverlayRatio}');
+    // log('boxHeight $boxHeight');
     return boxHeight;
   }
 
@@ -465,7 +506,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     }
 
     final bool isTop = holeRect.center.dy > mediaSize.height / 2;
-    final double boxWidth = _calcWidth(step, mediaSize);
+    final double boxWidth = _calcWidth(step, holeRect, mediaSize);
     final double boxHeight = _calcHeight(
       step,
       holeRect,
@@ -593,6 +634,10 @@ class AnimatedLabel extends StatelessWidget {
   final VoidCallback close;
   final VoidCallback next;
 
+  bool isNotEmptyHole() {
+    return holeAnimatedValue.width != 0 && holeAnimatedValue.height != 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     return FadeTransition(
@@ -607,7 +652,9 @@ class AnimatedLabel extends StatelessWidget {
         height: size.height,
         child: Stack(
           clipBehavior: Clip.antiAlias,
-          alignment: isTop ? Alignment.bottomCenter : Alignment.topCenter,
+          alignment: isNotEmptyHole()
+              ? (isTop ? Alignment.bottomCenter : Alignment.topCenter)
+              : Alignment.topCenter,
           children: [
             RepaintBoundary(
               child: CustomPaint(
