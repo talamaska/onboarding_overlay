@@ -70,7 +70,7 @@ class _AppState extends State<App> {
               hasLabelBox: true,
               fullscreen: true,
               overlayBehavior: HitTestBehavior.translucent,
-              onTapCallback: (area, next, close) {},
+              onTapCallback: (TapArea area, next, close) {},
               stepBuilder: (
                 BuildContext context,
                 OnboardingStepRenderInfo renderInfo,
@@ -105,11 +105,11 @@ class _AppState extends State<App> {
                           children: [
                             TextButton(
                               onPressed: renderInfo.nextStep,
-                              child: Text('Next'),
+                              child: const Text('Next'),
                             ),
                             TextButton(
                               onPressed: renderInfo.close,
-                              child: Text('close'),
+                              child: const Text('close'),
                             ),
                           ],
                         ),
@@ -220,7 +220,7 @@ class _AppState extends State<App> {
               hasLabelBox: true,
               hasArrow: true,
               overlayBehavior: HitTestBehavior.translucent,
-              margin: EdgeInsets.all(0),
+              margin: const EdgeInsets.all(0),
               onTapCallback: (
                 TapArea area,
                 VoidCallback next,
@@ -258,9 +258,9 @@ class _AppState extends State<App> {
               bodyText: "Or no widget at all! You're all done!",
               margin: EdgeInsets.zero,
               labelBoxPadding: const EdgeInsets.all(8.0),
-              shape: const CircleBorder(),
-              overlayShape: const CircleBorder(),
-              fullscreen: false,
+              // shape: const CircleBorder(),
+              // overlayShape: const CircleBorder(),
+              fullscreen: true,
             ),
             OnboardingStep(
               focusNode: focusNodes[8],
@@ -528,7 +528,7 @@ class _HomeState extends State<Home> {
                 )
               : ListTile(
                   leading: Focus(
-                    child: Icon(Icons.alarm),
+                    child: const Icon(Icons.alarm),
                     focusNode: widget.focusNodes[index + 8],
                   ),
                   title: Text('Item ${index + 1}'),
