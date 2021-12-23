@@ -1,4 +1,4 @@
-## [3.0.0-pre.14]
+## [3.0.0-pre.15]
 
 - add: demo add default theme textStyles
 - add: onTapCallback which if set will ignore the internal next step method call
@@ -13,6 +13,7 @@
 - fix: HitTestBehavior.translucent
 - fix: better calculation of the max size of the label box - issue [#26](https://github.com/talamaska/onboarding_overlay/issues/26) 
 - fix: positioning of the label box when the overlay is full screen and there is no focused widget. 
+- fix: regression label box not centered when no focus widget and overlay is not full screen.
 - change: make label box use more space available
 - change: **[Breaking Change]** rename title to titleText
 - remove: **[Breaking Change]** ArrowPosition.centerLeft and ArrowPosition.centerRight
