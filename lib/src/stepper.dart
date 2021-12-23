@@ -348,7 +348,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
             .clamp(0, (size.height - boxHeight).abs());
       }
     } else if (!step.fullscreen) {
-      return size.center(Offset.zero).dx;
+      return size.center(Offset.zero).dy - boxHeight / 2;
     } else {
       return media.padding.top;
     }
