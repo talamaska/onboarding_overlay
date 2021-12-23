@@ -20,6 +20,7 @@ class OverlayPainter extends CustomPainter {
     this.pulseInnerColor = defaultInnerPulseColor,
     this.pulseOuterColor = defaultOuterPulseColor,
     this.showPulseAnimation = false,
+    required this.isEmpty,
   });
 
   /// By default, the value is
@@ -58,6 +59,8 @@ class OverlayPainter extends CustomPainter {
   /// By default value is `false`
   final bool showPulseAnimation;
 
+  final bool isEmpty;
+
   @override
   void paint(Canvas canvas, Size size) {
     final Path canvasPath = Path()
@@ -92,7 +95,7 @@ class OverlayPainter extends CustomPainter {
         ..style = PaintingStyle.fill,
     );
 
-    if (hole.width != 0 && hole.height != 0 && showPulseAnimation) {
+    if (!isEmpty && showPulseAnimation) {
       final Rect pulseInnerRect = hole.inflate(20 * pulseAnimationInner);
       final Path pulseInnerPath = shape.getOuterPath(pulseInnerRect);
       final Path pulseInnerPathHole = Path.combine(

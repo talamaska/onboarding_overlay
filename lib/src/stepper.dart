@@ -347,6 +347,8 @@ class _OnboardingStepperState extends State<OnboardingStepper>
         return (holeRect.bottom + spacer)
             .clamp(0, (size.height - boxHeight).abs());
       }
+    } else if (!step.fullscreen) {
+      return size.center(Offset.zero).dy - boxHeight / 2;
     } else {
       return media.padding.top;
     }
@@ -570,6 +572,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
             pulseAnimationInner: pulseAnimationInner.value,
             pulseAnimationOuter: pulseAnimationOuter.value,
             colorAnimatedValue: colorAnimatedValue,
+            isEmpty: !(widgetRect.width != 0 && widgetRect.height != 0),
           ),
           Positioned(
             left: leftPos,
@@ -752,6 +755,7 @@ class AnimatedOverlay extends StatelessWidget {
     required this.overlayAnimation,
     required this.pulseAnimationInner,
     required this.pulseAnimationOuter,
+    required this.isEmpty,
   }) : super(key: key);
 
   final GlobalKey<State<StatefulWidget>> overlayKey;
@@ -762,6 +766,7 @@ class AnimatedOverlay extends StatelessWidget {
   final double pulseAnimationInner;
   final double pulseAnimationOuter;
   final Color? colorAnimatedValue;
+  final bool isEmpty;
 
   @override
   Widget build(BuildContext context) {
@@ -775,6 +780,7 @@ class AnimatedOverlay extends StatelessWidget {
         painter: OverlayPainter(
           fullscreen: step.fullscreen,
           shape: step.shape,
+          isEmpty: isEmpty,
           overlayShape: step.overlayShape,
           center:
               step.focusNode.context == null ? size.center(Offset.zero) : null,

@@ -536,32 +536,43 @@ class _HomeState extends State<Home> {
                 );
         },
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(left: 32),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            FloatingActionButton(
-              focusNode: widget.focusNodes[1],
-              onPressed: () {
-                final OnboardingState? onboarding = Onboarding.of(context);
-                if (onboarding != null) {
-                  onboarding.show();
-                }
-              },
-              child: const Icon(Icons.add),
-            ),
-            FloatingActionButton(
-              focusNode: widget.focusNodes[2],
-              onPressed: () {
-                _increment(context);
-              },
-              child: const Icon(Icons.add),
-            ),
-          ],
-        ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton(
+        focusNode: widget.focusNodes[1],
+        onPressed: () {
+          final OnboardingState? onboarding = Onboarding.of(context);
+          if (onboarding != null) {
+            onboarding.show();
+          }
+        },
+        child: const Icon(Icons.add),
       ),
+      // floatingActionButton: Padding(
+      //   padding: const EdgeInsets.only(left: 32),
+      //   child: Row(
+      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //     mainAxisSize: MainAxisSize.max,
+      //     children: [
+      //       FloatingActionButton(
+      //         focusNode: widget.focusNodes[1],
+      //         onPressed: () {
+      //           final OnboardingState? onboarding = Onboarding.of(context);
+      //           if (onboarding != null) {
+      //             onboarding.show();
+      //           }
+      //         },
+      //         child: const Icon(Icons.add),
+      //       ),
+      //       FloatingActionButton(
+      //         focusNode: widget.focusNodes[2],
+      //         onPressed: () {
+      //           _increment(context);
+      //         },
+      //         child: const Icon(Icons.add),
+      //       ),
+      //     ],
+      //   ),
+      // ),
     );
   }
 }
