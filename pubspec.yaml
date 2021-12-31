@@ -1,6 +1,6 @@
 name: onboarding_overlay
 description: Flexible to control Onboarding overlay with or without target element (fork from onboard_overlay)
-version: 2.3.5
+version: 3.0.0-pre.15
 repository: https://github.com/talamaska/onboarding_overlay
 
 environment:
@@ -11,11 +11,10 @@ dependencies:
     sdk: flutter
   vector_math: ^2.1.0
   auto_size_text: ^3.0.0
-  
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^1.0.4
-  
 
 flutter:

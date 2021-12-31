@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:onboarding_overlay/onboarding_overlay.dart';
 
@@ -12,11 +15,14 @@ final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 class App extends StatefulWidget {
   final GlobalKey<OnboardingState> onboardingKey = GlobalKey<OnboardingState>();
 
+  App({Key? key}) : super(key: key);
+
   @override
   _AppState createState() => _AppState();
 }
 
 class _AppState extends State<App> {
+  final GlobalKey closeKey = GlobalKey();
   late List<FocusNode> focusNodes;
 
   @override
@@ -32,13 +38,20 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
+        theme: ThemeData.from(
+          colorScheme: ColorScheme.fromSwatch(
+            primarySwatch: Colors.blue,
+            backgroundColor: Colors.white,
+          ),
+        ),
         home: Onboarding(
           key: widget.onboardingKey,
           autoSizeTexts: true,
+          debugBoundaries: true,
           steps: <OnboardingStep>[
             OnboardingStep(
               focusNode: focusNodes[0],
-              title: 'Tap anywhere to continue ',
+              titleText: 'Tap anywhere to continue ',
               titleTextColor: Colors.black,
               bodyText: 'Tap anywhere to continue Tap anywhere to continue',
               labelBoxPadding: const EdgeInsets.all(16.0),
@@ -52,14 +65,63 @@ class _AppState extends State<App> {
                   style: BorderStyle.solid,
                 ),
               ),
-              arrowPosition: ArrowPosition.top,
+              arrowPosition: ArrowPosition.autoVertical,
               hasArrow: true,
               hasLabelBox: true,
               fullscreen: true,
+              overlayBehavior: HitTestBehavior.translucent,
+              onTapCallback: (TapArea area, next, close) {},
+              stepBuilder: (
+                BuildContext context,
+                OnboardingStepRenderInfo renderInfo,
+              ) {
+                return Material(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Text(
+                          renderInfo.titleText,
+                          // style: renderInfo.titleStyle,
+                        ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Image.asset(
+                              'assets/demo.gif',
+                              width: 50,
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Flexible(
+                              child: AutoSizeText(
+                                renderInfo.bodyText,
+                                // style: renderInfo.bodyStyle,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            TextButton(
+                              onPressed: renderInfo.nextStep,
+                              child: const Text('Next'),
+                            ),
+                            TextButton(
+                              onPressed: renderInfo.close,
+                              child: const Text('close'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
             OnboardingStep(
               focusNode: focusNodes[1],
-              title: 'left fab',
+              titleText: 'left fab',
               bodyText: 'Tap to continue',
               shape: const CircleBorder(),
               fullscreen: false,
@@ -79,17 +141,18 @@ class _AppState extends State<App> {
             ),
             OnboardingStep(
               focusNode: focusNodes[2],
-              title: 'right fab',
+              titleText: 'right fab',
               bodyText: 'Tap only here to increment',
               shape: const CircleBorder(),
               fullscreen: false,
               overlayColor: Colors.blue.withOpacity(0.9),
               overlayShape: const CircleBorder(),
               overlayBehavior: HitTestBehavior.deferToChild,
+              showPulseAnimation: true,
             ),
             OnboardingStep(
               focusNode: focusNodes[3],
-              title: 'Easy to customize Easy to customize',
+              titleText: 'Easy to customize Easy to customize',
               titleTextColor: Colors.greenAccent,
               titleTextStyle: const TextStyle(
                 fontSize: 16.0,
@@ -114,25 +177,33 @@ class _AppState extends State<App> {
                   style: BorderStyle.solid,
                 ),
               ),
-              arrowPosition: ArrowPosition.top,
+              arrowPosition: ArrowPosition.autoVertical,
               hasArrow: true,
               hasLabelBox: true,
               textAlign: TextAlign.center,
             ),
             OnboardingStep(
               focusNode: focusNodes[4],
-              title: 'Menu',
+              titleText: 'Menu',
               bodyText: 'You can open menu from here',
               overlayColor: Colors.green.withOpacity(0.9),
               shape: const CircleBorder(),
               overlayBehavior: HitTestBehavior.translucent,
+              onTapCallback: (
+                TapArea area,
+                VoidCallback next,
+                VoidCallback close,
+              ) {
+                log('tap callback $area');
+                if (area == TapArea.hole) {
+                  next();
+                }
+              },
             ),
             OnboardingStep(
               focusNode: focusNodes[5],
-              title: 'Settings',
-              shape: const CircleBorder(),
-              bodyText:
-                  'Click here to access settings such as dark mode, daily limit, etc',
+              titleText: 'Close menu',
+              bodyText: 'Click here to close the drawer',
               fullscreen: false,
               overlayColor: Colors.black.withOpacity(0.8),
               overlayShape: const CircleBorder(),
@@ -147,10 +218,23 @@ class _AppState extends State<App> {
                 ),
               ),
               hasLabelBox: true,
+              hasArrow: true,
+              overlayBehavior: HitTestBehavior.translucent,
+              margin: const EdgeInsets.all(0),
+              onTapCallback: (
+                TapArea area,
+                VoidCallback next,
+                VoidCallback close,
+              ) {
+                log('tap callback $area');
+                if (area == TapArea.hole) {
+                  next();
+                }
+              },
             ),
             OnboardingStep(
               focusNode: focusNodes[6],
-              title: 'Counter Value',
+              titleText: 'Counter Value',
               bodyText: 'With automatic vertical positioning of the text',
               labelBoxPadding: const EdgeInsets.all(16.0),
               labelBoxDecoration: BoxDecoration(
@@ -163,23 +247,24 @@ class _AppState extends State<App> {
                   style: BorderStyle.solid,
                 ),
               ),
-              arrowPosition: ArrowPosition.bottom,
+              arrowPosition: ArrowPosition.autoVertical,
               hasArrow: true,
               hasLabelBox: true,
             ),
             OnboardingStep(
               focusNode: focusNodes[7],
-              title: "Or no widget at all! You're all done!",
+              titleText: "Or no widget at all! You're all done!",
+              textAlign: TextAlign.center,
               bodyText: "Or no widget at all! You're all done!",
               margin: EdgeInsets.zero,
               labelBoxPadding: const EdgeInsets.all(8.0),
-              shape: const CircleBorder(),
-              overlayShape: const CircleBorder(),
-              fullscreen: false,
+              // shape: const CircleBorder(),
+              // overlayShape: const CircleBorder(),
+              fullscreen: true,
             ),
             OnboardingStep(
               focusNode: focusNodes[8],
-              title: 'Icon 1',
+              titleText: 'Icon 1',
               shape: const CircleBorder(),
               bodyText: 'Icon 1Icon 1Icon 1Icon 1Icon 1Icon 1Icon 1Icon 1',
               fullscreen: false,
@@ -188,7 +273,7 @@ class _AppState extends State<App> {
             ),
             OnboardingStep(
               focusNode: focusNodes[9],
-              title: 'Icon 2',
+              titleText: 'Icon 2',
               shape: BeveledRectangleBorder(
                 borderRadius: BorderRadius.circular(15.0),
               ),
@@ -200,7 +285,7 @@ class _AppState extends State<App> {
             ),
             OnboardingStep(
               focusNode: focusNodes[10],
-              title: 'Icon 3',
+              titleText: 'Icon 3',
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16.0),
               ),
@@ -212,11 +297,11 @@ class _AppState extends State<App> {
               hasArrow: true,
               hasLabelBox: true,
               labelBoxDecoration: BoxDecoration(color: Colors.orange.shade900),
-              arrowPosition: ArrowPosition.top,
+              arrowPosition: ArrowPosition.autoVertical,
             ),
             OnboardingStep(
               focusNode: focusNodes[11],
-              title: 'Icon 4',
+              titleText: 'Icon 4',
               shape: ContinuousRectangleBorder(
                 borderRadius: BorderRadius.circular(16.0),
               ),
@@ -228,11 +313,11 @@ class _AppState extends State<App> {
               hasArrow: true,
               hasLabelBox: true,
               labelBoxDecoration: const BoxDecoration(color: Colors.green),
-              arrowPosition: ArrowPosition.top,
+              arrowPosition: ArrowPosition.autoVertical,
             ),
             OnboardingStep(
               focusNode: focusNodes[12],
-              title: 'Icon 5',
+              titleText: 'Icon 5',
               shape: const CircleBorder(),
               bodyText:
                   'Icon 5Icon 5Icon 5Icon 5Icon 5Icon 5Icon 5Icon 5Icon 5',
@@ -242,18 +327,18 @@ class _AppState extends State<App> {
             ),
             OnboardingStep(
               focusNode: focusNodes[13],
-              title: 'No icon',
+              titleText: 'No icon',
               bodyText: 'No iconNo iconNo iconNo iconNo iconNo iconNo iconNo ',
               fullscreen: true,
               overlayColor: Colors.black.withOpacity(0.8),
               hasArrow: true,
               hasLabelBox: true,
               labelBoxDecoration: const BoxDecoration(color: Colors.purple),
-              arrowPosition: ArrowPosition.bottom,
+              arrowPosition: ArrowPosition.autoVertical,
             ),
             OnboardingStep(
               focusNode: focusNodes[14],
-              title: 'Icon 7',
+              titleText: 'Icon 7',
               shape: const CircleBorder(),
               bodyText: 'Icon 7Icon 7Icon 7Icon 7Icon ',
               fullscreen: false,
@@ -262,7 +347,7 @@ class _AppState extends State<App> {
             ),
             OnboardingStep(
               focusNode: focusNodes[15],
-              title: 'Icon 8',
+              titleText: 'Icon 8',
               shape: const CircleBorder(),
               bodyText: 'Icon 8Icon 8Icon 8Icon 8Icon 8Icon 8Icon ',
               fullscreen: false,
@@ -273,11 +358,11 @@ class _AppState extends State<App> {
               hasArrow: true,
               hasLabelBox: true,
               labelBoxDecoration: BoxDecoration(color: Colors.cyan.shade900),
-              arrowPosition: ArrowPosition.bottom,
+              arrowPosition: ArrowPosition.autoVertical,
             ),
             OnboardingStep(
               focusNode: focusNodes[16],
-              title: 'Icon 9',
+              titleText: 'Icon 9',
               shape: const CircleBorder(),
               bodyText: 'Icon 9Icon 9Icon 9Icon 9Icon ',
               fullscreen: false,
@@ -290,11 +375,11 @@ class _AppState extends State<App> {
               labelBoxDecoration: BoxDecoration(
                 color: Colors.pink.shade900,
               ),
-              arrowPosition: ArrowPosition.bottom,
+              arrowPosition: ArrowPosition.autoVertical,
             ),
             OnboardingStep(
               focusNode: focusNodes[17],
-              title: 'Icon 10',
+              titleText: 'Icon 10',
               shape: const CircleBorder(),
               bodyText: 'Icon 10Icon 10Icon 10Icon 10Icon 10Icon 10Icon',
               fullscreen: false,
@@ -307,12 +392,16 @@ class _AppState extends State<App> {
           onChanged: (int index) {
             if (index == 4) {
               // close the drawer
-              if (scaffoldKey.currentState?.isDrawerOpen ?? false) {
-                scaffoldKey.currentState?.openEndDrawer();
-              }
+              // if (scaffoldKey.currentState?.isDrawerOpen ?? false) {
+              //   scaffoldKey.currentState?.openEndDrawer();
+              // }
               // interrupt onboarding on specific step
               // widget.onboardingKey.currentState.hide();
             }
+            final int? currentIndex =
+                widget.onboardingKey.currentState?.controller.currentIndex;
+
+            print('currentIndex $currentIndex');
           },
           child: Home(
             focusNodes: focusNodes,
@@ -371,7 +460,7 @@ class _HomeState extends State<Home> {
         ),
         actions: [
           IconButton(
-            focusNode: widget.focusNodes[5],
+            // focusNode: widget.focusNodes[5],
             icon: const Icon(Icons.mic),
             onPressed: () {},
           ),
@@ -387,9 +476,20 @@ class _HomeState extends State<Home> {
           )
         ],
       ),
-      drawer: const Drawer(
-        child: Center(
-          child: Text('Menu'),
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            const DrawerHeader(
+              child: Text('Menu'),
+            ),
+            ListTile(
+              focusNode: widget.focusNodes[5],
+              title: const Text('Close menu'),
+              onTap: () {
+                Navigator.of(context).pop();
+              },
+            )
+          ],
         ),
       ),
       body: ListView.builder(
@@ -406,8 +506,13 @@ class _HomeState extends State<Home> {
                         children: <Widget>[
                           Focus(
                             focusNode: widget.focusNodes[0],
-                            child: const Text(
-                                'You have pushed the button this many times:'),
+                            child: TextButton(
+                              child: const Text(
+                                  'You have pushed the button this many times:'),
+                              onPressed: () {
+                                print('do something');
+                              },
+                            ),
                           ),
                           Focus(
                             focusNode: widget.focusNodes[6],
@@ -423,7 +528,7 @@ class _HomeState extends State<Home> {
                 )
               : ListTile(
                   leading: Focus(
-                    child: Icon(Icons.alarm),
+                    child: const Icon(Icons.alarm),
                     focusNode: widget.focusNodes[index + 8],
                   ),
                   title: Text('Item ${index + 1}'),
@@ -431,32 +536,43 @@ class _HomeState extends State<Home> {
                 );
         },
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(left: 32),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            FloatingActionButton(
-              focusNode: widget.focusNodes[1],
-              onPressed: () {
-                final OnboardingState? onboarding = Onboarding.of(context);
-                if (onboarding != null) {
-                  onboarding.show();
-                }
-              },
-              child: const Icon(Icons.add),
-            ),
-            FloatingActionButton(
-              focusNode: widget.focusNodes[2],
-              onPressed: () {
-                _increment(context);
-              },
-              child: const Icon(Icons.add),
-            ),
-          ],
-        ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton(
+        focusNode: widget.focusNodes[1],
+        onPressed: () {
+          final OnboardingState? onboarding = Onboarding.of(context);
+          if (onboarding != null) {
+            onboarding.show();
+          }
+        },
+        child: const Icon(Icons.add),
       ),
+      // floatingActionButton: Padding(
+      //   padding: const EdgeInsets.only(left: 32),
+      //   child: Row(
+      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //     mainAxisSize: MainAxisSize.max,
+      //     children: [
+      //       FloatingActionButton(
+      //         focusNode: widget.focusNodes[1],
+      //         onPressed: () {
+      //           final OnboardingState? onboarding = Onboarding.of(context);
+      //           if (onboarding != null) {
+      //             onboarding.show();
+      //           }
+      //         },
+      //         child: const Icon(Icons.add),
+      //       ),
+      //       FloatingActionButton(
+      //         focusNode: widget.focusNodes[2],
+      //         onPressed: () {
+      //           _increment(context);
+      //         },
+      //         child: const Icon(Icons.add),
+      //       ),
+      //     ],
+      //   ),
+      // ),
     );
   }
 }
