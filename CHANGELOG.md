@@ -1,3 +1,7 @@
+## [3.1.0]
+ - fix: issues with scaled widgets from ResponsiveFramework package [#33](https://github.com/talamaska/onboarding_overlay/issues/33)
+ - fix: stepBuilder content could not be sized with a custom size [#31](https://github.com/talamaska/onboarding_overlay/issues/31)
+
 ## [3.0.0]
 
 - add: demo add default theme textStyles

@@ -688,67 +688,71 @@ class AnimatedLabel extends StatelessWidget {
                   hole: holeAnimatedValue,
                   isTop: isTop,
                 ),
-                child: SizedBox(
-                  width: size.width,
-                  child: Padding(
-                    padding: step.labelBoxPadding,
-                    child: step.stepBuilder != null
-                        ? step.stepBuilder?.call(
-                            context,
-                            OnboardingStepRenderInfo(
-                              titleText: step.titleText,
-                              titleStyle: activeTitleStyle,
-                              bodyText: step.bodyText,
-                              bodyStyle: activeBodyStyle,
-                              size: size,
-                              nextStep: next,
-                              close: close,
-                            ),
-                          )
-                        : autoSizeTexts
-                            ? AutoSizeText.rich(
-                                TextSpan(
-                                  text: step.titleText,
-                                  style: activeTitleStyle,
-                                  children: <InlineSpan>[
-                                    const TextSpan(text: '\n'),
-                                    TextSpan(
-                                      text: step.bodyText,
+                child: step.stepBuilder != null
+                    ? Padding(
+                        padding: step.labelBoxPadding,
+                        child: step.stepBuilder?.call(
+                          context,
+                          OnboardingStepRenderInfo(
+                            titleText: step.titleText,
+                            titleStyle: activeTitleStyle,
+                            bodyText: step.bodyText,
+                            bodyStyle: activeBodyStyle,
+                            size: size,
+                            nextStep: next,
+                            close: close,
+                          ),
+                        ),
+                      )
+                    : SizedBox(
+                        width: size.width,
+                        child: Padding(
+                          padding: step.labelBoxPadding,
+                          child: autoSizeTexts
+                              ? AutoSizeText.rich(
+                                  TextSpan(
+                                    text: step.titleText,
+                                    style: activeTitleStyle,
+                                    children: <InlineSpan>[
+                                      const TextSpan(text: '\n'),
+                                      TextSpan(
+                                        text: step.bodyText,
+                                        style: activeBodyStyle,
+                                      )
+                                    ],
+                                  ),
+                                  textDirection: Directionality.of(context),
+                                  textAlign: step.textAlign,
+                                  minFontSize: 12,
+                                )
+                              : Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  mainAxisAlignment: isTop
+                                      ? MainAxisAlignment.end
+                                      : MainAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      step.titleText,
+                                      style: activeTitleStyle,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: step.textAlign,
+                                      textDirection: Directionality.of(context),
+                                    ),
+                                    Text(
+                                      step.bodyText,
                                       style: activeBodyStyle,
+                                      maxLines: 5,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: step.textAlign,
+                                      textDirection: Directionality.of(context),
                                     )
                                   ],
                                 ),
-                                textDirection: Directionality.of(context),
-                                textAlign: step.textAlign,
-                                minFontSize: 12,
-                              )
-                            : Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                mainAxisAlignment: isTop
-                                    ? MainAxisAlignment.end
-                                    : MainAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    step.titleText,
-                                    style: activeTitleStyle,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    textAlign: step.textAlign,
-                                    textDirection: Directionality.of(context),
-                                  ),
-                                  Text(
-                                    step.bodyText,
-                                    style: activeBodyStyle,
-                                    maxLines: 5,
-                                    overflow: TextOverflow.ellipsis,
-                                    textAlign: step.textAlign,
-                                    textDirection: Directionality.of(context),
-                                  )
-                                ],
-                              ),
-                  ),
-                ),
+                        ),
+                      ),
               ),
             )
           ],
