@@ -22,6 +22,8 @@ class Onboarding extends StatefulWidget {
     this.duration = const Duration(milliseconds: 350),
     this.globalOnboarding = false,
     this.debugBoundaries = false,
+    this.scaleHeight = 1.0,
+    this.scaleWidth = 1.0,
   }) : super(key: key);
 
   /// The first index of the Onboarding, by default it is 0
@@ -62,8 +64,17 @@ class Onboarding extends StatefulWidget {
   /// This will make the Onboarding to use the root level `Overlay`
   final bool globalOnboarding;
 
-  /// or
-  /// context.findAncestorStateOfType\<OnboardingState\>();
+  /// By default the value is 1.0.
+  /// That property would be used with responsive_framework package,
+  /// which scales the widgets
+  final double scaleWidth;
+
+  /// By default the value is 1.0.
+  /// That property would be used with responsive_framework package,
+  /// which scales the widgets
+  final double scaleHeight;
+
+  /// Get the closest Onboarding state in the widget tree
   static OnboardingState? of(BuildContext context,
       {bool rootOnboarding = false}) {
     final OnboardingState? result = rootOnboarding
@@ -157,6 +168,8 @@ class OnboardingState extends State<Onboarding> {
             duration: widget.duration,
             autoSizeTexts: widget.autoSizeTexts,
             debugBoundaries: widget.debugBoundaries,
+            scaleWidth: widget.scaleWidth,
+            scaleHeight: widget.scaleHeight,
             onChanged: (int index) {
               controller.setCurrentIndex(index);
               widget.onChanged?.call(index);
