@@ -36,6 +36,8 @@ class OnboardingStepper extends StatefulWidget {
     this.autoSizeTexts = false,
     this.stepIndexes = const <int>[],
     this.debugBoundaries = false,
+    this.scaleWidth = 1.0,
+    this.scaleHeight = 1.0,
     required this.constraints,
   })  : assert(() {
           if (stepIndexes.isNotEmpty && !stepIndexes.contains(initialIndex)) {
@@ -49,10 +51,10 @@ class OnboardingStepper extends StatefulWidget {
         }()),
         super(key: key);
 
-  /// is reqired
+  /// is required
   final List<OnboardingStep> steps;
 
-  /// By default, vali is 0
+  /// By default, value is 0
   final int initialIndex;
 
   /// By default stepIndexes os an empty array
@@ -79,6 +81,14 @@ class OnboardingStepper extends StatefulWidget {
   final bool debugBoundaries;
 
   final BoxConstraints constraints;
+
+  /// By default the value is 1.0
+  /// That property would be used with responsive_framework package
+  final double scaleWidth;
+
+  /// By default the value is 1.0
+  /// That property would be used with responsive_framework package
+  final double scaleHeight;
 
   @override
   _OnboardingStepperState createState() => _OnboardingStepperState();
@@ -280,7 +290,11 @@ class _OnboardingStepperState extends State<OnboardingStepper>
         step.focusNode.context?.findRenderObject() as RenderBox?;
 
     holeOffset = box?.localToGlobal(Offset.zero) ?? Offset.zero;
-    widgetRect = box != null ? holeOffset & box.size : Rect.zero;
+    widgetRect = box != null
+        ? holeOffset &
+            Size(box.size.width * widget.scaleWidth,
+                box.size.height * widget.scaleHeight)
+        : Rect.zero;
     holeTween = RectTween(
       begin: Rect.zero.shift(widgetRect.center),
       end: step.margin.inflateRect(widgetRect),
@@ -674,67 +688,71 @@ class AnimatedLabel extends StatelessWidget {
                   hole: holeAnimatedValue,
                   isTop: isTop,
                 ),
-                child: SizedBox(
-                  width: size.width,
-                  child: Padding(
-                    padding: step.labelBoxPadding,
-                    child: step.stepBuilder != null
-                        ? step.stepBuilder?.call(
-                            context,
-                            OnboardingStepRenderInfo(
-                              titleText: step.titleText,
-                              titleStyle: activeTitleStyle,
-                              bodyText: step.bodyText,
-                              bodyStyle: activeBodyStyle,
-                              size: size,
-                              nextStep: next,
-                              close: close,
-                            ),
-                          )
-                        : autoSizeTexts
-                            ? AutoSizeText.rich(
-                                TextSpan(
-                                  text: step.titleText,
-                                  style: activeTitleStyle,
-                                  children: <InlineSpan>[
-                                    const TextSpan(text: '\n'),
-                                    TextSpan(
-                                      text: step.bodyText,
+                child: step.stepBuilder != null
+                    ? Padding(
+                        padding: step.labelBoxPadding,
+                        child: step.stepBuilder?.call(
+                          context,
+                          OnboardingStepRenderInfo(
+                            titleText: step.titleText,
+                            titleStyle: activeTitleStyle,
+                            bodyText: step.bodyText,
+                            bodyStyle: activeBodyStyle,
+                            size: size,
+                            nextStep: next,
+                            close: close,
+                          ),
+                        ),
+                      )
+                    : SizedBox(
+                        width: size.width,
+                        child: Padding(
+                          padding: step.labelBoxPadding,
+                          child: autoSizeTexts
+                              ? AutoSizeText.rich(
+                                  TextSpan(
+                                    text: step.titleText,
+                                    style: activeTitleStyle,
+                                    children: <InlineSpan>[
+                                      const TextSpan(text: '\n'),
+                                      TextSpan(
+                                        text: step.bodyText,
+                                        style: activeBodyStyle,
+                                      )
+                                    ],
+                                  ),
+                                  textDirection: Directionality.of(context),
+                                  textAlign: step.textAlign,
+                                  minFontSize: 12,
+                                )
+                              : Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  mainAxisAlignment: isTop
+                                      ? MainAxisAlignment.end
+                                      : MainAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      step.titleText,
+                                      style: activeTitleStyle,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: step.textAlign,
+                                      textDirection: Directionality.of(context),
+                                    ),
+                                    Text(
+                                      step.bodyText,
                                       style: activeBodyStyle,
+                                      maxLines: 5,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: step.textAlign,
+                                      textDirection: Directionality.of(context),
                                     )
                                   ],
                                 ),
-                                textDirection: Directionality.of(context),
-                                textAlign: step.textAlign,
-                                minFontSize: 12,
-                              )
-                            : Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                mainAxisAlignment: isTop
-                                    ? MainAxisAlignment.end
-                                    : MainAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    step.titleText,
-                                    style: activeTitleStyle,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    textAlign: step.textAlign,
-                                    textDirection: Directionality.of(context),
-                                  ),
-                                  Text(
-                                    step.bodyText,
-                                    style: activeBodyStyle,
-                                    maxLines: 5,
-                                    overflow: TextOverflow.ellipsis,
-                                    textAlign: step.textAlign,
-                                    textDirection: Directionality.of(context),
-                                  )
-                                ],
-                              ),
-                  ),
-                ),
+                        ),
+                      ),
               ),
             )
           ],

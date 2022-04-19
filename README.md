@@ -260,7 +260,7 @@ OnboardingStep(
 13. **From v.3.0.0** Combining `onTapCallback` with the `overlayBehavior` gives more control.
 - If you want to capture any clicks and decide what to do depending on the area that was clicked - use `HitTestBehavior.opaque`
 - if you want to be able to click on the focused widget and control when to go to next step or close - use `HitTestBehavior.translucent`
-- If you want to capture clicks only on the overlay, the clicks on the hole will not be controled by the callback - use `HitTestBehavior.deferToChild`
+- If you want to capture clicks only on the overlay, the clicks on the hole will not be controlled by the callback - use `HitTestBehavior.deferToChild`
 
 Using the `TapArea` you can specify what happens when the user clicked on certain area. 
 The possible options are `hole`, `label` and `overlay`
@@ -303,3 +303,42 @@ if( onboarding?.controller.isVisible ?? false) {
 17. **From v.3.0.0** you can show a red border around the label box for debugging purposes by using an `Onboarding` parameter `debugBoundaries` which is `false` by default.
 
 <img src="https://github.com/talamaska/onboarding_overlay/blob/master/screenshots/demo2.png?raw=true" width="320"/>
+
+18. **From v.3.1.0** The package can be used with [ResponsiveFramework](https://pub.dev/packages/responsive_framework). For this to work as expected you need to perform these changes to your code:
+
+    * move `Onboarding` widget under the `ResponsiveWrapper.builder`
+    * wrap with a `Builder` to be able to access the inherited widget for `ResponsiveWrapperData`
+    * manually calculate scale for width and height 
+    * pass the calculated values to the `Onboarding` widget.
+    * by default these scale values will be 1.0
+
+Example:
+
+```dart
+return MaterialApp(
+      home: ResponsiveWrapper.builder(
+        Builder(builder: (context) {
+          final ResponsiveWrapperData data = ResponsiveWrapper.of(context);
+          final scaleWidth = data.screenWidth / data.scaledWidth;
+          final scaleHeight = data.screenHeight / data.scaledHeight;
+
+          return Onboarding(
+            key: widget.onboardingKey,
+            steps: steps,
+            globalOnboarding: true,
+            debugBoundaries: true,
+            child: const Home(),
+            scaleWidth: scaleWidth,
+            scaleHeight: scaleHeight,
+          );
+        }),
+        maxWidth: 1200,
+        minWidth: 480,
+        defaultScale: true,
+        breakpoints: [
+          const ResponsiveBreakpoint.autoScale(800, name: TABLET),
+        ],
+      ),
+      initialRoute: "/",
+    );
+```

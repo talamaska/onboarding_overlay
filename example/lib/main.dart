@@ -65,55 +65,62 @@ class _AppState extends State<App> {
                   style: BorderStyle.solid,
                 ),
               ),
-              arrowPosition: ArrowPosition.autoVertical,
+              arrowPosition: ArrowPosition.autoVerticalCenter,
               hasArrow: true,
               hasLabelBox: true,
               fullscreen: true,
               overlayBehavior: HitTestBehavior.translucent,
-              onTapCallback: (TapArea area, next, close) {},
+              onTapCallback: (
+                TapArea area,
+                VoidCallback next,
+                VoidCallback close,
+              ) {},
               stepBuilder: (
                 BuildContext context,
                 OnboardingStepRenderInfo renderInfo,
               ) {
-                return Material(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Text(
-                          renderInfo.titleText,
-                          // style: renderInfo.titleStyle,
-                        ),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Image.asset(
-                              'assets/demo.gif',
-                              width: 50,
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Flexible(
-                              child: AutoSizeText(
-                                renderInfo.bodyText,
-                                // style: renderInfo.bodyStyle,
+                return SizedBox(
+                  width: 200,
+                  child: Material(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Text(
+                            renderInfo.titleText,
+                            // style: renderInfo.titleStyle,
+                          ),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Image.asset(
+                                'assets/demo.gif',
+                                width: 50,
                               ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            TextButton(
-                              onPressed: renderInfo.nextStep,
-                              child: const Text('Next'),
-                            ),
-                            TextButton(
-                              onPressed: renderInfo.close,
-                              child: const Text('close'),
-                            ),
-                          ],
-                        ),
-                      ],
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Flexible(
+                                child: AutoSizeText(
+                                  renderInfo.bodyText,
+                                  // style: renderInfo.bodyStyle,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              TextButton(
+                                onPressed: renderInfo.nextStep,
+                                child: const Text('Next'),
+                              ),
+                              TextButton(
+                                onPressed: renderInfo.close,
+                                child: const Text('close'),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );
