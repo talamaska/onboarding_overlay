@@ -1,3 +1,7 @@
+## [3.1.1]
+ - fix: lint issues
+ - change: update dependencies
+
 ## [3.1.0]
  - fix: issues with scaled widgets from ResponsiveFramework package [#33](https://github.com/talamaska/onboarding_overlay/issues/33)
  - fix: stepBuilder content could not be sized with a custom size [#31](https://github.com/talamaska/onboarding_overlay/issues/31)
@@ -15,8 +19,8 @@
 - fix: when empty list is passed to steps the onboarding should not start and not throw [#25](https://github.com/talamaska/onboarding_overlay/issues/25)
 - fix: when an empty list of indexes is passed to showWithSteps the onboarding should not start and not throw [#25](https://github.com/talamaska/onboarding_overlay/issues/25)
 - fix: HitTestBehavior.translucent
-- fix: better calculation of the max size of the label box - issue [#26](https://github.com/talamaska/onboarding_overlay/issues/26) 
-- fix: positioning of the label box when the overlay is full screen and there is no focused widget. 
+- fix: better calculation of the max size of the label box - issue [#26](https://github.com/talamaska/onboarding_overlay/issues/26)
+- fix: positioning of the label box when the overlay is full screen and there is no focused widget.
 - fix: regression label box not centered when no focus widget and overlay is not full screen.
 - change: make label box use more space available
 - change: **[Breaking Change]** rename title to titleText
