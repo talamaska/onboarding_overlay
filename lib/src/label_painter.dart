@@ -1,5 +1,4 @@
 import 'dart:math' as math;
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -291,11 +290,6 @@ class LabelPainter extends CustomPainter {
   }
 
   Path drawBottomCenterArrow(Rect paddingBox, double a, double b) {
-    Rect hPB = paddingBox;
-    if (hole.width != 0) {
-      hPB = hole;
-    }
-
     return Path()
       ..moveTo(
         paddingBox.bottomCenter.dx - b,
