@@ -150,6 +150,11 @@ class OnboardingState extends State<Onboarding> {
     controller.setIsVisible(false);
   }
 
+  /// Returns true if onboarding session overlay is visible to user
+  bool isVisible() {
+    return controller.isVisible;
+  }
+
   OverlayEntry _createOverlayEntry({
     required int initialIndex,
     List<int> stepIndexes = const <int>[],
