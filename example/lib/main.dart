@@ -162,7 +162,9 @@ class _AppState extends State<App> {
               titleText: 'Easy to customize Easy to customize',
               titleTextColor: Colors.greenAccent,
               titleTextStyle: const TextStyle(
-                fontSize: 16.0,
+                fontSize: 46.0,
+                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.w900,
               ),
               bodyText:
                   'Easy to customize Easy to customize Easy to customize Easy to customize',
