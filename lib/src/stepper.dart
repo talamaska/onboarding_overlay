@@ -477,8 +477,8 @@ class _OnboardingStepperState extends State<OnboardingStepper>
       color: step.titleTextStyle?.color ?? step.titleTextColor,
     );
 
-    final TextStyle activeTitleStyle = (textTheme.headline5 ?? headline5).merge(
-        step.titleTextStyle != null ? stepTitleTextStyle : localTitleTextStyle);
+    final TextStyle activeTitleStyle = stepTitleTextStyle.merge(
+        step.titleTextStyle ?? localTitleTextStyle);
 
     return activeTitleStyle;
   }
@@ -492,8 +492,8 @@ class _OnboardingStepperState extends State<OnboardingStepper>
       color: step.bodyTextStyle?.color ?? step.bodyTextColor,
     );
 
-    final TextStyle activeBodyStyle = (textTheme.bodyText1 ?? bodyText1).merge(
-        step.bodyTextStyle != null ? stepBodyTextStyle : localBodyTextStyle);
+    final TextStyle activeBodyStyle = stepBodyTextStyle.merge(
+        step.bodyTextStyle ?? localBodyTextStyle);
 
     return activeBodyStyle;
   }
