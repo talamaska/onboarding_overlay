@@ -1,3 +1,6 @@
+## [3.1.2]
+ - fix: Properly handle titleTextStyle and bodyTextStyle which where ignored, except for the color attribute. (Thanks to [kristofb](https://github.com/kristofb))
+
 ## [3.1.1]
  - fix: lint issues
  - change: update dependencies
