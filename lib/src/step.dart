@@ -38,11 +38,10 @@ class OnboardingStepRenderInfo {
   });
 }
 
-typedef StepWidgetBuilder = Widget Function(
-    BuildContext context, OnboardingStepRenderInfo renderInfo);
+typedef StepWidgetBuilder = Widget Function(BuildContext context, OnboardingStepRenderInfo renderInfo);
+typedef StepPainterBuilder = CustomPainter Function(BuildContext context, Rect hole, bool isTop);
 
-typedef TapCallback = void Function(
-    TapArea area, VoidCallback next, VoidCallback close);
+typedef TapCallback = void Function(TapArea area, VoidCallback next, VoidCallback close);
 
 @immutable
 class OnboardingStep {
@@ -90,6 +89,7 @@ class OnboardingStep {
     this.arrowPosition = ArrowPosition.autoVertical,
     this.overlayBehavior = HitTestBehavior.opaque,
     this.stepBuilder,
+    this.stepPainterBuilder,
     this.showPulseAnimation = false,
     this.pulseInnerColor = defaultInnerPulseColor,
     this.pulseOuterColor = defaultOuterPulseColor,
@@ -97,8 +97,7 @@ class OnboardingStep {
   })  : assert(() {
           if (titleTextColor == null && titleTextStyle == null) {
             final List<DiagnosticsNode> information = <DiagnosticsNode>[
-              ErrorSummary(
-                  'You should provide at least one of titleTextColor or titleTextStyle'),
+              ErrorSummary('You should provide at least one of titleTextColor or titleTextStyle'),
             ];
 
             throw FlutterError.fromParts(information);
@@ -108,8 +107,7 @@ class OnboardingStep {
         assert(() {
           if (bodyTextColor == null && bodyTextStyle == null) {
             final List<DiagnosticsNode> information = <DiagnosticsNode>[
-              ErrorSummary(
-                  'You should provide at least one of bodyTextColor or bodyTextStyle'),
+              ErrorSummary('You should provide at least one of bodyTextColor or bodyTextStyle'),
             ];
 
             throw FlutterError.fromParts(information);
@@ -241,6 +239,8 @@ class OnboardingStep {
   /// but remember that you will not be able to actually scroll it, as there is already an `GestureDetector` upper in the tree that will catch the gestures
   /// The non full-screen overlays provide significantly smaller available space
   final StepWidgetBuilder? stepBuilder;
+
+  final StepPainterBuilder? stepPainterBuilder;
 
   /// By default, the value used is false
   ///
