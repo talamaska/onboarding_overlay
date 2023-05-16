@@ -245,6 +245,10 @@ class OnboardingStep {
   /// The non full-screen overlays provide significantly smaller available space
   final StepWidgetBuilder? stepBuilder;
 
+  /// [stepPainterBuilder] is a callback funtion that passes the context, the title `String`, the hole `Rect`
+  /// and if the arrow position isTop `bool`.
+  /// By default it is `null` and it will use the [LabelPainter].
+  /// You can use this to draw custom shapes around the hole. You can use the [LabelPainter] as a reference.
   final StepPainterBuilder? stepPainterBuilder;
 
   /// By default, the value used is false
