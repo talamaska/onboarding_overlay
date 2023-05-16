@@ -38,10 +38,13 @@ class OnboardingStepRenderInfo {
   });
 }
 
-typedef StepWidgetBuilder = Widget Function(BuildContext context, OnboardingStepRenderInfo renderInfo);
-typedef StepPainterBuilder = CustomPainter Function(BuildContext context, Rect hole, bool isTop);
+typedef StepWidgetBuilder = Widget Function(
+    BuildContext context, OnboardingStepRenderInfo renderInfo);
+typedef StepPainterBuilder = CustomPainter Function(
+    BuildContext context, Rect hole, bool isTop);
 
-typedef TapCallback = void Function(TapArea area, VoidCallback next, VoidCallback close);
+typedef TapCallback = void Function(
+    TapArea area, VoidCallback next, VoidCallback close);
 
 @immutable
 class OnboardingStep {
@@ -97,7 +100,8 @@ class OnboardingStep {
   })  : assert(() {
           if (titleTextColor == null && titleTextStyle == null) {
             final List<DiagnosticsNode> information = <DiagnosticsNode>[
-              ErrorSummary('You should provide at least one of titleTextColor or titleTextStyle'),
+              ErrorSummary(
+                  'You should provide at least one of titleTextColor or titleTextStyle'),
             ];
 
             throw FlutterError.fromParts(information);
@@ -107,7 +111,8 @@ class OnboardingStep {
         assert(() {
           if (bodyTextColor == null && bodyTextStyle == null) {
             final List<DiagnosticsNode> information = <DiagnosticsNode>[
-              ErrorSummary('You should provide at least one of bodyTextColor or bodyTextStyle'),
+              ErrorSummary(
+                  'You should provide at least one of bodyTextColor or bodyTextStyle'),
             ];
 
             throw FlutterError.fromParts(information);

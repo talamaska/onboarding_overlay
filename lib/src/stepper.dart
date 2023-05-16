@@ -94,7 +94,8 @@ class OnboardingStepper extends StatefulWidget {
   _OnboardingStepperState createState() => _OnboardingStepperState();
 }
 
-class _OnboardingStepperState extends State<OnboardingStepper> with TickerProviderStateMixin {
+class _OnboardingStepperState extends State<OnboardingStepper>
+    with TickerProviderStateMixin {
   late int stepperIndex;
   late ColorTween overlayColorTween;
   late AnimationController overlayController;
@@ -164,7 +165,8 @@ class _OnboardingStepperState extends State<OnboardingStepper> with TickerProvid
 
   Future<void> startStepper({int fromIndex = 0}) async {
     assert(() {
-      if (widget.stepIndexes.isNotEmpty && !widget.stepIndexes.contains(widget.initialIndex)) {
+      if (widget.stepIndexes.isNotEmpty &&
+          !widget.stepIndexes.contains(widget.initialIndex)) {
         final List<DiagnosticsNode> information = <DiagnosticsNode>[
           ErrorSummary('stepIndexes should contain initialIndex'),
         ];
@@ -176,7 +178,8 @@ class _OnboardingStepperState extends State<OnboardingStepper> with TickerProvid
     assert(() {
       if (fromIndex >= widget.steps.length && fromIndex < 0) {
         final List<DiagnosticsNode> information = <DiagnosticsNode>[
-          ErrorSummary('fromIndex cannot be bigger then the number of steps or smaller than zero.'),
+          ErrorSummary(
+              'fromIndex cannot be bigger then the number of steps or smaller than zero.'),
         ];
 
         throw FlutterError.fromParts(information);
@@ -203,7 +206,8 @@ class _OnboardingStepperState extends State<OnboardingStepper> with TickerProvid
 
   Future<void> _nextStep() async {
     assert(() {
-      if (widget.stepIndexes.isNotEmpty && !widget.stepIndexes.contains(widget.initialIndex)) {
+      if (widget.stepIndexes.isNotEmpty &&
+          !widget.stepIndexes.contains(widget.initialIndex)) {
         final List<DiagnosticsNode> information = <DiagnosticsNode>[
           ErrorSummary('stepIndexes should contain initialIndex'),
         ];
@@ -282,11 +286,14 @@ class _OnboardingStepperState extends State<OnboardingStepper> with TickerProvid
   }
 
   void calcWidgetRect(OnboardingStep step) {
-    final RenderBox? box = step.focusNode.context?.findRenderObject() as RenderBox?;
+    final RenderBox? box =
+        step.focusNode.context?.findRenderObject() as RenderBox?;
 
     holeOffset = box?.localToGlobal(Offset.zero) ?? Offset.zero;
     widgetRect = box != null
-        ? holeOffset & Size(box.size.width * widget.scaleWidth, box.size.height * widget.scaleHeight)
+        ? holeOffset &
+            Size(box.size.width * widget.scaleWidth,
+                box.size.height * widget.scaleHeight)
         : Rect.zero;
     holeTween = RectTween(
       begin: Rect.zero.shift(widgetRect.center),
@@ -327,8 +334,8 @@ class _OnboardingStepperState extends State<OnboardingStepper> with TickerProvid
     double boxWidth,
   ) {
     if (widgetRect.width != 0 && widgetRect.height != 0) {
-      return (widgetRect.center.dx - boxWidth / 2)
-          .clamp(sideGap, (size.width - boxWidth - sideGap).clamp(0, size.width));
+      return (widgetRect.center.dx - boxWidth / 2).clamp(
+          sideGap, (size.width - boxWidth - sideGap).clamp(0, size.width));
     } else {
       return size.width / 2 - boxWidth / 2;
     }
@@ -347,10 +354,12 @@ class _OnboardingStepperState extends State<OnboardingStepper> with TickerProvid
 
       if (widgetRect.center.dy > size.height / 2) {
         // log('11. 0 - ${size.height - boxHeight}');
-        return (holeRect.top - boxHeight - spacer).clamp(0, (size.height - boxHeight).abs());
+        return (holeRect.top - boxHeight - spacer)
+            .clamp(0, (size.height - boxHeight).abs());
       } else {
         // log('12. 0 - ${size.height - boxHeight}');
-        return (holeRect.bottom + spacer).clamp(0, (size.height - boxHeight).abs());
+        return (holeRect.bottom + spacer)
+            .clamp(0, (size.height - boxHeight).abs());
       }
     } else if (!step.fullscreen) {
       return size.center(Offset.zero).dy - boxHeight / 2;
@@ -373,7 +382,9 @@ class _OnboardingStepperState extends State<OnboardingStepper> with TickerProvid
 
     final double boxWidth = step.fullscreen
         ? (mediaSize.width - 2 * sideGap)
-        : ((widgetRect.width != 0 && widgetRect.height != 0) ? a + holeRect.width / 4 : a * 2);
+        : ((widgetRect.width != 0 && widgetRect.height != 0)
+            ? a + holeRect.width / 4
+            : a * 2);
     // log('boxWidth $boxWidth');
     return boxWidth;
   }
@@ -416,27 +427,40 @@ class _OnboardingStepperState extends State<OnboardingStepper> with TickerProvid
     } else {
       if (widgetRect.width != 0 && widgetRect.height != 0) {
         if (isTop) {
-          boxHeight = (a - sideGap - (step.hasArrow ? kArrowHeight + sideGap : sideGap) + holeRect.height / 2).clamp(
-              0,
-              holeRect.top -
+          boxHeight = (a -
                   sideGap -
-                  (step.hasArrow ? kArrowHeight + sideGap : sideGap) -
-                  step.margin.top -
-                  media.padding.top -
-                  media.padding.bottom);
+                  (step.hasArrow ? kArrowHeight + sideGap : sideGap) +
+                  holeRect.height / 2)
+              .clamp(
+                  0,
+                  holeRect.top -
+                      sideGap -
+                      (step.hasArrow ? kArrowHeight + sideGap : sideGap) -
+                      step.margin.top -
+                      media.padding.top -
+                      media.padding.bottom);
         } else {
-          boxHeight = (a - sideGap - (step.hasArrow ? kArrowHeight + sideGap : sideGap) + holeRect.height / 2).clamp(
-              0,
-              mediaSize.height -
-                  holeRect.bottom -
+          boxHeight = (a -
                   sideGap -
-                  (step.hasArrow ? kArrowHeight + sideGap : sideGap) -
-                  step.margin.bottom -
-                  media.padding.top -
-                  media.padding.bottom);
+                  (step.hasArrow ? kArrowHeight + sideGap : sideGap) +
+                  holeRect.height / 2)
+              .clamp(
+                  0,
+                  mediaSize.height -
+                      holeRect.bottom -
+                      sideGap -
+                      (step.hasArrow ? kArrowHeight + sideGap : sideGap) -
+                      step.margin.bottom -
+                      media.padding.top -
+                      media.padding.bottom);
         }
       } else {
-        boxHeight = (a * 2).clamp(0, mediaSize.height - media.padding.top - media.padding.bottom - 2 * kSpace);
+        boxHeight = (a * 2).clamp(
+            0,
+            mediaSize.height -
+                media.padding.top -
+                media.padding.bottom -
+                2 * kSpace);
       }
     }
     // log('radius ${mediaSize.width * kOverlayRatio}');
@@ -445,25 +469,31 @@ class _OnboardingStepperState extends State<OnboardingStepper> with TickerProvid
   }
 
   TextStyle _setupTitleStyle(OnboardingStep step, TextTheme textTheme) {
-    final TextStyle localTitleTextStyle = (textTheme.headline5 ?? headline5).copyWith(color: step.titleTextColor);
+    final TextStyle localTitleTextStyle =
+        (textTheme.headline5 ?? headline5).copyWith(color: step.titleTextColor);
 
-    final TextStyle stepTitleTextStyle = (textTheme.headline5 ?? headline5).copyWith(
+    final TextStyle stepTitleTextStyle =
+        (textTheme.headline5 ?? headline5).copyWith(
       color: step.titleTextStyle?.color ?? step.titleTextColor,
     );
 
-    final TextStyle activeTitleStyle = stepTitleTextStyle.merge(step.titleTextStyle ?? localTitleTextStyle);
+    final TextStyle activeTitleStyle =
+        stepTitleTextStyle.merge(step.titleTextStyle ?? localTitleTextStyle);
 
     return activeTitleStyle;
   }
 
   TextStyle _setupBodyStyle(OnboardingStep step, TextTheme textTheme) {
-    final TextStyle localBodyTextStyle = (textTheme.bodyText1 ?? bodyText1).copyWith(color: step.bodyTextColor);
+    final TextStyle localBodyTextStyle =
+        (textTheme.bodyText1 ?? bodyText1).copyWith(color: step.bodyTextColor);
 
-    final TextStyle stepBodyTextStyle = (textTheme.bodyText1 ?? bodyText1).copyWith(
+    final TextStyle stepBodyTextStyle =
+        (textTheme.bodyText1 ?? bodyText1).copyWith(
       color: step.bodyTextStyle?.color ?? step.bodyTextColor,
     );
 
-    final TextStyle activeBodyStyle = stepBodyTextStyle.merge(step.bodyTextStyle ?? localBodyTextStyle);
+    final TextStyle activeBodyStyle =
+        stepBodyTextStyle.merge(step.bodyTextStyle ?? localBodyTextStyle);
 
     return activeBodyStyle;
   }
@@ -500,24 +530,30 @@ class _OnboardingStepperState extends State<OnboardingStepper> with TickerProvid
     );
 
     final double leftPos = _getHorizontalPosition(step, mediaSize, boxWidth);
-    final double topPos = _getVerticalPosition(step, mediaSize, boxHeight, media);
+    final double topPos =
+        _getVerticalPosition(step, mediaSize, boxHeight, media);
     final Rect? holeAnimatedValue = holeTween.evaluate(overlayAnimation);
-    final Color? colorAnimatedValue = overlayColorTween.evaluate(overlayAnimation);
+    final Color? colorAnimatedValue =
+        overlayColorTween.evaluate(overlayAnimation);
 
     return Listener(
       behavior: step.overlayBehavior,
       onPointerDown: (PointerDownEvent details) {
         // log('global listener');
         final BoxHitTestResult result = BoxHitTestResult();
-        final RenderBox overlayBox = overlayKey.currentContext?.findRenderObject() as RenderBox;
+        final RenderBox overlayBox =
+            overlayKey.currentContext?.findRenderObject() as RenderBox;
         final Offset localOverlay = overlayBox.globalToLocal(details.position);
 
         if (step.onTapCallback != null) {
-          final RenderBox labelBox = labelKey.currentContext?.findRenderObject() as RenderBox;
+          final RenderBox labelBox =
+              labelKey.currentContext?.findRenderObject() as RenderBox;
           final Offset localLabel = labelBox.globalToLocal(details.position);
 
-          final bool isLabelClicked = labelBox.hitTest(result, position: localLabel);
-          final bool isOverlayClicked = overlayBox.hitTest(result, position: localOverlay);
+          final bool isLabelClicked =
+              labelBox.hitTest(result, position: localLabel);
+          final bool isOverlayClicked =
+              overlayBox.hitTest(result, position: localOverlay);
           final TapArea area = isOverlayClicked && !isLabelClicked
               ? TapArea.overlay
               : isOverlayClicked && isLabelClicked
@@ -563,7 +599,9 @@ class _OnboardingStepperState extends State<OnboardingStepper> with TickerProvid
               isTop: isTop,
               step: step,
               isEmpty: !(widgetRect.width != 0 && widgetRect.height != 0),
-              holeAnimatedValue: holeAnimatedValue?.shift(Offset(-leftPos, -topPos)) ?? Rect.zero,
+              holeAnimatedValue:
+                  holeAnimatedValue?.shift(Offset(-leftPos, -topPos)) ??
+                      Rect.zero,
               leftPos: leftPos,
               topPos: topPos,
               autoSizeTexts: widget.autoSizeTexts,
@@ -633,13 +671,16 @@ class AnimatedLabel extends StatelessWidget {
         height: size.height,
         child: Stack(
           clipBehavior: Clip.antiAlias,
-          alignment: isNotEmptyHole() ? (isTop ? Alignment.bottomCenter : Alignment.topCenter) : Alignment.center,
+          alignment: isNotEmptyHole()
+              ? (isTop ? Alignment.bottomCenter : Alignment.topCenter)
+              : Alignment.center,
           children: <Widget>[
             RepaintBoundary(
               child: CustomPaint(
                 key: labelKey,
                 painter: step.stepPainterBuilder != null
-                    ? step.stepPainterBuilder?.call(context, holeAnimatedValue, isTop)
+                    ? step.stepPainterBuilder
+                        ?.call(context, holeAnimatedValue, isTop)
                     : LabelPainter(
                         opacity: 1,
                         hasLabelBox: step.hasLabelBox,
@@ -689,8 +730,11 @@ class AnimatedLabel extends StatelessWidget {
                                 )
                               : Column(
                                   mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                                  mainAxisAlignment: isTop ? MainAxisAlignment.end : MainAxisAlignment.start,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  mainAxisAlignment: isTop
+                                      ? MainAxisAlignment.end
+                                      : MainAxisAlignment.start,
                                   children: [
                                     Text(
                                       step.titleText,
@@ -759,7 +803,8 @@ class AnimatedOverlay extends StatelessWidget {
           shape: step.shape,
           isEmpty: isEmpty,
           overlayShape: step.overlayShape,
-          center: step.focusNode.context == null ? size.center(Offset.zero) : null,
+          center:
+              step.focusNode.context == null ? size.center(Offset.zero) : null,
           hole: holeAnimatedValue ?? Rect.zero,
           overlayAnimation: overlayAnimation,
           pulseInnerColor: step.pulseInnerColor,
