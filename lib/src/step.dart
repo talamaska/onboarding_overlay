@@ -40,6 +40,8 @@ class OnboardingStepRenderInfo {
 
 typedef StepWidgetBuilder = Widget Function(
     BuildContext context, OnboardingStepRenderInfo renderInfo);
+typedef StepPainterBuilder = CustomPainter Function(
+    BuildContext context, Rect hole, bool isTop);
 
 typedef TapCallback = void Function(
     TapArea area, VoidCallback next, VoidCallback close);
@@ -90,6 +92,7 @@ class OnboardingStep {
     this.arrowPosition = ArrowPosition.autoVertical,
     this.overlayBehavior = HitTestBehavior.opaque,
     this.stepBuilder,
+    this.stepPainterBuilder,
     this.showPulseAnimation = false,
     this.pulseInnerColor = defaultInnerPulseColor,
     this.pulseOuterColor = defaultOuterPulseColor,
@@ -241,6 +244,12 @@ class OnboardingStep {
   /// but remember that you will not be able to actually scroll it, as there is already an `GestureDetector` upper in the tree that will catch the gestures
   /// The non full-screen overlays provide significantly smaller available space
   final StepWidgetBuilder? stepBuilder;
+
+  /// [stepPainterBuilder] is a callback funtion that passes the context, the title `String`, the hole `Rect`
+  /// and if the arrow position isTop `bool`.
+  /// By default it is `null` and it will use the [LabelPainter].
+  /// You can use this to draw custom shapes around the hole. You can use the [LabelPainter] as a reference.
+  final StepPainterBuilder? stepPainterBuilder;
 
   /// By default, the value used is false
   ///

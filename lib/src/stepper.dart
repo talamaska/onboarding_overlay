@@ -478,7 +478,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     );
 
     final TextStyle activeTitleStyle = stepTitleTextStyle.merge(
-        step.titleTextStyle ?? localTitleTextStyle);
+      step.titleTextStyle ?? localTitleTextStyle);
 
     return activeTitleStyle;
   }
@@ -493,7 +493,7 @@ class _OnboardingStepperState extends State<OnboardingStepper>
     );
 
     final TextStyle activeBodyStyle = stepBodyTextStyle.merge(
-        step.bodyTextStyle ?? localBodyTextStyle);
+      step.bodyTextStyle ?? localBodyTextStyle);
 
     return activeBodyStyle;
   }
@@ -674,20 +674,23 @@ class AnimatedLabel extends StatelessWidget {
           alignment: isNotEmptyHole()
               ? (isTop ? Alignment.bottomCenter : Alignment.topCenter)
               : Alignment.center,
-          children: [
+          children: <Widget>[
             RepaintBoundary(
               child: CustomPaint(
                 key: labelKey,
-                painter: LabelPainter(
-                  opacity: 1,
-                  hasLabelBox: step.hasLabelBox,
-                  labelBoxPadding: step.labelBoxPadding,
-                  labelBoxDecoration: step.labelBoxDecoration,
-                  hasArrow: step.hasArrow,
-                  arrowPosition: step.arrowPosition,
-                  hole: holeAnimatedValue,
-                  isTop: isTop,
-                ),
+                painter: step.stepPainterBuilder != null
+                    ? step.stepPainterBuilder
+                        ?.call(context, holeAnimatedValue, isTop)
+                    : LabelPainter(
+                        opacity: 1,
+                        hasLabelBox: step.hasLabelBox,
+                        labelBoxPadding: step.labelBoxPadding,
+                        labelBoxDecoration: step.labelBoxDecoration,
+                        hasArrow: step.hasArrow,
+                        arrowPosition: step.arrowPosition,
+                        hole: holeAnimatedValue,
+                        isTop: isTop,
+                      ),
                 child: step.stepBuilder != null
                     ? Padding(
                         padding: step.labelBoxPadding,
