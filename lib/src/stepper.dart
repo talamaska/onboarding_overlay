@@ -477,8 +477,8 @@ class _OnboardingStepperState extends State<OnboardingStepper>
       color: step.titleTextStyle?.color ?? step.titleTextColor,
     );
 
-    final TextStyle activeTitleStyle =
-        stepTitleTextStyle.merge(step.titleTextStyle ?? localTitleTextStyle);
+    final TextStyle activeTitleStyle = stepTitleTextStyle.merge(
+      step.titleTextStyle ?? localTitleTextStyle);
 
     return activeTitleStyle;
   }
@@ -492,8 +492,8 @@ class _OnboardingStepperState extends State<OnboardingStepper>
       color: step.bodyTextStyle?.color ?? step.bodyTextColor,
     );
 
-    final TextStyle activeBodyStyle =
-        stepBodyTextStyle.merge(step.bodyTextStyle ?? localBodyTextStyle);
+    final TextStyle activeBodyStyle = stepBodyTextStyle.merge(
+      step.bodyTextStyle ?? localBodyTextStyle);
 
     return activeBodyStyle;
   }
