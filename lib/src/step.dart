@@ -51,15 +51,15 @@ class OnboardingStep {
   /// At least a [titleText] or a [bodyText] should be provided.
   ///
   /// [titleTextColor] has a default value of `Color(0xFFFFFFFF),
-  /// if a [titleTextStyle] is provided with a color it takes a precendence
+  /// if a [titleTextStyle] is provided with a color it takes a precedence
   /// over the [titleTextColor].
   ///
   /// [bodyTextColor] has a default value of `Color(0xFFFFFFFF),
-  /// if a [bodyTextStyle] is provided with a color it takes a precendence
+  /// if a [bodyTextStyle] is provided with a color it takes a precedence
   /// over the [bodyTextColor].
   ///
-  /// [stepBuilder] is a callback funtion that passes the context, the title `String`, the actual title `TextStyle`,
-  /// the bodyText `String` and the actual bodytext `TextStyle`.
+  /// [stepBuilder] is a callback function that passes the context, the title `String`, the actual title `TextStyle`,
+  /// the bodyText `String` and the actual bodyText `TextStyle`.
   /// By default it is `null`. If you decide to use it you are on your own - there will be no safety measures.
   /// If the content is too much you might get overflow error. To mitigate such issues try using `SingleChildScrollView`,
   /// but remember that you will not be able to actually scroll it, as there is already an `GestureDetector` upper in the tree that will catch the gestures
@@ -171,7 +171,7 @@ class OnboardingStep {
   ///   .bodyText1
   ///   .copyWith(color: step.bodyTextColor)
   /// ```
-  /// if a [bodyTextStyle] is provided with a color it takes a precendence
+  /// if a [bodyTextStyle] is provided with a color it takes a precedence
   /// over the [bodyTextColor].
   final TextStyle? bodyTextStyle;
 
@@ -237,15 +237,15 @@ class OnboardingStep {
   /// `OverlayBehavior.deferToChild` triggers only the onTap on the widget
   final HitTestBehavior overlayBehavior;
 
-  /// [stepBuilder] is a callback funtion that passes the context, the title `String`, the actual title `TextStyle`,
-  /// the bodyText `String` and the actual bodytext `TextStyle`.
+  /// [stepBuilder] is a callback function that passes the context, the title `String`, the actual title `TextStyle`,
+  /// the bodyText `String` and the actual bodyText `TextStyle`.
   /// By default it is `null`. If you decide to use it you are on your own - there will be no safety measures.
   /// If the content is too much you might get overflow error. To mitigate such issues try using `SingleChildScrollView`,
   /// but remember that you will not be able to actually scroll it, as there is already an `GestureDetector` upper in the tree that will catch the gestures
   /// The non full-screen overlays provide significantly smaller available space
   final StepWidgetBuilder? stepBuilder;
 
-  /// [stepPainterBuilder] is a callback funtion that passes the context, the title `String`, the hole `Rect`
+  /// [stepPainterBuilder] is a callback function that passes the context, the title `String`, the hole `Rect`
   /// and if the arrow position isTop `bool`.
   /// By default it is `null` and it will use the [LabelPainter].
   /// You can use this to draw custom shapes around the hole. You can use the [LabelPainter] as a reference.
@@ -326,30 +326,30 @@ class OnboardingStep {
   @override
   String toString() {
     return '''OnboardingStep(
-      key: $key, 
-      focusNode: $focusNode, 
-      textAlign: $textAlign, 
-      titleTextColor: $titleTextColor, 
-      title: $titleText, 
-      arrowPosition: $arrowPosition, 
-      titleTextStyle: $titleTextStyle, 
-      bodyText: $bodyText, 
-      bodyTextColor: $bodyTextColor, 
-      bodyTextStyle: $bodyTextStyle, 
-      labelBoxDecoration: $labelBoxDecoration, 
-      shape: $shape, 
-      overlayColor: $overlayColor, 
-      overlayShape: $overlayShape, 
-      margin: $margin, 
-      labelBoxPadding: $labelBoxPadding, 
-      hasLabelBox: $hasLabelBox, 
-      hasArrow: $hasArrow, 
-      fullscreen: $fullscreen, 
-      delay: $delay, 
-      overlayBehavior: $overlayBehavior, 
-      stepBuilder: $stepBuilder, 
-      showPulseAnimation: $showPulseAnimation, 
-      pulseInnerColor: $pulseInnerColor, 
+      key: $key,
+      focusNode: $focusNode,
+      textAlign: $textAlign,
+      titleTextColor: $titleTextColor,
+      title: $titleText,
+      arrowPosition: $arrowPosition,
+      titleTextStyle: $titleTextStyle,
+      bodyText: $bodyText,
+      bodyTextColor: $bodyTextColor,
+      bodyTextStyle: $bodyTextStyle,
+      labelBoxDecoration: $labelBoxDecoration,
+      shape: $shape,
+      overlayColor: $overlayColor,
+      overlayShape: $overlayShape,
+      margin: $margin,
+      labelBoxPadding: $labelBoxPadding,
+      hasLabelBox: $hasLabelBox,
+      hasArrow: $hasArrow,
+      fullscreen: $fullscreen,
+      delay: $delay,
+      overlayBehavior: $overlayBehavior,
+      stepBuilder: $stepBuilder,
+      showPulseAnimation: $showPulseAnimation,
+      pulseInnerColor: $pulseInnerColor,
       pulseOuterColor: $pulseOuterColor,
       onTapCallback: $onTapCallback,
     )''';

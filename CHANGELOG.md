@@ -1,44 +1,85 @@
+## [3.2.1]
+
+- add: 'hide' method guard (Thanks to [hpstuff](https://github.com/hpstuff))
+  with [#54](https://github.com/talamaska/onboarding_overlay/pull/51)
+- add: method to check Overlay visibility from OverlayState (Thanks to
+  [shaikhaman2000](https://github.com/shaikhaman2000)) with
+  [#39](https://github.com/talamaska/onboarding_overlay/pull/39)
+- add: 'stepPainterBuilder' so that the user can create custom look different
+  than the default LabelPainter (Thanks to
+  [hpstuff](https://github.com/hpstuff)) with
+  [#52](https://github.com/talamaska/onboarding_overlay/pull/52)
+- fix: deprecations maintenance
+
 ## [3.1.2]
- - fix: Properly handle titleTextStyle and bodyTextStyle which where ignored, except for the color attribute. (Thanks to [kristofb](https://github.com/kristofb))
+
+- fix: Properly handle titleTextStyle and bodyTextStyle which where ignored,
+  except for the color attribute. (Thanks to
+  [kristofb](https://github.com/kristofb))
 
 ## [3.1.1]
- - fix: lint issues
- - change: update dependencies
+
+- fix: lint issues
+- change: update dependencies
 
 ## [3.1.0]
- - fix: issues with scaled widgets from ResponsiveFramework package [#33](https://github.com/talamaska/onboarding_overlay/issues/33)
- - fix: stepBuilder content could not be sized with a custom size [#31](https://github.com/talamaska/onboarding_overlay/issues/31)
+
+- fix: issues with scaled widgets from ResponsiveFramework package
+  [#33](https://github.com/talamaska/onboarding_overlay/issues/33)
+- fix: stepBuilder content could not be sized with a custom size
+  [#31](https://github.com/talamaska/onboarding_overlay/issues/31)
 
 ## [3.0.0]
 
 - add: demo add default theme textStyles
 - add: onTapCallback which if set will ignore the internal next step method call
-- add: a OverlayController (ChangeNotifier) attached to the OverlayState that provides the currentIndex, currentStep and isVisible - [#20](https://github.com/talamaska/onboarding_overlay/issues/20)
-- add: possibility to build your own step layout with stepBuilder - [#21](https://github.com/talamaska/onboarding_overlay/issues/21)
-- add: pulse animation on the focused widget (Thanks to the author [Gautier](https://github.com/g-apparence) of the [pal](https://pub.dev/packages/pal) package for the inspiration)
+- add: a OverlayController (ChangeNotifier) attached to the OverlayState that
+  provides the currentIndex, currentStep and isVisible -
+  [#20](https://github.com/talamaska/onboarding_overlay/issues/20)
+- add: possibility to build your own step layout with stepBuilder -
+  [#21](https://github.com/talamaska/onboarding_overlay/issues/21)
+- add: pulse animation on the focused widget (Thanks to the author
+  [Gautier](https://github.com/g-apparence) of the
+  [pal](https://pub.dev/packages/pal) package for the inspiration)
 - add: globalOnboarding setting that force the use of rootOverlay
-- add: debugBoundaries boolean to show red border around the max size of the label box
-- add: ArrowPosition.autoVertical and ArrowPosition.autoVerticalCenter. This setting will automatically position the label box arrow, if enabled, above or below the label box, depending on its position relative to the widget of interest.
-- fix: when empty list is passed to steps the onboarding should not start and not throw [#25](https://github.com/talamaska/onboarding_overlay/issues/25)
-- fix: when an empty list of indexes is passed to showWithSteps the onboarding should not start and not throw [#25](https://github.com/talamaska/onboarding_overlay/issues/25)
+- add: debugBoundaries boolean to show red border around the max size of the
+  label box
+- add: ArrowPosition.autoVertical and ArrowPosition.autoVerticalCenter. This
+  setting will automatically position the label box arrow, if enabled, above or
+  below the label box, depending on its position relative to the widget of
+  interest.
+- fix: when empty list is passed to steps the onboarding should not start and
+  not throw [#25](https://github.com/talamaska/onboarding_overlay/issues/25)
+- fix: when an empty list of indexes is passed to showWithSteps the onboarding
+  should not start and not throw
+  [#25](https://github.com/talamaska/onboarding_overlay/issues/25)
 - fix: HitTestBehavior.translucent
-- fix: better calculation of the max size of the label box - issue [#26](https://github.com/talamaska/onboarding_overlay/issues/26)
-- fix: positioning of the label box when the overlay is full screen and there is no focused widget.
-- fix: regression label box not centered when no focus widget and overlay is not full screen.
+- fix: better calculation of the max size of the label box - issue
+  [#26](https://github.com/talamaska/onboarding_overlay/issues/26)
+- fix: positioning of the label box when the overlay is full screen and there is
+  no focused widget.
+- fix: regression label box not centered when no focus widget and overlay is not
+  full screen.
 - change: make label box use more space available
 - change: **[Breaking Change]** rename title to titleText
-- remove: **[Breaking Change]** ArrowPosition.centerLeft and ArrowPosition.centerRight
+- remove: **[Breaking Change]** ArrowPosition.centerLeft and
+  ArrowPosition.centerRight
 - add: docs
 
 ## [2.3.5]
 
 - add: more docs around the titleTextStyle and bodyTextStyle
-- fix: make sure that if a color is not set in the titleTextStyle and bodyTextStyle properties they will fallback to titleTextColor or bodyTextColor accordingly
+- fix: make sure that if a color is not set in the titleTextStyle and
+  bodyTextStyle properties they will fallback to titleTextColor or bodyTextColor
+  accordingly
 
 ## [2.3.4]
 
-- fix: position of the overlay when no focus node is attached and the setting of the overlay is fullscreen: false - issue [#16](https://github.com/talamaska/onboarding_overlay/issues/16)
-- fix: merging text styles was done incorrectly - issue [#14](https://github.com/talamaska/onboarding_overlay/issues/14)
+- fix: position of the overlay when no focus node is attached and the setting of
+  the overlay is fullscreen: false - issue
+  [#16](https://github.com/talamaska/onboarding_overlay/issues/16)
+- fix: merging text styles was done incorrectly - issue
+  [#14](https://github.com/talamaska/onboarding_overlay/issues/14)
 
 ## [2.3.3]
 
@@ -46,7 +87,8 @@
 
 ## [2.3.2]
 
-- change: use aut_size_text library again because a stable null-safe version was published
+- change: use aut_size_text library again because a stable null-safe version was
+  published
 - fix: remove a repeated text for debugging purposes reported in #14
 
 ## [2.3.1]
@@ -55,7 +97,8 @@
 - add: more clear docs
 - add: more documentation in the readme
 - add: expand the examples
-- add: auto size text via AutoSizeText widget in which case if turned on will ignore maxLines
+- add: auto size text via AutoSizeText widget in which case if turned on will
+  ignore maxLines
 - add: hard limit maxLines for the title to be 2 lines
 - add: hard limit maxLines for the body to be 5 lines
 - add: overlayBehavior that accepts HitTestBehavior
@@ -67,7 +110,8 @@
 - fix: docs for the arrowPosition
 - fix: imports
 - fix: multiplication of the bodyText
-- fix: issue with change orientation (thanks to [IgorKhramtsov](https://github.com/IgorKhramtsov))
+- fix: issue with change orientation (thanks to
+  [IgorKhramtsov](https://github.com/IgorKhramtsov))
 - fix: landscape positions and sizes
 - fix: badge to include pre-release versions
 

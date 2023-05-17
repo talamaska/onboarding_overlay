@@ -12,13 +12,13 @@ import 'step.dart';
 
 const double sideGap = 5;
 const Color debugBorderColor = Color(0xFFFF0000);
-const TextStyle headline5 = TextStyle(
+const TextStyle headlineStyle = TextStyle(
   fontSize: 15,
   fontWeight: FontWeight.normal,
   color: Color(0xFF000000),
 );
 
-const TextStyle bodyText1 = TextStyle(
+const TextStyle bodyTextStyle = TextStyle(
   fontSize: 15,
   fontWeight: FontWeight.normal,
   color: Color(0xFF000000),
@@ -60,7 +60,7 @@ class OnboardingStepper extends StatefulWidget {
   /// By default stepIndexes os an empty array
   final List<int> stepIndexes;
 
-  /// `onChanged` is called everytime when the previous step has faded out,
+  /// `onChanged` is called every time when the previous step has faded out,
   ///
   /// before the next step is shown with a value of the step index on which the user was
   final ValueChanged<int>? onChanged;
@@ -91,10 +91,10 @@ class OnboardingStepper extends StatefulWidget {
   final double scaleHeight;
 
   @override
-  _OnboardingStepperState createState() => _OnboardingStepperState();
+  OnboardingStepperState createState() => OnboardingStepperState();
 }
 
-class _OnboardingStepperState extends State<OnboardingStepper>
+class OnboardingStepperState extends State<OnboardingStepper>
     with TickerProviderStateMixin {
   late int stepperIndex;
   late ColorTween overlayColorTween;
@@ -470,30 +470,31 @@ class _OnboardingStepperState extends State<OnboardingStepper>
 
   TextStyle _setupTitleStyle(OnboardingStep step, TextTheme textTheme) {
     final TextStyle localTitleTextStyle =
-        (textTheme.headline5 ?? headline5).copyWith(color: step.titleTextColor);
+        (textTheme.headlineSmall ?? headlineStyle)
+            .copyWith(color: step.titleTextColor);
 
     final TextStyle stepTitleTextStyle =
-        (textTheme.headline5 ?? headline5).copyWith(
+        (textTheme.headlineSmall ?? headlineStyle).copyWith(
       color: step.titleTextStyle?.color ?? step.titleTextColor,
     );
 
-    final TextStyle activeTitleStyle = stepTitleTextStyle.merge(
-      step.titleTextStyle ?? localTitleTextStyle);
+    final TextStyle activeTitleStyle =
+        stepTitleTextStyle.merge(step.titleTextStyle ?? localTitleTextStyle);
 
     return activeTitleStyle;
   }
 
   TextStyle _setupBodyStyle(OnboardingStep step, TextTheme textTheme) {
-    final TextStyle localBodyTextStyle =
-        (textTheme.bodyText1 ?? bodyText1).copyWith(color: step.bodyTextColor);
+    final TextStyle localBodyTextStyle = (textTheme.bodyLarge ?? bodyTextStyle)
+        .copyWith(color: step.bodyTextColor);
 
     final TextStyle stepBodyTextStyle =
-        (textTheme.bodyText1 ?? bodyText1).copyWith(
+        (textTheme.bodyLarge ?? bodyTextStyle).copyWith(
       color: step.bodyTextStyle?.color ?? step.bodyTextColor,
     );
 
-    final TextStyle activeBodyStyle = stepBodyTextStyle.merge(
-      step.bodyTextStyle ?? localBodyTextStyle);
+    final TextStyle activeBodyStyle =
+        stepBodyTextStyle.merge(step.bodyTextStyle ?? localBodyTextStyle);
 
     return activeBodyStyle;
   }
@@ -735,7 +736,7 @@ class AnimatedLabel extends StatelessWidget {
                                   mainAxisAlignment: isTop
                                       ? MainAxisAlignment.end
                                       : MainAxisAlignment.start,
-                                  children: [
+                                  children: <Widget>[
                                     Text(
                                       step.titleText,
                                       style: activeTitleStyle,

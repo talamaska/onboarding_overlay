@@ -117,7 +117,7 @@ class OnboardingState extends State<Onboarding> {
   void show() {
     if (widget.steps.isNotEmpty) {
       _overlayEntry = _createOverlayEntry(initialIndex: widget.initialIndex);
-      Overlay.of(context, rootOverlay: widget.globalOnboarding)!
+      Overlay.of(context, rootOverlay: widget.globalOnboarding)
           .insert(_overlayEntry);
       controller.setIsVisible(true);
     }
@@ -127,7 +127,7 @@ class OnboardingState extends State<Onboarding> {
   void showFromIndex(int index) {
     if (widget.steps.isNotEmpty) {
       _overlayEntry = _createOverlayEntry(initialIndex: index);
-      Overlay.of(context, rootOverlay: widget.globalOnboarding)!
+      Overlay.of(context, rootOverlay: widget.globalOnboarding)
           .insert(_overlayEntry);
       controller.setIsVisible(true);
     }
@@ -138,7 +138,7 @@ class OnboardingState extends State<Onboarding> {
     if (widget.steps.isNotEmpty && stepIndexes.isNotEmpty) {
       _overlayEntry =
           _createOverlayEntry(initialIndex: index, stepIndexes: stepIndexes);
-      Overlay.of(context, rootOverlay: widget.globalOnboarding)!
+      Overlay.of(context, rootOverlay: widget.globalOnboarding)
           .insert(_overlayEntry);
       controller.setIsVisible(true);
     }
