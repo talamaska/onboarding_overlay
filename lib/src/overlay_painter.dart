@@ -86,7 +86,7 @@ class OverlayPainter extends CustomPainter {
       PathOperation.difference,
       fullscreen ? canvasPath : overlayPath,
       holePath,
-    );
+    )..fillType = PathFillType.evenOdd;
 
     canvas.drawPath(
       mainPath,
@@ -102,7 +102,7 @@ class OverlayPainter extends CustomPainter {
         PathOperation.difference,
         pulseInnerPath,
         holePath,
-      );
+      )..fillType = PathFillType.evenOdd;
       final Paint pulseInnerPaint = Paint()
         ..color = pulseInnerColor.withOpacity(0.5)
         ..style = PaintingStyle.fill;
@@ -114,7 +114,7 @@ class OverlayPainter extends CustomPainter {
         PathOperation.difference,
         pulseOuterPath,
         pulseInnerPath,
-      );
+      )..fillType = PathFillType.evenOdd;
       final Paint pulseOuterPaint = Paint()
         ..color = pulseOuterColor.withOpacity(0.2)
         ..style = PaintingStyle.fill;
