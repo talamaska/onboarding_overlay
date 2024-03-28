@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import 'constants.dart';
@@ -87,6 +88,9 @@ class OverlayPainter extends CustomPainter {
       fullscreen ? canvasPath : overlayPath,
       holePath,
     );
+    if (kIsWeb) {
+      mainPath.fillType = PathFillType.evenOdd;
+    }
 
     canvas.drawPath(
       mainPath,
@@ -103,6 +107,7 @@ class OverlayPainter extends CustomPainter {
         pulseInnerPath,
         holePath,
       );
+      ;
       final Paint pulseInnerPaint = Paint()
         ..color = pulseInnerColor.withOpacity(0.5)
         ..style = PaintingStyle.fill;
@@ -115,6 +120,10 @@ class OverlayPainter extends CustomPainter {
         pulseOuterPath,
         pulseInnerPath,
       );
+      if (kIsWeb) {
+        pulseInnerPathHole.fillType = PathFillType.evenOdd;
+        pulseOuterPathHole.fillType = PathFillType.evenOdd;
+      }
       final Paint pulseOuterPaint = Paint()
         ..color = pulseOuterColor.withOpacity(0.2)
         ..style = PaintingStyle.fill;
