@@ -107,7 +107,7 @@ class OverlayPainter extends CustomPainter {
         pulseInnerPath,
         holePath,
       );
-      ;
+      
       final Paint pulseInnerPaint = Paint()
         ..color = pulseInnerColor.withOpacity(0.5)
         ..style = PaintingStyle.fill;

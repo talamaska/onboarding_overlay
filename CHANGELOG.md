@@ -1,3 +1,8 @@
+## [3.2.2]
+
+- fix: Fixing web painting where the hole on the overlay does not get drawn. [#37](https://github.com/talamaska/onboarding_overlay/issues/37)
+  (Thanks to [andyskw](https://github.com/andyskw))
+
 ## [3.2.1]
 
 - add: 'hide' method guard (Thanks to [hpstuff](https://github.com/hpstuff))

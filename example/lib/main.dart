@@ -410,7 +410,7 @@ class _AppState extends State<App> {
             final int? currentIndex =
                 widget.onboardingKey.currentState?.controller.currentIndex;
 
-            print('currentIndex $currentIndex');
+            log('currentIndex $currentIndex');
           },
           child: Home(
             focusNodes: focusNodes,
