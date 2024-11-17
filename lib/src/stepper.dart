@@ -207,6 +207,10 @@ class OnboardingStepperState extends State<OnboardingStepper>
       widget.onStart!();
     }
 
+    if (step.onShowStep != null) {
+      step.onShowStep!();
+    }
+
     setTweensAndAnimate(step);
     step.focusNode.requestFocus();
   }
@@ -264,6 +268,11 @@ class OnboardingStepperState extends State<OnboardingStepper>
 
       final OnboardingStep step = widget.steps[stepperIndex];
       await Future<void>.delayed(step.delay);
+
+      if (step.onShowStep != null) {
+      step.onShowStep!();
+    }
+
 
       if (widget.stepIndexes.indexWhere((int el) => el == stepperIndex) != -1) {
         setTweensAndAnimate(step);
