@@ -33,6 +33,7 @@ class OnboardingStepper extends StatefulWidget {
     this.pulseDuration = const Duration(milliseconds: 1000),
     this.onChanged,
     this.onEnd,
+    this.onStart,
     this.autoSizeTexts = false,
     this.stepIndexes = const <int>[],
     this.debugBoundaries = false,
@@ -59,6 +60,8 @@ class OnboardingStepper extends StatefulWidget {
 
   /// By default stepIndexes os an empty array
   final List<int> stepIndexes;
+
+  final VoidCallback onStart;
 
   /// `onChanged` is called every time when the previous step has faded out,
   ///
@@ -200,7 +203,9 @@ class OnboardingStepperState extends State<OnboardingStepper>
       await Future<void>.delayed(step.delay);
     }
 
-    widget.onChanged?.call(stepperIndex - 1);
+    if (widget.onStart != null) {
+      widget.onStart!();
+    }
 
     setTweensAndAnimate(step);
     step.focusNode.requestFocus();
