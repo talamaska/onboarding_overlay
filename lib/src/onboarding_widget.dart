@@ -181,7 +181,7 @@ class OnboardingState extends State<Onboarding> {
             debugBoundaries: widget.debugBoundaries,
             scaleWidth: widget.scaleWidth,
             scaleHeight: widget.scaleHeight,
-            onStart: onStart,
+            onStart: widget.onStart,
             onChanged: (int index) {
               controller.setCurrentIndex(index);
               widget.onChanged?.call(index);
