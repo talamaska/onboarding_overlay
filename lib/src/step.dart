@@ -96,6 +96,7 @@ class OnboardingStep {
     this.showPulseAnimation = false,
     this.pulseInnerColor = defaultInnerPulseColor,
     this.pulseOuterColor = defaultOuterPulseColor,
+    this.onShowStep,
     this.onTapCallback,
   })  : assert(() {
           if (titleTextColor == null && titleTextStyle == null) {
@@ -134,6 +135,8 @@ class OnboardingStep {
 
   /// is required
   final FocusNode focusNode;
+
+  final VoidCallback? onShowStep;
 
   /// By default, the value used is `TextAlign.start`
   final TextAlign textAlign;
@@ -292,6 +295,7 @@ class OnboardingStep {
     Color? pulseInnerColor,
     Color? pulseOuterColor,
     TapCallback? onTapCallback,
+    VoidCallback? onShowStep,
   }) {
     return OnboardingStep(
       key: key ?? this.key,
@@ -320,6 +324,7 @@ class OnboardingStep {
       pulseInnerColor: pulseInnerColor ?? this.pulseInnerColor,
       pulseOuterColor: pulseOuterColor ?? this.pulseOuterColor,
       onTapCallback: onTapCallback ?? this.onTapCallback,
+      onShowStep: onShowStep ?? this.onShowStep,
     );
   }
 
@@ -352,6 +357,7 @@ class OnboardingStep {
       pulseInnerColor: $pulseInnerColor,
       pulseOuterColor: $pulseOuterColor,
       onTapCallback: $onTapCallback,
+      onShowStep: $onShowStep,
     )''';
   }
 
@@ -385,6 +391,7 @@ class OnboardingStep {
         other.showPulseAnimation == showPulseAnimation &&
         other.pulseInnerColor == pulseInnerColor &&
         other.pulseOuterColor == pulseOuterColor &&
+        other.onShowStep == onShowStep &&
         other.onTapCallback == onTapCallback;
   }
 
@@ -415,6 +422,7 @@ class OnboardingStep {
         showPulseAnimation.hashCode ^
         pulseInnerColor.hashCode ^
         pulseOuterColor.hashCode ^
+      onShowStep.hashCode ^
         onTapCallback.hashCode;
   }
 }
