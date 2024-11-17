@@ -16,6 +16,7 @@ class Onboarding extends StatefulWidget {
     this.initialIndex = 0,
     this.onChanged,
     this.onEnd,
+    this.onStart,
     this.autoSizeTexts = false,
     required this.steps,
     required this.child,
@@ -34,6 +35,8 @@ class Onboarding extends StatefulWidget {
 
   /// A callback that signal when the `Onboarding` is finished or stopped
   final ValueChanged<int>? onEnd;
+
+  final VoidCallback? onStart;
 
   /// By default, the value used is false
   /// Sometimes the `titleText` and the `bodyText` might not fit well in the constrained label box,
@@ -178,6 +181,7 @@ class OnboardingState extends State<Onboarding> {
             debugBoundaries: widget.debugBoundaries,
             scaleWidth: widget.scaleWidth,
             scaleHeight: widget.scaleHeight,
+            onStart: onStart,
             onChanged: (int index) {
               controller.setCurrentIndex(index);
               widget.onChanged?.call(index);
