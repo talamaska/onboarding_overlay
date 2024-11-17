@@ -61,7 +61,7 @@ class OnboardingStepper extends StatefulWidget {
   /// By default stepIndexes os an empty array
   final List<int> stepIndexes;
 
-  final VoidCallback onStart;
+  final VoidCallback? onStart;
 
   /// `onChanged` is called every time when the previous step has faded out,
   ///
