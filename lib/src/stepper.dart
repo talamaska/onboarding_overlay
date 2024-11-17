@@ -200,6 +200,8 @@ class OnboardingStepperState extends State<OnboardingStepper>
       await Future<void>.delayed(step.delay);
     }
 
+    widget.onChanged?.call(stepperIndex);
+
     setTweensAndAnimate(step);
     step.focusNode.requestFocus();
   }
