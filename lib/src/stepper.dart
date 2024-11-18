@@ -208,7 +208,7 @@ class OnboardingStepperState extends State<OnboardingStepper>
     }
 
     if (step.onShowStep != null) {
-      step.onShowStep!();
+      step.onShowStep!(_nextStep);
     }
 
     setTweensAndAnimate(step);
@@ -246,7 +246,7 @@ class OnboardingStepperState extends State<OnboardingStepper>
         await Future<void>.delayed(step.delay);
       }
       if (step.onShowStep != null) {
-        step.onShowStep!();
+        step.onShowStep!(_nextStep);
       }
       if (stepperIndex < widget.steps.length && stepperIndex >= 0) {
         setTweensAndAnimate(step);
@@ -273,7 +273,7 @@ class OnboardingStepperState extends State<OnboardingStepper>
       await Future<void>.delayed(step.delay);
 
       if (step.onShowStep != null) {
-        step.onShowStep!();
+        step.onShowStep!(_nextStep);
       }
 
 
