@@ -136,7 +136,7 @@ class OnboardingStep {
   /// is required
   final FocusNode focusNode;
 
-  final VoidCallback? onShowStep;
+  final void Function(VoidCallback nextStep)? onShowStep;
 
   /// By default, the value used is `TextAlign.start`
   final TextAlign textAlign;
