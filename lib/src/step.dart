@@ -46,6 +46,9 @@ typedef StepPainterBuilder = CustomPainter Function(
 typedef TapCallback = void Function(
     TapArea area, VoidCallback next, VoidCallback close);
 
+typedef ShowStepCallback = void Function(
+    VoidCallback next);
+
 @immutable
 class OnboardingStep {
   /// At least a [titleText] or a [bodyText] should be provided.
@@ -135,8 +138,6 @@ class OnboardingStep {
 
   /// is required
   final FocusNode focusNode;
-
-  final void Function(VoidCallback nextStep)? onShowStep;
 
   /// By default, the value used is `TextAlign.start`
   final TextAlign textAlign;
@@ -268,6 +269,8 @@ class OnboardingStep {
 
   final TapCallback? onTapCallback;
 
+  final ShowStepCallback? onShowStep;
+
   OnboardingStep copyWith({
     Key? key,
     FocusNode? focusNode,
@@ -295,7 +298,7 @@ class OnboardingStep {
     Color? pulseInnerColor,
     Color? pulseOuterColor,
     TapCallback? onTapCallback,
-    Function(VoidCallback nextStep)? onShowStep,
+    ShowStepCallback? onShowStep,
   }) {
     return OnboardingStep(
       key: key ?? this.key,
@@ -422,7 +425,7 @@ class OnboardingStep {
         showPulseAnimation.hashCode ^
         pulseInnerColor.hashCode ^
         pulseOuterColor.hashCode ^
-      onShowStep.hashCode ^
+        onShowStep.hashCode ^
         onTapCallback.hashCode;
   }
 }
