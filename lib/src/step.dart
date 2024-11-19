@@ -295,7 +295,7 @@ class OnboardingStep {
     Color? pulseInnerColor,
     Color? pulseOuterColor,
     TapCallback? onTapCallback,
-    VoidCallback? onShowStep,
+    Function(VoidCallback nextStep)? onShowStep,
   }) {
     return OnboardingStep(
       key: key ?? this.key,
