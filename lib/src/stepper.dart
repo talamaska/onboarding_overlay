@@ -282,6 +282,7 @@ class OnboardingStepperState extends State<OnboardingStepper>
         step.focusNode.requestFocus();
       }
     }
+    if (!mounted) return;
     setState(() {
       calcWidgetRect(widget.steps[stepperIndex]);
     });
