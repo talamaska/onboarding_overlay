@@ -232,6 +232,7 @@ class OnboardingStepperState extends State<OnboardingStepper>
     
     if (widget.stepIndexes.isEmpty) {
       await overlayController.reverse();
+      if (!mounted) return;
       widget.onChanged?.call(stepperIndex);
       // await Future<void>.delayed(Duration(milliseconds: 1000));
       if (stepperIndex < widget.steps.length - 1) {
@@ -247,6 +248,7 @@ class OnboardingStepperState extends State<OnboardingStepper>
       if (stepperIndex > 0) {
         await Future<void>.delayed(step.delay);
       }
+      if (!mounted) return;
       if (step.onShowStep != null) {
         step.onShowStep!(_nextStep);
       }
@@ -256,7 +258,7 @@ class OnboardingStepperState extends State<OnboardingStepper>
       }
     } else {
       await overlayController.reverse();
-
+if (!mounted) return;
       widget.onChanged?.call(stepperIndex);
 
       if (_stepIndexes.isEmpty) {
@@ -273,7 +275,7 @@ class OnboardingStepperState extends State<OnboardingStepper>
 
       final OnboardingStep step = widget.steps[stepperIndex];
       await Future<void>.delayed(step.delay);
-
+if (!mounted) return;
       if (step.onShowStep != null) {
         step.onShowStep!(_nextStep);
       }
@@ -284,7 +286,7 @@ class OnboardingStepperState extends State<OnboardingStepper>
         step.focusNode.requestFocus();
       }
     }
-    if (!mounted) return;
+    
     setState(() {
       calcWidgetRect(widget.steps[stepperIndex]);
     });
