@@ -227,7 +227,9 @@ class OnboardingStepperState extends State<OnboardingStepper>
       }
       return true;
     }());
-
+    
+    if (!mounted) return;
+    
     if (widget.stepIndexes.isEmpty) {
       await overlayController.reverse();
       widget.onChanged?.call(stepperIndex);
