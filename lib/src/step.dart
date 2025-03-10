@@ -46,6 +46,9 @@ typedef StepPainterBuilder = CustomPainter Function(
 typedef TapCallback = void Function(
     TapArea area, VoidCallback next, VoidCallback close);
 
+typedef ShowStepCallback = void Function(
+    VoidCallback next);
+
 @immutable
 class OnboardingStep {
   /// At least a [titleText] or a [bodyText] should be provided.
@@ -96,6 +99,7 @@ class OnboardingStep {
     this.showPulseAnimation = false,
     this.pulseInnerColor = defaultInnerPulseColor,
     this.pulseOuterColor = defaultOuterPulseColor,
+    this.onShowStep,
     this.onTapCallback,
   })  : assert(() {
           if (titleTextColor == null && titleTextStyle == null) {
@@ -265,6 +269,8 @@ class OnboardingStep {
 
   final TapCallback? onTapCallback;
 
+  final ShowStepCallback? onShowStep;
+
   OnboardingStep copyWith({
     Key? key,
     FocusNode? focusNode,
@@ -292,6 +298,7 @@ class OnboardingStep {
     Color? pulseInnerColor,
     Color? pulseOuterColor,
     TapCallback? onTapCallback,
+    ShowStepCallback? onShowStep,
   }) {
     return OnboardingStep(
       key: key ?? this.key,
@@ -320,6 +327,7 @@ class OnboardingStep {
       pulseInnerColor: pulseInnerColor ?? this.pulseInnerColor,
       pulseOuterColor: pulseOuterColor ?? this.pulseOuterColor,
       onTapCallback: onTapCallback ?? this.onTapCallback,
+      onShowStep: onShowStep ?? this.onShowStep,
     );
   }
 
@@ -352,6 +360,7 @@ class OnboardingStep {
       pulseInnerColor: $pulseInnerColor,
       pulseOuterColor: $pulseOuterColor,
       onTapCallback: $onTapCallback,
+      onShowStep: $onShowStep,
     )''';
   }
 
@@ -385,6 +394,7 @@ class OnboardingStep {
         other.showPulseAnimation == showPulseAnimation &&
         other.pulseInnerColor == pulseInnerColor &&
         other.pulseOuterColor == pulseOuterColor &&
+        other.onShowStep == onShowStep &&
         other.onTapCallback == onTapCallback;
   }
 
@@ -415,6 +425,7 @@ class OnboardingStep {
         showPulseAnimation.hashCode ^
         pulseInnerColor.hashCode ^
         pulseOuterColor.hashCode ^
+        onShowStep.hashCode ^
         onTapCallback.hashCode;
   }
 }
