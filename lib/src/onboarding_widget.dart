@@ -144,11 +144,12 @@ class OnboardingState extends State<Onboarding> {
   /// Hides the onboarding session overlay
   void hide() {
     final OnboardingController? controller = _controllerVar;
-    if (controller == null || !controller.isVisible) {
-      return;
+    if (controller == null) return;
+    if (controller.isVisible) {
+      _overlayEntry.remove();
+      controller.setIsVisible(false);
     }
-    _overlayEntry.remove();
-    controller.setIsVisible(false);
+    _controllerVar = null; // Reset the controller variable to allow recreation of state
   }
 
   /// Returns true if onboarding session overlay is visible to user
