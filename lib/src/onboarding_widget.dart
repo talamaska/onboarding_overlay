@@ -48,7 +48,7 @@ class Onboarding extends StatefulWidget {
   final bool debugBoundaries;
 
   /// is required
-  final List<OnboardingStep> steps;
+  final List<OnboardingStep> Function() steps;
 
   /// is required
   final Widget child;
@@ -75,21 +75,16 @@ class Onboarding extends StatefulWidget {
   final double scaleHeight;
 
   /// Get the closest Onboarding state in the widget tree
-  static OnboardingState? of(BuildContext context,
-      {bool rootOnboarding = false}) {
-    final OnboardingState? result = rootOnboarding
-        ? context.findRootAncestorStateOfType<OnboardingState>()
-        : context.findAncestorStateOfType<OnboardingState>();
+  static OnboardingState? of(BuildContext context, {bool rootOnboarding = false}) {
+    final OnboardingState? result =
+        rootOnboarding ? context.findRootAncestorStateOfType<OnboardingState>() : context.findAncestorStateOfType<OnboardingState>();
     assert(() {
       if (result == null) {
         final List<DiagnosticsNode> information = <DiagnosticsNode>[
           ErrorSummary('No Onboarding widget found.'),
-          ErrorDescription(
-              'Accessing the OnboardingState with Onboarding.of(context) needs an Onboarding widget ancestor'),
-          ErrorHint(
-              'The most common way to add an Onboarding to an application is to include it, below MaterialApp widget in the runApp() call.'),
-          context.describeElement(
-              'The context from which that widget was searching for an OnboardingState was')
+          ErrorDescription('Accessing the OnboardingState with Onboarding.of(context) needs an Onboarding widget ancestor'),
+          ErrorHint('The most common way to add an Onboarding to an application is to include it, below MaterialApp widget in the runApp() call.'),
+          context.describeElement('The context from which that widget was searching for an OnboardingState was')
         ];
 
         throw FlutterError.fromParts(information);
@@ -105,73 +100,77 @@ class Onboarding extends StatefulWidget {
 
 class OnboardingState extends State<Onboarding> {
   late OverlayEntry _overlayEntry;
-  late OnboardingController controller;
+  OnboardingController? _controllerVar;
+
+  OnboardingController get _controller {
+    return _controllerVar ??= OnboardingController(steps: widget.steps());
+  }
 
   @override
   void initState() {
     super.initState();
-    controller = OnboardingController(steps: widget.steps);
   }
 
   /// Shows an onboarding session with all steps provided and initial index passed via the widget
   void show() {
-    if (widget.steps.isNotEmpty) {
+    final OnboardingController controller = _controller;
+    if (controller.steps.isNotEmpty) {
       _overlayEntry = _createOverlayEntry(initialIndex: widget.initialIndex);
-      Overlay.of(context, rootOverlay: widget.globalOnboarding)
-          .insert(_overlayEntry);
+      Overlay.of(context, rootOverlay: widget.globalOnboarding).insert(_overlayEntry);
       controller.setIsVisible(true);
     }
   }
 
   /// Shows an onboarding session from a specific step index
   void showFromIndex(int index) {
-    if (widget.steps.isNotEmpty) {
+    final OnboardingController controller = _controller;
+    if (controller.steps.isNotEmpty) {
       _overlayEntry = _createOverlayEntry(initialIndex: index);
-      Overlay.of(context, rootOverlay: widget.globalOnboarding)
-          .insert(_overlayEntry);
+      Overlay.of(context, rootOverlay: widget.globalOnboarding).insert(_overlayEntry);
       controller.setIsVisible(true);
     }
   }
 
   /// Shows an onboarding session from a specific step index and a specific order and set of step indexes
   void showWithSteps(int index, List<int> stepIndexes) {
-    if (widget.steps.isNotEmpty && stepIndexes.isNotEmpty) {
-      _overlayEntry =
-          _createOverlayEntry(initialIndex: index, stepIndexes: stepIndexes);
-      Overlay.of(context, rootOverlay: widget.globalOnboarding)
-          .insert(_overlayEntry);
+    final OnboardingController controller = _controller;
+    if (controller.steps.isNotEmpty && stepIndexes.isNotEmpty) {
+      _overlayEntry = _createOverlayEntry(initialIndex: index, stepIndexes: stepIndexes);
+      Overlay.of(context, rootOverlay: widget.globalOnboarding).insert(_overlayEntry);
       controller.setIsVisible(true);
     }
   }
 
   /// Hides the onboarding session overlay
   void hide() {
-    if (!controller.isVisible) {
-      return;
+    final OnboardingController? controller = _controllerVar;
+    if (controller == null) return;
+    if (controller.isVisible) {
+      _overlayEntry.remove();
+      controller.setIsVisible(false);
     }
-    _overlayEntry.remove();
-    controller.setIsVisible(false);
+    _controllerVar = null; // Reset the controller variable to allow recreation of state
   }
 
   /// Returns true if onboarding session overlay is visible to user
   bool isVisible() {
-    return controller.isVisible;
+    return _controllerVar?.isVisible ?? false;
   }
 
   OverlayEntry _createOverlayEntry({
     required int initialIndex,
     List<int> stepIndexes = const <int>[],
   }) {
+    final OnboardingController controller = _controller;
     controller.setCurrentIndex(initialIndex);
     return OverlayEntry(
       opaque: false,
       builder: (BuildContext context) {
-        return LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints constraints) {
+        return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
           return OnboardingStepper(
             constraints: constraints,
             initialIndex: initialIndex,
-            steps: widget.steps,
+            steps: controller.steps,
             stepIndexes: stepIndexes,
             duration: widget.duration,
             autoSizeTexts: widget.autoSizeTexts,
