@@ -1,3 +1,10 @@
+## [3.2.3]
+
+- BREAKING: The `Onboarding` widget now takes a function (`List<OnboardingStep> Function()`) to obtain the steps, instead of a direct `List<OnboardingStep>`. The step list is only created when onboarding starts, allowing you to modify or generate the steps dynamically before onboarding begins.
+
+**Migration:** Update your `Onboarding` widget to pass a function that returns the step list, e.g. `steps: () => mySteps`, instead of `steps: mySteps`.
+
+
 ## [3.2.2]
 
 - fix: Fixing web painting where the hole on the overlay does not get drawn. [#37](https://github.com/talamaska/onboarding_overlay/issues/37)
