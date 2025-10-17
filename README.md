@@ -405,3 +405,5 @@ return MaterialApp(
     `bool`. By default it is `null` and it will use the `LabelPainter`. You can
     use this to draw custom shapes around the hole. You can use the
     `LabelPainter` as a reference
+
+20. **From 3.2.3** [animateOverlayHole] is a property that can be set to `false` to disable the animation of the overlay hole.

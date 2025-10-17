@@ -1,3 +1,9 @@
+## [3.2.3]
+
+- add: 'animateOverlayHole' property to the OnboardingStep so that the user can
+  control if the overlay hole should be animated or not.
+  (Thanks to [MarcinusX](https://github.com/MarcinusX))
+
 ## [3.2.2]
 
 - fix: Fixing web painting where the hole on the overlay does not get drawn. [#37](https://github.com/talamaska/onboarding_overlay/issues/37)
