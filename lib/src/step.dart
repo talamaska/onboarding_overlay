@@ -83,6 +83,7 @@ class OnboardingStep {
     this.overlayShape = const RoundedRectangleBorder(
       borderRadius: BorderRadius.all(Radius.circular(8.0)),
     ),
+    this.animateOverlayHole = true,
     this.hasLabelBox = false,
     this.labelBoxPadding = const EdgeInsets.all(8.0),
     this.labelBoxDecoration = const BoxDecoration(),
@@ -197,6 +198,11 @@ class OnboardingStep {
   /// ```
   final ShapeBorder overlayShape;
 
+  /// By default, the value used is true
+  ///
+  /// If true, the overlay hole will be animated when the step is shown.
+  final bool animateOverlayHole;
+
   /// This is the space around the `Widget` we want which we would clip a hole
   /// By default, the value is `EdgeInsets.all(8.0)`
   final EdgeInsets margin;
@@ -280,6 +286,7 @@ class OnboardingStep {
     ShapeBorder? shape,
     Color? overlayColor,
     ShapeBorder? overlayShape,
+    bool? animateOverlayHole,
     EdgeInsets? margin,
     EdgeInsets? labelBoxPadding,
     bool? hasLabelBox,
@@ -308,6 +315,7 @@ class OnboardingStep {
       shape: shape ?? this.shape,
       overlayColor: overlayColor ?? this.overlayColor,
       overlayShape: overlayShape ?? this.overlayShape,
+      animateOverlayHole: animateOverlayHole ?? this.animateOverlayHole,
       margin: margin ?? this.margin,
       labelBoxPadding: labelBoxPadding ?? this.labelBoxPadding,
       hasLabelBox: hasLabelBox ?? this.hasLabelBox,
@@ -340,6 +348,7 @@ class OnboardingStep {
       shape: $shape,
       overlayColor: $overlayColor,
       overlayShape: $overlayShape,
+      animateOverlayHole: $animateOverlayHole,
       margin: $margin,
       labelBoxPadding: $labelBoxPadding,
       hasLabelBox: $hasLabelBox,
@@ -374,6 +383,7 @@ class OnboardingStep {
         other.shape == shape &&
         other.overlayColor == overlayColor &&
         other.overlayShape == overlayShape &&
+        other.animateOverlayHole == animateOverlayHole &&
         other.margin == margin &&
         other.labelBoxPadding == labelBoxPadding &&
         other.hasLabelBox == hasLabelBox &&
@@ -404,6 +414,7 @@ class OnboardingStep {
         shape.hashCode ^
         overlayColor.hashCode ^
         overlayShape.hashCode ^
+        animateOverlayHole.hashCode ^
         margin.hashCode ^
         labelBoxPadding.hashCode ^
         hasLabelBox.hashCode ^

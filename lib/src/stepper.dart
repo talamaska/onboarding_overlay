@@ -533,7 +533,9 @@ class OnboardingStepperState extends State<OnboardingStepper>
     final double leftPos = _getHorizontalPosition(step, mediaSize, boxWidth);
     final double topPos =
         _getVerticalPosition(step, mediaSize, boxHeight, media);
-    final Rect? holeAnimatedValue = holeTween.evaluate(overlayAnimation);
+    final Rect? holeAnimatedValue = step.animateOverlayHole
+        ? holeTween.evaluate(overlayAnimation)
+        : holeRect;
     final Color? colorAnimatedValue =
         overlayColorTween.evaluate(overlayAnimation);
 
