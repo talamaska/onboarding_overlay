@@ -352,7 +352,7 @@ class OnboardingStepperState extends State<OnboardingStepper>
     if (widgetRect.width != 0 && widgetRect.height != 0) {
       final Rect holeRect = step.margin.inflateRect(widgetRect);
 
-      if (widgetRect.center.dy > size.height / 2) {
+      if (holeRect.center.dy > size.height / 2) {
         // log('11. 0 - ${size.height - boxHeight}');
         return (holeRect.top - boxHeight - spacer)
             .clamp(0, (size.height - boxHeight).abs());

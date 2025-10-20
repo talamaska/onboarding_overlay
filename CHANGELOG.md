@@ -1,5 +1,7 @@
 ## [3.2.3]
-
+- fix: Use holeRect (after margin) instead of widgetRect to calculate the vertical position
+  [#67](https://github.com/talamaska/onboarding_overlay/issues/67)
+  (Thanks to [MarcinusX](https://github.com/MarcinusX))
 - add: 'animateOverlayHole' property to the OnboardingStep so that the user can
   control if the overlay hole should be animated or not.
   (Thanks to [MarcinusX](https://github.com/MarcinusX))
