@@ -86,6 +86,7 @@ class OnboardingStep {
     this.animateOverlayHole = true,
     this.hasLabelBox = false,
     this.labelBoxPadding = const EdgeInsets.all(8.0),
+    this.labelBoxMargin = EdgeInsets.zero,
     this.labelBoxDecoration = const BoxDecoration(),
     this.hasArrow = false,
     this.fullscreen = true,
@@ -207,8 +208,13 @@ class OnboardingStep {
   /// By default, the value is `EdgeInsets.all(8.0)`
   final EdgeInsets margin;
 
-  /// By default the value is `EdgeInsets.zero`
+  /// By default the value is `EdgeInsets.all(8.0)`
+  /// Space inside the label box (inside the decoration box).
   final EdgeInsets labelBoxPadding;
+
+  /// By default the value is `EdgeInsets.zero`
+  /// Space around the label box (outside the decoration box).
+  final EdgeInsets labelBoxMargin;
 
   /// By default, the value is
   /// ```
@@ -289,6 +295,7 @@ class OnboardingStep {
     bool? animateOverlayHole,
     EdgeInsets? margin,
     EdgeInsets? labelBoxPadding,
+    EdgeInsets? labelBoxMargin,
     bool? hasLabelBox,
     bool? hasArrow,
     bool? fullscreen,
@@ -318,6 +325,7 @@ class OnboardingStep {
       animateOverlayHole: animateOverlayHole ?? this.animateOverlayHole,
       margin: margin ?? this.margin,
       labelBoxPadding: labelBoxPadding ?? this.labelBoxPadding,
+      labelBoxMargin: labelBoxMargin ?? this.labelBoxMargin,
       hasLabelBox: hasLabelBox ?? this.hasLabelBox,
       hasArrow: hasArrow ?? this.hasArrow,
       fullscreen: fullscreen ?? this.fullscreen,
@@ -351,6 +359,7 @@ class OnboardingStep {
       animateOverlayHole: $animateOverlayHole,
       margin: $margin,
       labelBoxPadding: $labelBoxPadding,
+      labelBoxMargin: $labelBoxMargin,
       hasLabelBox: $hasLabelBox,
       hasArrow: $hasArrow,
       fullscreen: $fullscreen,
@@ -386,6 +395,7 @@ class OnboardingStep {
         other.animateOverlayHole == animateOverlayHole &&
         other.margin == margin &&
         other.labelBoxPadding == labelBoxPadding &&
+        other.labelBoxMargin == labelBoxMargin &&
         other.hasLabelBox == hasLabelBox &&
         other.hasArrow == hasArrow &&
         other.fullscreen == fullscreen &&
@@ -417,6 +427,7 @@ class OnboardingStep {
         animateOverlayHole.hashCode ^
         margin.hashCode ^
         labelBoxPadding.hashCode ^
+        labelBoxMargin.hashCode ^
         hasLabelBox.hashCode ^
         hasArrow.hashCode ^
         fullscreen.hashCode ^

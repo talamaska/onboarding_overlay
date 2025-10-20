@@ -1,4 +1,7 @@
 ## [3.2.3]
+- add: 'labelBoxMargin' property to the OnboardingStep so that the user can
+  control the space around the label box. Especially useful for limiting maximum width of the label box.
+  (Thanks to [MarcinusX](https://github.com/MarcinusX))
 - fix: Use holeRect (after margin) instead of widgetRect to calculate the vertical position
   [#67](https://github.com/talamaska/onboarding_overlay/issues/67)
   (Thanks to [MarcinusX](https://github.com/MarcinusX))

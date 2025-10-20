@@ -406,4 +406,21 @@ return MaterialApp(
     use this to draw custom shapes around the hole. You can use the
     `LabelPainter` as a reference
 
-20. **From 3.2.3** [animateOverlayHole] is a property that can be set to `false` to disable the animation of the overlay hole.
+20. **From 3.2.3**
+- [animateOverlayHole] is a property that can be set to `false` to disable the animation of the overlay hole.
+- [labelBoxMargin] property to the OnboardingStep so that the user can
+  control the space around the label box. Especially useful for limiting maximum width of the label box.
+
+Example:
+```dart
+OnboardingStep(
+  focusNode: focusNodes[0],
+  titleText: 'Tap anywhere to continue ',
+  labelBoxMargin: const EdgeInsets.symmetric(horizontal: 16.0), // <--This ensures that there will be always padding around the label box on the left and right sides
+  labelBoxDecoration: BoxDecoration(
+    shape: BoxShape.rectangle,
+    borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+    color: const Color(0xFF00E1FF),
+  ),
+),
+```

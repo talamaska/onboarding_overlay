@@ -335,7 +335,8 @@ class OnboardingStepperState extends State<OnboardingStepper>
   ) {
     if (widgetRect.width != 0 && widgetRect.height != 0) {
       return (widgetRect.center.dx - boxWidth / 2).clamp(
-          sideGap, (size.width - boxWidth - sideGap).clamp(0, size.width));
+          sideGap + step.labelBoxMargin.left,
+          (size.width - boxWidth - sideGap).clamp(0, size.width));
     } else {
       return size.width / 2 - boxWidth / 2;
     }
@@ -381,7 +382,7 @@ class OnboardingStepperState extends State<OnboardingStepper>
     final double a = math.sqrt(math.pow(radius, 2) / 2);
 
     final double boxWidth = step.fullscreen
-        ? (mediaSize.width - 2 * sideGap)
+        ? (mediaSize.width - 2 * sideGap - step.labelBoxMargin.horizontal)
         : ((widgetRect.width != 0 && widgetRect.height != 0)
             ? a + holeRect.width / 4
             : a * 2);
