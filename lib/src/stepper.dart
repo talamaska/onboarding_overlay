@@ -539,13 +539,6 @@ class OnboardingStepperState extends State<OnboardingStepper>
     final Color? colorAnimatedValue =
         overlayColorTween.evaluate(overlayAnimation);
 
-    log('=== LABEL POSITIONING ===');
-    log('leftPos: $leftPos');
-    log('topPos: $topPos');
-    log('boxWidth: $boxWidth');
-    log('boxHeight: $boxHeight');
-    log('holeAnimatedValue (before shift): $holeAnimatedValue');
-
     return Listener(
       behavior: step.overlayBehavior,
       onPointerDown: (PointerDownEvent details) {
