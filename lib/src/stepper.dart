@@ -33,6 +33,7 @@ class OnboardingStepper extends StatefulWidget {
     this.pulseDuration = const Duration(milliseconds: 1000),
     this.onChanged,
     this.onEnd,
+    this.onStart,
     this.autoSizeTexts = false,
     this.stepIndexes = const <int>[],
     this.debugBoundaries = false,
@@ -59,6 +60,8 @@ class OnboardingStepper extends StatefulWidget {
 
   /// By default stepIndexes os an empty array
   final List<int> stepIndexes;
+
+  final VoidCallback? onStart;
 
   /// `onChanged` is called every time when the previous step has faded out,
   ///
@@ -200,6 +203,14 @@ class OnboardingStepperState extends State<OnboardingStepper>
       await Future<void>.delayed(step.delay);
     }
 
+    if (widget.onStart != null) {
+      widget.onStart!();
+    }
+
+    if (step.onShowStep != null) {
+      step.onShowStep!(_nextStep);
+    }
+
     setTweensAndAnimate(step);
     step.focusNode.requestFocus();
   }
@@ -216,9 +227,12 @@ class OnboardingStepperState extends State<OnboardingStepper>
       }
       return true;
     }());
-
+    
+    if (!mounted) return;
+    
     if (widget.stepIndexes.isEmpty) {
       await overlayController.reverse();
+      if (!mounted) return;
       widget.onChanged?.call(stepperIndex);
       // await Future<void>.delayed(Duration(milliseconds: 1000));
       if (stepperIndex < widget.steps.length - 1) {
@@ -234,13 +248,17 @@ class OnboardingStepperState extends State<OnboardingStepper>
       if (stepperIndex > 0) {
         await Future<void>.delayed(step.delay);
       }
+      if (!mounted) return;
+      if (step.onShowStep != null) {
+        step.onShowStep!(_nextStep);
+      }
       if (stepperIndex < widget.steps.length && stepperIndex >= 0) {
         setTweensAndAnimate(step);
         step.focusNode.requestFocus();
       }
     } else {
       await overlayController.reverse();
-
+if (!mounted) return;
       widget.onChanged?.call(stepperIndex);
 
       if (_stepIndexes.isEmpty) {
@@ -257,12 +275,18 @@ class OnboardingStepperState extends State<OnboardingStepper>
 
       final OnboardingStep step = widget.steps[stepperIndex];
       await Future<void>.delayed(step.delay);
+if (!mounted) return;
+      if (step.onShowStep != null) {
+        step.onShowStep!(_nextStep);
+      }
+
 
       if (widget.stepIndexes.indexWhere((int el) => el == stepperIndex) != -1) {
         setTweensAndAnimate(step);
         step.focusNode.requestFocus();
       }
     }
+    
     setState(() {
       calcWidgetRect(widget.steps[stepperIndex]);
     });
